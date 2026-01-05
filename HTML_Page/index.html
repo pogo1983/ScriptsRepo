@@ -1,37 +1,51 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style type="text/css">
     body {
       background: linear-gradient(135deg, #f2f2f7 0%, #ffffff 100%);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "Segoe UI", Roboto, sans-serif;
       margin: 0;
-      padding: 12px;
-      font-size: 11pt;
-      line-height: 1.4;
+      padding: 5px;
+      font-size: 14pt;
+      line-height: 1.3;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      letter-spacing: 0.2px;
+      font-weight: 400;
     }
     
     table,td,tr {
-      font-size: 10pt;
+      font-size: 13pt;
       background: rgba(255, 255, 255, 0.85);
       border: none;
-      border-radius: 10px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(18px);
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      backdrop-filter: blur(10px);
       overflow: hidden;
       table-layout: auto;
       text-align: justify;
       vertical-align: text-top;
-      margin: 6px;
+      margin: 2px;
+      padding: 4px;
+      text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
+      letter-spacing: 0.1px;
+      font-weight: 450;
+      line-height: 1.4;
     }
     
     h2 {
       text-align: center;
       color: #1d1d1f;
-      margin: 8px 0 6px 0;
-      font-weight: 600;
-      font-size: 12pt;
-      letter-spacing: -0.4px;
+      margin: 4px 0 2px 0;
+      font-weight: 700;
+      font-size: 15pt;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+      background: linear-gradient(135deg, #1d1d1f 0%, #333 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     
     h1 {
@@ -45,18 +59,18 @@
     
     .env-section {
       background: rgba(255, 255, 255, 0.9);
-      margin: 6px;
-      padding: 14px;
-      border-radius: 12px;
+      margin: 2px;
+      padding: 6px;
+      border-radius: 8px;
       border: 1px solid rgba(0, 122, 255, 0.2);
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-      backdrop-filter: blur(18px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      backdrop-filter: blur(10px);
     }
     
     .dev-env {
-      background: rgba(255, 149, 0, 0.1);
-      border: 1px solid rgba(255, 149, 0, 0.3);
-      box-shadow: 0 6px 25px rgba(255, 149, 0, 0.1);
+      background: rgba(255, 235, 0, 0.1);
+      border: 1px solid rgba(255, 235, 0, 0.3);
+      box-shadow: 0 6px 25px rgba(255, 235, 0, 0.1);
     }
     
     .generators {
@@ -66,30 +80,30 @@
     }
     
     .dev-y01 {
-      background: rgba(255, 149, 0, 0.08);
-      border: 1px solid rgba(255, 149, 0, 0.25);
-      box-shadow: 0 6px 25px rgba(255, 149, 0, 0.08);
+      background: rgba(255, 235, 0, 0.08);
+      border: 1px solid rgba(255, 235, 0, 0.25);
+      box-shadow: 0 6px 25px rgba(255, 235, 0, 0.08);
     }
     
     .dev-y02 {
-      background: rgba(255, 149, 0, 0.15);
-      border: 1px solid rgba(255, 149, 0, 0.4);
-      box-shadow: 0 6px 25px rgba(255, 149, 0, 0.12);
+      background: rgba(255, 235, 0, 0.15);
+      border: 1px solid rgba(255, 235, 0, 0.4);
+      box-shadow: 0 6px 25px rgba(255, 235, 0, 0.12);
     }
     
     a {
       color: #007AFF;
       text-decoration: none;
       font-weight: 500;
-      font-size: 10pt;
-      padding: 4px 8px;
-      border-radius: 6px;
+      font-size: 13pt;
+      padding: 2px 4px;
+      border-radius: 4px;
       display: inline-block;
-      margin: 2px;
-      transition: all 0.18s ease;
+      margin: 1px;
+      transition: all 0.15s ease;
       background: rgba(0, 122, 255, 0.05);
       border: 1px solid rgba(0, 122, 255, 0.1);
-      line-height: 1.3;
+      line-height: 1.1;
     }
     
     a:hover {
@@ -102,14 +116,14 @@
       background: #007AFF;
       color: white;
       border: none;
-      padding: 6px 10px;
-      border-radius: 8px;
+      padding: 3px 6px;
+      border-radius: 4px;
       font-weight: 600;
-      font-size: 10pt;
+      font-size: 13pt;
       cursor: pointer;
-      margin: 3px;
-      transition: all 0.18s ease;
-      box-shadow: 0 3px 8px rgba(0, 122, 255, 0.3);
+      margin: 1px;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 4px rgba(0, 122, 255, 0.2);
     }
     
     button:hover {
@@ -122,7 +136,149 @@
       border: none;
       height: 1px;
       background: rgba(0, 0, 0, 0.1);
-      margin: 8px 0;
+      margin: 4px 0;
+    }
+    
+    .rdp-info {
+      font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', 'Courier New', monospace;
+      font-size: 10pt;
+      color: #2d3748;
+      display: inline-block;
+      word-break: break-all;
+      line-height: 1.2;
+    }
+    
+    .rdp-info:hover {
+    }
+    
+    /* Responsive Design */
+    @media screen and (max-width: 1200px) {
+      table, td, tr {
+        font-size: 12pt;
+      }
+      
+      body {
+        font-size: 13pt;
+        padding: 3px;
+      }
+      
+      h2 {
+        font-size: 14pt;
+      }
+      
+      .rdp-info {
+        font-size: 9pt;
+      }
+    }
+    
+    @media screen and (max-width: 768px) {
+      body {
+        font-size: 12pt;
+        padding: 2px;
+      }
+      
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      
+      td {
+        display: inline-block;
+        vertical-align: top;
+        width: 300px;
+        min-width: 280px;
+        margin: 2px;
+        padding: 8px;
+      }
+      
+      tr {
+        display: block;
+        margin-bottom: 10px;
+      }
+      
+      table, td, tr {
+        font-size: 11pt;
+      }
+      
+      h2 {
+        font-size: 13pt;
+      }
+      
+      h1 {
+        font-size: 16pt;
+      }
+      
+      a {
+        font-size: 12pt;
+        padding: 4px 6px;
+        margin: 2px;
+        display: inline-block;
+        min-height: 20px;
+      }
+      
+      button {
+        font-size: 12pt;
+        padding: 6px 8px;
+        margin: 2px;
+        min-height: 32px;
+      }
+      
+      .rdp-info {
+        font-size: 9pt;
+      }
+    }
+    
+    @media screen and (max-width: 480px) {
+      body {
+        font-size: 11pt;
+        padding: 1px;
+      }
+      
+      td {
+        width: 100%;
+        min-width: auto;
+        display: block;
+        margin: 1px 0;
+      }
+      
+      table, td, tr {
+        font-size: 10pt;
+      }
+      
+      h2 {
+        font-size: 12pt;
+      }
+      
+      h1 {
+        font-size: 14pt;
+      }
+      
+      a {
+        font-size: 11pt;
+        padding: 6px 8px;
+        margin: 2px 1px;
+        width: auto;
+        min-height: 24px;
+      }
+      
+      button {
+        font-size: 11pt;
+        padding: 8px 10px;
+        margin: 2px 1px;
+        min-height: 36px;
+        width: auto;
+      }
+      
+      .rdp-info {
+        font-size: 8pt;
+        word-break: break-word;
+      }
+      
+      .env-section, .generators, .dev-y01, .dev-y02 {
+        margin: 1px;
+        padding: 6px;
+      }
     }
   </style>
   </head>
@@ -154,34 +310,34 @@
 			<td class="env-section generators">
 				<h2>NL GENERATORS</h2>
 				<!-- NL IBAN Generator -->
-				<div style="margin: 6px 0; padding: 8px; background-color: #f0f8ff; border: 1px solid #007acc; border-radius: 6px;">
-					<h3 style="margin: 4px 0; color: #007acc; font-size: 11pt;">[BANK] NL IBAN Generator</h3>
-					<button onclick="generateDefaultIBAN()" style="background-color: #007acc; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 3px; font-size: 9pt;">Default IBAN</button>
-					<button onclick="generateRandomIBAN()" style="background-color: #007acc; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 3px; font-size: 9pt;">Random IBAN</button>
-					<div id="ibanResult" style="display:none; margin: 5px 0; padding: 4px; background-color: #e8f4fd; border: 1px solid #007acc; border-radius: 4px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 9pt;"></div>
+				<div style="margin: 3px 0; padding: 4px; background-color: #f0f8ff; border: 1px solid #007acc; border-radius: 3px;">
+					<h3 style="margin: 2px 0; color: #007acc; font-size: 14pt;">[BANK] NL IBAN Generator</h3>
+					<button onclick="generateDefaultIBAN()" style="background-color: #007acc; color: white; border: none; padding: 2px 4px; border-radius: 2px; cursor: pointer; margin: 1px; font-size: 12pt;">Default IBAN</button>
+					<button onclick="generateRandomIBAN()" style="background-color: #007acc; color: white; border: none; padding: 2px 4px; border-radius: 2px; cursor: pointer; margin: 1px; font-size: 12pt;">Random IBAN</button>
+					<div id="ibanResult" style="display:none; margin: 3px 0; padding: 2px; background-color: #e8f4fd; border: 1px solid #007acc; border-radius: 2px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 12pt;"></div>
 				</div>
 				
 				<!-- NL BSN Generator -->
-				<div style="margin: 6px 0; padding: 8px; background-color: #f0fff0; border: 1px solid #28a745; border-radius: 6px;">
-					<h3 style="margin: 4px 0; color: #28a745; font-size: 11pt;">[ID] NL BSN Generator</h3>
-					<button onclick="generateRandomBSN()" style="background-color: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 3px; font-size: 9pt;">Random BSN</button>
-					<button onclick="generateMultipleBSN()" style="background-color: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 3px; font-size: 9pt;">5 BSNs</button>
-					<div id="bsnResult" style="display:none; margin: 5px 0; padding: 4px; background-color: #d4edda; border: 1px solid #28a745; border-radius: 4px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 9pt;"></div>
+				<div style="margin: 3px 0; padding: 4px; background-color: #f0fff0; border: 1px solid #28a745; border-radius: 3px;">
+					<h3 style="margin: 2px 0; color: #28a745; font-size: 14pt;">[ID] NL BSN Generator</h3>
+					<button onclick="generateRandomBSN()" style="background-color: #28a745; color: white; border: none; padding: 2px 4px; border-radius: 2px; cursor: pointer; margin: 1px; font-size: 12pt;">Random BSN</button>
+					<button onclick="generateMultipleBSN()" style="background-color: #28a745; color: white; border: none; padding: 2px 4px; border-radius: 2px; cursor: pointer; margin: 1px; font-size: 12pt;">5 BSNs</button>
+					<div id="bsnResult" style="display:none; margin: 3px 0; padding: 2px; background-color: #d4edda; border: 1px solid #28a745; border-radius: 2px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 12pt;"></div>
 				</div>
 				
 				<!-- NL Phone Generator -->
-				<div style="margin: 6px 0; padding: 8px; background-color: #fff8dc; border: 1px solid #ffa500; border-radius: 6px;">
-					<h3 style="margin: 4px 0; color: #ff8c00; font-size: 11pt;">[PHONE] NL Phone Generator</h3>
-					<button onclick="generateRandomPhone()" style="background-color: #ffa500; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 3px; font-size: 9pt;">Random Phone</button>
-					<button onclick="generateMultiplePhone()" style="background-color: #ffa500; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 3px; font-size: 9pt;">5 Phones</button>
-					<div id="phoneResult" style="display:none; margin: 5px 0; padding: 4px; background-color: #fff8dc; border: 1px solid #ffa500; border-radius: 4px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 9pt;"></div>
+				<div style="margin: 3px 0; padding: 4px; background-color: #fffacd; border: 1px solid #ffdd00; border-radius: 3px;">
+					<h3 style="margin: 2px 0; color: #ccaa00; font-size: 14pt;">[PHONE] NL Phone Generator</h3>
+					<button onclick="generateRandomPhone()" style="background-color: #ffdd00; color: #333; border: none; padding: 2px 4px; border-radius: 2px; cursor: pointer; margin: 1px; font-size: 12pt;">Random Phone</button>
+					<button onclick="generateMultiplePhone()" style="background-color: #ffdd00; color: #333; border: none; padding: 2px 4px; border-radius: 2px; cursor: pointer; margin: 1px; font-size: 12pt;">5 Phones</button>
+					<div id="phoneResult" style="display:none; margin: 3px 0; padding: 2px; background-color: #fffacd; border: 1px solid #ffdd00; border-radius: 2px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 12pt;"></div>
 				</div>
 				
 				<!-- Batch Generator -->
-				<div style="margin: 6px 0; padding: 8px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 6px;">
-					<h3 style="margin: 4px 0; color: #856404; font-size: 11pt;">[BATCH] Batch Generator</h3>
-					<button onclick="generateBatch()" style="background-color: #ffc107; color: #212529; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 3px; font-size: 9pt;">IBAN & BSN & Phone</button>
-					<div id="batchResult" style="display:none; margin: 5px 0; padding: 4px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 9pt;"></div>
+				<div style="margin: 3px 0; padding: 4px; background-color: #fffbcd; border: 1px solid #ffcc00; border-radius: 3px;">
+					<h3 style="margin: 2px 0; color: #b8860b; font-size: 14pt;">[BATCH] Batch Generator</h3>
+					<button onclick="generateBatch()" style="background-color: #ffcc00; color: #333; border: none; padding: 2px 4px; border-radius: 2px; cursor: pointer; margin: 1px; font-size: 12pt;">IBAN & BSN & Phone</button>
+					<div id="batchResult" style="display:none; margin: 3px 0; padding: 2px; background-color: #fffbcd; border: 1px solid #ffcc00; border-radius: 2px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 12pt;"></div>
 				</div>
 			</td>
 			
@@ -302,7 +458,7 @@
 		<tr>
 	<td class="dev-y01">
 		<h2>DEV-Y01-01</h2>
-		RDP/DB: DEV-Y01-TIM01.ad.infomedics.dev<br><br>
+		<div class="rdp-info" title="DEV-Y01-TIM01.ad.infomedics.dev">RDP/DB: DEV-Y01-TIM01.ad.infomedics.dev</div><br><br>
 		<a href="https://dev-y01-01-tim.infomedics.dev">TIM</a><br>
 		<a href="https://dev-y01-01-inzicht2.infomedics.dev">Inzicht</a><br>
 		<a href="https://dev-y01-01-rekening.infomedics.dev">Rekening</a><br>
@@ -317,7 +473,7 @@
 	
 	<td class="dev-y01">
 		<h2>DEV-Y01-02</h2>
-		RDP/DB: DEV-Y01-TIM02.ad.infomedics.dev<br><br>
+		<div class="rdp-info" title="DEV-Y01-TIM02.ad.infomedics.dev">RDP/DB: DEV-Y01-TIM02.ad.infomedics.dev</div><br><br>
 		<a href="https://dev-y01-02-tim.infomedics.dev">TIM</a><br>
 		<a href="https://dev-y01-02-inzicht2.infomedics.dev">Inzicht</a><br>
 		<a href="https://dev-y01-02-rekening.infomedics.dev">Rekening</a><br>
@@ -332,7 +488,7 @@
 	
 	<td class="dev-y01">
 		<h2>DEV-Y01-03</h2>
-		RDP/DB: DEV-Y01-TIM03.ad.infomedics.dev<br><br>
+		<div class="rdp-info" title="DEV-Y01-TIM03.ad.infomedics.dev">RDP/DB: DEV-Y01-TIM03.ad.infomedics.dev</div><br><br>
 		<a href="https://dev-y01-03-tim.infomedics.dev">TIM</a><br>
 		<a href="https://dev-y01-03-inzicht2.infomedics.dev">Inzicht</a><br>
 		<a href="https://dev-y01-03-rekening.infomedics.dev">Rekening</a><br>
@@ -347,7 +503,7 @@
 	
 	<td class="dev-y02">
 		<h2>DEV-Y02-01</h2>
-		RDP/DB: DEV-Y02-TIM01.ad.infomedics.dev<br><br>
+		<div class="rdp-info" title="DEV-Y02-TIM01.ad.infomedics.dev">RDP/DB: DEV-Y02-TIM01.ad.infomedics.dev</div><br><br>
 		<a href="https://dev-y02-01-tim.infomedics.dev">TIM</a><br>
 		<a href="https://dev-y02-01-inzicht2.infomedics.dev">Inzicht</a><br>
 		<a href="https://dev-y02-01-rekening.infomedics.dev">Rekening</a><br>
@@ -362,7 +518,7 @@
 	
 	<td class="dev-y02">
 		<h2>DEV-Y02-02</h2>
-		RDP/DB: DEV-Y02-TIM02.ad.infomedics.dev<br><br>
+		<div class="rdp-info" title="DEV-Y02-TIM02.ad.infomedics.dev">RDP/DB: DEV-Y02-TIM02.ad.infomedics.dev</div><br><br>
 		<a href="https://dev-y02-02-tim.infomedics.dev">TIM</a><br>
 		<a href="https://dev-y02-02-inzicht2.infomedics.dev">Inzicht</a><br>
 		<a href="https://dev-y02-02-rekening.infomedics.dev">Rekening</a><br>
@@ -377,7 +533,7 @@
 	
 	<td class="dev-y02">
 		<h2>DEV-Y02-03</h2>
-		RDP/DB: DEV-Y02-TIM03.ad.infomedics.dev<br><br>
+		<div class="rdp-info" title="DEV-Y02-TIM03.ad.infomedics.dev">RDP/DB: DEV-Y02-TIM03.ad.infomedics.dev</div><br><br>
 		<a href="https://dev-y02-03-tim.infomedics.dev">TIM</a><br>
 		<a href="https://dev-y02-03-inzicht2.infomedics.dev">Inzicht</a><br>
 		<a href="https://dev-y02-03-rekening.infomedics.dev">Rekening</a><br>
