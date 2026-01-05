@@ -2,132 +2,55 @@
 <head>
 <meta charset="UTF-8">
 <style type="text/css">
-    body {
-      background: linear-gradient(135deg, #f2f2f7 0%, #ffffff 100%);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
-      margin: 0;
-      padding: 12px;
-      font-size: 11pt;
-      line-height: 1.4;
-    }
-    
     table,td,tr {
-      font-size: 10pt;
-      background: rgba(255, 255, 255, 0.85);
-      border: none;
-      border-radius: 10px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(18px);
-      overflow: hidden;
-      table-layout: auto;
-      text-align: justify;
-      vertical-align: text-top;
-      margin: 6px;
+      font-size: 15pt;
+	  background: #ddeaff;
+	  border:5px solid;
+	  border-color: #2a3547;
+	  overflow:auto;
+	  table-layout:auto;
+	  text-align: justify;
+	  vertical-align: text-top;
     }
-    
-    h2 {
-      text-align: center;
-      color: #1d1d1f;
-      margin: 8px 0 6px 0;
-      font-weight: 600;
-      font-size: 12pt;
-      letter-spacing: -0.4px;
-    }
-    
-    h1 {
-      text-align: center;
-      color: #1d1d1f;
-      margin: 12px 0;
-      font-weight: 700;
-      font-size: 18pt;
-      letter-spacing: -0.7px;
-    }
-    
-    .env-section {
-      background: rgba(255, 255, 255, 0.9);
-      margin: 6px;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(0, 122, 255, 0.2);
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-      backdrop-filter: blur(18px);
-    }
-    
-    .dev-env {
-      background: rgba(255, 149, 0, 0.1);
-      border: 1px solid rgba(255, 149, 0, 0.3);
-      box-shadow: 0 6px 25px rgba(255, 149, 0, 0.1);
-    }
-    
-    .generators {
-      background: rgba(52, 199, 89, 0.1);
-      border: 1px solid rgba(52, 199, 89, 0.3);
-      box-shadow: 0 6px 25px rgba(52, 199, 89, 0.1);
-    }
-    
-    .dev-y01 {
-      background: rgba(255, 149, 0, 0.08);
-      border: 1px solid rgba(255, 149, 0, 0.25);
-      box-shadow: 0 6px 25px rgba(255, 149, 0, 0.08);
-    }
-    
-    .dev-y02 {
-      background: rgba(255, 149, 0, 0.15);
-      border: 1px solid rgba(255, 149, 0, 0.4);
-      box-shadow: 0 6px 25px rgba(255, 149, 0, 0.12);
-    }
-    
-    a {
-      color: #007AFF;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 10pt;
-      padding: 4px 8px;
-      border-radius: 6px;
-      display: inline-block;
-      margin: 2px;
-      transition: all 0.18s ease;
-      background: rgba(0, 122, 255, 0.05);
-      border: 1px solid rgba(0, 122, 255, 0.1);
-      line-height: 1.3;
-    }
-    
-    a:hover {
-      background: rgba(0, 122, 255, 0.1);
-      transform: scale(1.02);
-      box-shadow: 0 4px 15px rgba(0, 122, 255, 0.2);
-    }
-    
-    button {
-      background: #007AFF;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 10pt;
-      cursor: pointer;
-      margin: 3px;
-      transition: all 0.18s ease;
-      box-shadow: 0 3px 8px rgba(0, 122, 255, 0.3);
-    }
-    
-    button:hover {
-      background: #0056b3;
-      transform: scale(1.05);
-      box-shadow: 0 4px 20px rgba(0, 122, 255, 0.4);
-    }
-    
-    hr {
-      border: none;
-      height: 1px;
-      background: rgba(0, 0, 0, 0.1);
-      margin: 8px 0;
-    }
+	h2 {
+	 text-align:center;
+	 color: #2a3547;
+	 margin-bottom: 15px;
+	}
+	h1 {
+	 text-align:center;
+	 color: #2a3547;
+	 margin: 20px 0;
+	}
+	.env-section {
+	 background: #f0f8ff;
+	 margin: 5px;
+	 padding: 15px;
+	 border-radius: 8px;
+	 border: 2px solid #007acc;
+	}
+	.dev-env {
+	 background: #fff8dc;
+	 border-color: #ffa500;
+	}
+	.generators {
+	 background: #f0fff0;
+	 border-color: #28a745;
+	}
+	.dev-y01 {
+	 background: #ffff99;
+	 border-color: #ffa500;
+	}
+	.dev-y02 {
+	 background: #e6e600;
+	 border-color: #ffa500;
+	}
   </style>
   </head>
   
 <body>
+	<h1>WEB PORTALS & ENVIRONMENT DASHBOARD</h1>
+	
 	<table style="width: 100%; border-collapse: collapse;">
 		<tr>
 			<td class="env-section">
@@ -136,6 +59,8 @@
 				<a href="https://infoprojektgdansk.sharepoint.com/sites/InfomedicsTIM/Shared%20Documents/Forms/AllItems.aspx">SharePoint_INFOMEDICS</a><br>
 				<a href="https://www.office.com/?auth=2">Office365</a><br>
 				<a href="https://outlook.office365.com/owa/infoprojekt.pl/mpogorzelski@InfoprojektGdansk.mail.onmicrosoft.com/?path=/mail/inbox">OWA INFOPROJEKT</a><br>
+				<a href="http://bugs.infoprojekt.pl/bugzilla/">BugZilla Infoprojekt</a><br>
+				<a href="https://bugs.infomedics.nl/index.cgi">BugZilla Infomedics</a><br>
 				<a href="http://tfs.infoprojekt.local/Prod/Infomedics/">TFS INFOPROJEKT</a><br>
 				<a href="http://tasak/Infomedics/TIM/">TASAK</a><br>
 				<a href="https://tasak2/Infomedics/TIM/Bug/">TASAK AZURE</a><br>
@@ -148,40 +73,41 @@
 				<a href="https://infomedics.visualstudio.com/TIM/_wiki/wikis/TIM.wiki?wikiVersion=GBwikiMaster&pagePath=%2FWelcome%20to%20TIM%2C%20The%20Infomedics%20Machine!">INFOMEDICS Release Notes</a><br>
 				<a href="https://passsrv04/SecretServer/app/#/folders/19">Thycotic Secret Server</a><br>
 				<a href="https://mpogorzelski/JMETER/">JMeterDashboard</a><br>
-
+				<a href="https://mpogorzelski/JMETER_OLD/">JMeterDashboard OLD</a><br>
+				<a href="https://mpogorzelski/JMETER_NEW/">JMeterDashboard NEW</a><br>
 			</td>
 			
 			<td class="env-section generators">
 				<h2>NL GENERATORS</h2>
 				<!-- NL IBAN Generator -->
-				<div style="margin: 6px 0; padding: 8px; background-color: #f0f8ff; border: 1px solid #007acc; border-radius: 6px;">
-					<h3 style="margin: 4px 0; color: #007acc; font-size: 11pt;">[BANK] NL IBAN Generator</h3>
-					<button onclick="generateDefaultIBAN()" style="background-color: #007acc; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 3px; font-size: 9pt;">Default IBAN</button>
-					<button onclick="generateRandomIBAN()" style="background-color: #007acc; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 3px; font-size: 9pt;">Random IBAN</button>
-					<div id="ibanResult" style="display:none; margin: 5px 0; padding: 4px; background-color: #e8f4fd; border: 1px solid #007acc; border-radius: 4px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 9pt;"></div>
+				<div style="margin: 10px 0; padding: 10px; background-color: #f0f8ff; border: 1px solid #007acc; border-radius: 4px;">
+					<h3 style="margin: 5px 0; color: #007acc;">[BANK] NL IBAN Generator</h3>
+					<button onclick="generateDefaultIBAN()" style="background-color: #007acc; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">Default IBAN</button>
+					<button onclick="generateRandomIBAN()" style="background-color: #007acc; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">Random IBAN</button>
+					<div id="ibanResult" style="display:none; margin: 8px 0; padding: 5px; background-color: #e8f4fd; border: 1px solid #007acc; border-radius: 3px; font-family: 'Courier New', monospace; font-weight: bold;"></div>
 				</div>
 				
 				<!-- NL BSN Generator -->
-				<div style="margin: 6px 0; padding: 8px; background-color: #f0fff0; border: 1px solid #28a745; border-radius: 6px;">
-					<h3 style="margin: 4px 0; color: #28a745; font-size: 11pt;">[ID] NL BSN Generator</h3>
-					<button onclick="generateRandomBSN()" style="background-color: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 3px; font-size: 9pt;">Random BSN</button>
-					<button onclick="generateMultipleBSN()" style="background-color: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 3px; font-size: 9pt;">5 BSNs</button>
-					<div id="bsnResult" style="display:none; margin: 5px 0; padding: 4px; background-color: #d4edda; border: 1px solid #28a745; border-radius: 4px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 9pt;"></div>
+				<div style="margin: 10px 0; padding: 10px; background-color: #f0fff0; border: 1px solid #28a745; border-radius: 4px;">
+					<h3 style="margin: 5px 0; color: #28a745;">[ID] NL BSN Generator</h3>
+					<button onclick="generateRandomBSN()" style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">Random BSN</button>
+					<button onclick="generateMultipleBSN()" style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">5 BSNs</button>
+					<div id="bsnResult" style="display:none; margin: 8px 0; padding: 5px; background-color: #d4edda; border: 1px solid #28a745; border-radius: 3px; font-family: 'Courier New', monospace; font-weight: bold;"></div>
 				</div>
 				
 				<!-- NL Phone Generator -->
-				<div style="margin: 6px 0; padding: 8px; background-color: #fff8dc; border: 1px solid #ffa500; border-radius: 6px;">
-					<h3 style="margin: 4px 0; color: #ff8c00; font-size: 11pt;">[PHONE] NL Phone Generator</h3>
-					<button onclick="generateRandomPhone()" style="background-color: #ffa500; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 3px; font-size: 9pt;">Random Phone</button>
-					<button onclick="generateMultiplePhone()" style="background-color: #ffa500; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 3px; font-size: 9pt;">5 Phones</button>
-					<div id="phoneResult" style="display:none; margin: 5px 0; padding: 4px; background-color: #fff8dc; border: 1px solid #ffa500; border-radius: 4px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 9pt;"></div>
+				<div style="margin: 10px 0; padding: 10px; background-color: #fff8dc; border: 1px solid #ffa500; border-radius: 4px;">
+					<h3 style="margin: 5px 0; color: #ff8c00;">[PHONE] NL Phone Generator</h3>
+					<button onclick="generateRandomPhone()" style="background-color: #ffa500; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">Random Phone</button>
+					<button onclick="generateMultiplePhone()" style="background-color: #ffa500; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">5 Phones</button>
+					<div id="phoneResult" style="display:none; margin: 8px 0; padding: 5px; background-color: #fff8dc; border: 1px solid #ffa500; border-radius: 3px; font-family: 'Courier New', monospace; font-weight: bold;"></div>
 				</div>
 				
 				<!-- Batch Generator -->
-				<div style="margin: 6px 0; padding: 8px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 6px;">
-					<h3 style="margin: 4px 0; color: #856404; font-size: 11pt;">[BATCH] Batch Generator</h3>
-					<button onclick="generateBatch()" style="background-color: #ffc107; color: #212529; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 3px; font-size: 9pt;">IBAN & BSN & Phone</button>
-					<div id="batchResult" style="display:none; margin: 5px 0; padding: 4px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 9pt;"></div>
+				<div style="margin: 10px 0; padding: 10px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;">
+					<h3 style="margin: 5px 0; color: #856404;">[BATCH] Batch Generator</h3>
+					<button onclick="generateBatch()" style="background-color: #ffc107; color: #212529; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">IBAN & BSN & Phone</button>
+					<div id="batchResult" style="display:none; margin: 8px 0; padding: 5px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 3px; font-family: 'Courier New', monospace; font-weight: bold;"></div>
 				</div>
 			</td>
 			
