@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NL IBAN & BSN Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            border-bottom: 2px solid #007acc;
+            padding-bottom: 10px;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .section h2 {
+            color: #007acc;
+            margin-top: 0;
+        }
+        .generator-group {
+            margin: 15px 0;
+        }
+        button {
+            background-color: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #005a99;
+        }
+        .result {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #e8f4fd;
+            border: 1px solid #007acc;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dutch IBAN & BSN Generator</h1>
+        
+        <div class="warning">
+            <strong>Warning:</strong> This tool generates test/dummy numbers for development purposes only. 
+            Do not use these numbers for any official or real transactions.
+        </div>
+
+        <div class="section">
+            <h2>🏦 NL IBAN Generator</h2>
+            <div class="generator-group">
+                <button onclick="generateDefaultIBAN()">Generate Default NL IBAN</button>
+                <button onclick="generateRandomIBAN()">Generate Random NL IBAN</button>
+                <div id="ibanResult" class="result" style="display:none;"></div>
+                <div class="info">
+                    Netherlands IBAN format: NL + 2 check digits + 4 letter bank code + 10 digit account number
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🆔 NL BSN Generator</h2>
+            <div class="generator-group">
+                <button onclick="generateRandomBSN()">Generate Random Valid BSN</button>
+                <button onclick="generateMultipleBSN()">Generate 5 Random BSNs</button>
+                <div id="bsnResult" class="result" style="display:none;"></div>
+                <div class="info">
+                    BSN (Burgerservicenummer) is a 8 or 9 digit number with built-in validation (11-test)
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📋 Batch Generator</h2>
+            <div class="generator-group">
+                <button onclick="generateBatch()">Generate Both IBAN & BSN</button>
+                <div id="batchResult" class="result" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dutch bank codes for IBAN generation
+        const dutchBankCodes = [
+            'ABNA', 'RABO', 'INGB', 'BUNQ', 'ASNB', 'TRIO', 'SNSB', 'KNAB'
+        ];
+
+        // Calculate IBAN check digits
+        function calculateIBANCheckDigits(countryCode, bankCode, accountNumber) {
+            // Move country code and check digits to the end
+            const rearranged = bankCode + accountNumber + countryCode + '00';
+            
+            // Replace letters with numbers (A=10, B=11, ..., Z=35)
+            let numericString = '';
+            for (let char of rearranged) {
+                if (char >= 'A' && char <= 'Z') {
+                    numericString += (char.charCodeAt(0) - 55).toString();
+                } else {
+                    numericString += char;
+                }
+            }
+            
+            // Calculate mod 97
+            let remainder = 0;
+            for (let i = 0; i < numericString.length; i++) {
+                remainder = (remainder * 10 + parseInt(numericString[i])) % 97;
+            }
+            
+            const checkDigits = 98 - remainder;
+            return checkDigits.toString().padStart(2, '0');
+        }
+
+        // Generate default NL IBAN
+        function generateDefaultIBAN() {
+            const bankCode = 'ABNA';
+            const accountNumber = '0123456789';
+            const checkDigits = calculateIBANCheckDigits('NL', bankCode, accountNumber);
+            const iban = `NL${checkDigits}${bankCode}${accountNumber}`;
+            
+            document.getElementById('ibanResult').innerHTML = iban;
+            document.getElementById('ibanResult').style.display = 'block';
+        }
+
+        // Generate random NL IBAN
+        function generateRandomIBAN() {
+            const bankCode = dutchBankCodes[Math.floor(Math.random() * dutchBankCodes.length)];
+            const accountNumber = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+            const checkDigits = calculateIBANCheckDigits('NL', bankCode, accountNumber);
+            const iban = `NL${checkDigits}${bankCode}${accountNumber}`;
+            
+            document.getElementById('ibanResult').innerHTML = iban;
+            document.getElementById('ibanResult').style.display = 'block';
+        }
+
+        // Validate BSN using 11-test
+        function validateBSN(bsn) {
+            const digits = bsn.toString().split('').map(d => parseInt(d));
+            if (digits.length !== 8 && digits.length !== 9) return false;
+            
+            let sum = 0;
+            for (let i = 0; i < digits.length - 1; i++) {
+                sum += digits[i] * (digits.length - i);
+            }
+            
+            const lastDigit = digits[digits.length - 1];
+            const remainder = sum % 11;
+            
+            return remainder === lastDigit && remainder !== 10;
+        }
+
+        // Generate random valid BSN
+        function generateValidBSN() {
+            let attempts = 0;
+            while (attempts < 1000) {
+                // Generate 8 or 9 digit number
+                const isNineDigits = Math.random() > 0.3; // 70% chance for 9 digits
+                const length = isNineDigits ? 9 : 8;
+                
+                // First digit cannot be 0 for 9-digit BSN
+                const firstDigit = isNineDigits ? Math.floor(Math.random() * 9) + 1 : Math.floor(Math.random() * 10);
+                
+                let bsn = firstDigit.toString();
+                for (let i = 1; i < length; i++) {
+                    bsn += Math.floor(Math.random() * 10).toString();
+                }
+                
+                if (validateBSN(bsn)) {
+                    return bsn;
+                }
+                attempts++;
+            }
+            
+            // Fallback: generate a known valid BSN structure
+            return generateKnownValidBSN();
+        }
+
+        // Generate a BSN using known valid structure
+        function generateKnownValidBSN() {
+            const isNineDigits = Math.random() > 0.3;
+            const length = isNineDigits ? 9 : 8;
+            
+            let digits = [];
+            
+            // Generate first n-1 digits
+            for (let i = 0; i < length - 1; i++) {
+                if (i === 0 && length === 9) {
+                    digits.push(Math.floor(Math.random() * 9) + 1); // First digit 1-9 for 9-digit BSN
+                } else {
+                    digits.push(Math.floor(Math.random() * 10));
+                }
+            }
+            
+            // Calculate the check digit
+            let sum = 0;
+            for (let i = 0; i < digits.length; i++) {
+                sum += digits[i] * (length - i);
+            }
+            
+            const checkDigit = sum % 11;
+            if (checkDigit < 10) {
+                digits.push(checkDigit);
+                return digits.join('');
+            } else {
+                // If check digit would be 10, modify the last regular digit
+                if (digits[digits.length - 1] > 0) {
+                    digits[digits.length - 1]--;
+                    sum -= 1;
+                    const newCheckDigit = sum % 11;
+                    digits.push(newCheckDigit);
+                    return digits.join('');
+                } else {
+                    // Recursive call if we can't easily fix it
+                    return generateKnownValidBSN();
+                }
+            }
+        }
+
+        // Generate single BSN
+        function generateRandomBSN() {
+            const bsn = generateValidBSN();
+            document.getElementById('bsnResult').innerHTML = bsn;
+            document.getElementById('bsnResult').style.display = 'block';
+        }
+
+        // Generate multiple BSNs
+        function generateMultipleBSN() {
+            const bsns = [];
+            for (let i = 0; i < 5; i++) {
+                bsns.push(generateValidBSN());
+            }
+            document.getElementById('bsnResult').innerHTML = bsns.join('<br>');
+            document.getElementById('bsnResult').style.display = 'block';
+        }
+
+        // Generate both IBAN and BSN
+        function generateBatch() {
+            const bankCode = dutchBankCodes[Math.floor(Math.random() * dutchBankCodes.length)];
+            const accountNumber = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+            const checkDigits = calculateIBANCheckDigits('NL', bankCode, accountNumber);
+            const iban = `NL${checkDigits}${bankCode}${accountNumber}`;
+            
+            const bsn = generateValidBSN();
+            
+            document.getElementById('batchResult').innerHTML = 
+                `<strong>IBAN:</strong> ${iban}<br><strong>BSN:</strong> ${bsn}`;
+            document.getElementById('batchResult').style.display = 'block';
+        }
+
+        // Initialize with a default IBAN on page load
+        window.onload = function() {
+            generateDefaultIBAN();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<style type="text/css">
+    table,td,tr {
+      font-size: 15pt;
+	  background: #ddeaff;
+	  border:5px solid;
+	  border-color: #2a3547;
+	  overflow:auto;
+	  table-layout:auto;
+	  text-align: justify;
+	  vertical-align: text-top;
+    }
+	h2 {
+	 text-align:center;
+	 color: #2a3547;
+	 margin-bottom: 15px;
+	}
+	h1 {
+	 text-align:center;
+	 color: #2a3547;
+	 margin: 20px 0;
+	}
+	.env-section {
+	 background: #f0f8ff;
+	 margin: 5px;
+	 padding: 15px;
+	 border-radius: 8px;
+	 border: 2px solid #007acc;
+	}
+	.dev-env {
+	 background: #fff8dc;
+	 border-color: #ffa500;
+	}
+	.generators {
+	 background: #f0fff0;
+	 border-color: #28a745;
+	}
+	.dev-y01 {
+	 background: #ffff99;
+	 border-color: #ffa500;
+	}
+	.dev-y02 {
+	 background: #e6e600;
+	 border-color: #ffa500;
+	}
+  </style>
+  </head>
+  
+<body>
+	<h1>WEB PORTALS & ENVIRONMENT DASHBOARD</h1>
+	
+	<table style="width: 100%; border-collapse: collapse;">
+		<tr>
+			<td class="env-section">
+				<h2>INFOPROJEKT WEB SITES</h2>
+				<a href="http://chronos/">Chronos</a><br>
+				<a href="https://infoprojektgdansk.sharepoint.com/sites/InfomedicsTIM/Shared%20Documents/Forms/AllItems.aspx">SharePoint_INFOMEDICS</a><br>
+				<a href="https://www.office.com/?auth=2">Office365</a><br>
+				<a href="https://outlook.office365.com/owa/infoprojekt.pl/mpogorzelski@InfoprojektGdansk.mail.onmicrosoft.com/?path=/mail/inbox">OWA INFOPROJEKT</a><br>
+				<a href="http://bugs.infoprojekt.pl/bugzilla/">BugZilla Infoprojekt</a><br>
+				<a href="https://bugs.infomedics.nl/index.cgi">BugZilla Infomedics</a><br>
+				<a href="http://tfs.infoprojekt.local/Prod/Infomedics/">TFS INFOPROJEKT</a><br>
+				<a href="http://tasak/Infomedics/TIM/">TASAK</a><br>
+				<a href="https://tasak2/Infomedics/TIM/Bug/">TASAK AZURE</a><br>
+				<a href="https://imfint-ts01.imfint.local:8900/servermanager/connections">Windows Admin Center</a><br>
+				<a href="http://imfint05-ws01.imfint.local/Paczkomat">Paczkomat</a><br>
+				<a href="http://links.imfint.local/">LINKI DO SRODOWISK</a><br>
+				<a href="http://imfint05-ws01.imfint.local/Environments/index.html">What VERSION</a><br>
+				<a href="https://infomedics.visualstudio.com/_projects">INFOMEDICS VISUAL STUDIO</a><br>
+				<a href="https://infomedicsfactoring.sharepoint.com/teams/DesignArchitecture/Shared%20Documents/Forms/AllItems.aspx">INFOMEDICS Design & Architecture</a><br>
+				<a href="https://infomedics.visualstudio.com/TIM/_wiki/wikis/TIM.wiki?wikiVersion=GBwikiMaster&pagePath=%2FWelcome%20to%20TIM%2C%20The%20Infomedics%20Machine!">INFOMEDICS Release Notes</a><br>
+				<a href="https://passsrv04/SecretServer/app/#/folders/19">Thycotic Secret Server</a><br>
+				<a href="https://mpogorzelski/JMETER/">JMeterDashboard</a><br>
+				<a href="https://mpogorzelski/JMETER_OLD/">JMeterDashboard OLD</a><br>
+				<a href="https://mpogorzelski/JMETER_NEW/">JMeterDashboard NEW</a><br>
+			</td>
+			
+			<td class="env-section generators">
+				<h2>NL GENERATORS</h2>
+				<!-- NL IBAN Generator -->
+				<div style="margin: 10px 0; padding: 10px; background-color: #f0f8ff; border: 1px solid #007acc; border-radius: 4px;">
+					<h3 style="margin: 5px 0; color: #007acc;">[BANK] NL IBAN Generator</h3>
+					<button onclick="generateDefaultIBAN()" style="background-color: #007acc; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">Default IBAN</button>
+					<button onclick="generateRandomIBAN()" style="background-color: #007acc; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">Random IBAN</button>
+					<div id="ibanResult" style="display:none; margin: 8px 0; padding: 5px; background-color: #e8f4fd; border: 1px solid #007acc; border-radius: 3px; font-family: 'Courier New', monospace; font-weight: bold;"></div>
+				</div>
+				
+				<!-- NL BSN Generator -->
+				<div style="margin: 10px 0; padding: 10px; background-color: #f0fff0; border: 1px solid #28a745; border-radius: 4px;">
+					<h3 style="margin: 5px 0; color: #28a745;">[ID] NL BSN Generator</h3>
+					<button onclick="generateRandomBSN()" style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">Random BSN</button>
+					<button onclick="generateMultipleBSN()" style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">5 BSNs</button>
+					<div id="bsnResult" style="display:none; margin: 8px 0; padding: 5px; background-color: #d4edda; border: 1px solid #28a745; border-radius: 3px; font-family: 'Courier New', monospace; font-weight: bold;"></div>
+				</div>
+				
+				<!-- NL Phone Generator -->
+				<div style="margin: 10px 0; padding: 10px; background-color: #fff8dc; border: 1px solid #ffa500; border-radius: 4px;">
+					<h3 style="margin: 5px 0; color: #ff8c00;">[PHONE] NL Phone Generator</h3>
+					<button onclick="generateRandomPhone()" style="background-color: #ffa500; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">Random Phone</button>
+					<button onclick="generateMultiplePhone()" style="background-color: #ffa500; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">5 Phones</button>
+					<div id="phoneResult" style="display:none; margin: 8px 0; padding: 5px; background-color: #fff8dc; border: 1px solid #ffa500; border-radius: 3px; font-family: 'Courier New', monospace; font-weight: bold;"></div>
+				</div>
+				
+				<!-- Batch Generator -->
+				<div style="margin: 10px 0; padding: 10px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;">
+					<h3 style="margin: 5px 0; color: #856404;">[BATCH] Batch Generator</h3>
+					<button onclick="generateBatch()" style="background-color: #ffc107; color: #212529; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">IBAN & BSN & Phone</button>
+					<div id="batchResult" style="display:none; margin: 8px 0; padding: 5px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 3px; font-family: 'Courier New', monospace; font-weight: bold;"></div>
+				</div>
+			</td>
+			
+			<!-- IMFINT Environments Column 1: 04 & 05 -->
+			<td class="env-section">
+				<h2>IMFINT04</h2>
+				<a href="https://04-tim.imfint.local">TIM GUI</a><br>
+				<a href="https://04-provider-profiel.imfint.local/idm/#/">IAM PROVIDER</a><br>
+		<a href="https://04-rekening.imfint.local/Betalen?invoice=2192002710071">PAYMENT PAGE</a><br>
+
+				<a href="https://04-ami.imfint.local/">Customer Credit aka AMI</a><br>
+				<a href="https://04-rq.imfint.local/">RabbitMQ</a><br>
+				<a href="https://04-api.imfint.local/dpay">DPAY API</a><br>
+
+				<hr style="margin: 10px 0;">
+				<a href="https://04-inzicht2.imfint.local">InZicht2</a><br>
+				<a href="https://04-inzicht2.imfint.local/infomedics_ssp/user">InZicht2 Admin</a><br>
+
+				
+				<h2>IMFINT05</h2>
+				<a href="https://05-tim.imfint.local">TIM GUI</a><br>
+				<a href="https://05-provider-profiel.imfint.local/idm/#/">IAM PROVIDER</a><br>
+		<a href="https://05-rekening.imfint.local/Betalen?invoice=2192002710071">PAYMENT PAGE</a><br>
+
+				<a href="https://05-ami.imfint.local/">Customer Credit aka AMI</a><br>
+				<a href="https://05-rq.imfint.local/">RabbitMQ</a><br>
+				<a href="https://05-api.imfint.local/dpay">DPAY API</a><br>		<a href="https://05-imd.imfint.local/">IMD GUI</a><br>				<hr style="margin: 10px 0;">
+				<a href="https://05-inzicht2.imfint.local">InZicht2</a><br>
+				<a href="https://05-inzicht2.imfint.local/infomedics_ssp/user">InZicht2 Admin</a><br>
+
+			
+			<!-- IMFINT Environments Column 2: 06 & 07 -->
+			<td class="env-section">
+				<h2>IMFINT06</h2>
+				<a href="https://06-tim.imfint.local">TIM GUI</a><br>
+				<a href="https://06-provider-profiel.imfint.local/idm/#/">IAM PROVIDER</a><br>
+		<a href="https://06-rekening.imfint.local/Betalen?invoice=2192002710071">PAYMENT PAGE</a><br>
+
+				<a href="https://06-ami.imfint.local/">Customer Credit aka AMI</a><br>
+				<a href="https://06-rq.imfint.local/">RabbitMQ</a><br>
+				<a href="https://06-api.imfint.local/dpay">DPAY API</a><br>		<a href="https://06-imd.imfint.local/">IMD GUI</a><br>				<hr style="margin: 10px 0;">
+				<a href="https://06-inzicht2.imfint.local">InZicht2</a><br>
+				<a href="https://06-inzicht2.imfint.local/infomedics_ssp/user">InZicht2 Admin</a><br>
+
+				
+				<h2>IMFINT07</h2>
+				<a href="https://07-tim.imfint.local">TIM GUI</a><br>
+				<a href="https://07-provider-profiel.imfint.local/idm/#/">IAM PROVIDER</a><br>
+		<a href="https://07-rekening.imfint.local/Betalen?invoice=2192002710071">PAYMENT PAGE</a><br>
+
+				<a href="https://07-ami.imfint.local/">Customer Credit aka AMI</a><br>
+				<a href="https://07-rq.imfint.local/">RabbitMQ</a><br>
+				<a href="https://07-api.imfint.local/dpay">DPAY API</a><br>			<a href="https://07-imd.imfint.local/">IMD GUI</a><br>
+				<hr style="margin: 10px 0;">
+				<a href="https://07-inzicht2.imfint.local">InZicht2</a><br>
+				<a href="https://07-inzicht2.imfint.local/infomedics_ssp/user">InZicht2 Admin</a><br>
+
+			</td>
+			
+			<!-- IMFINT Environments Column 3: 08 & 10 -->
+			<td class="env-section">
+				<h2>IMFINT08</h2>
+				<a href="https://08-tim.imfint.local">TIM GUI</a><br>
+				<a href="https://08-provider-profiel.imfint.local/idm/#/">IAM PROVIDER</a><br>
+		<a href="https://08-rekening.imfint.local/Betalen?invoice=2192002710071">PAYMENT PAGE</a><br>
+
+				<a href="https://08-ami.imfint.local/">Customer Credit aka AMI</a><br>
+		<a href="https://08-rq.imfint.local:15671/">RabbitMQ</a><br>
+		<a href="https://08-api.imfint.local/dpay">DPAY API</a><br>
+		<a href="https://08-imd.imfint.local/">IMD GUI</a><br>
+		<hr style="margin: 10px 0;">
+				<a href="https://08-inzicht2.imfint.local">InZicht2</a><br>
+				<a href="https://08-inzicht2.imfint.local/infomedics_ssp/user">InZicht2 Admin</a><br>
+
+				
+				<h2>IMFINT10</h2>
+				<a href="https://10-tim.imfint.local">TIM GUI</a><br>
+				<a href="https://10-provider-profiel.imfint.local/idm/#/">IAM PROVIDER</a><br>
+		<a href="https://10-rekening.imfint.local/Betalen?invoice=2192002710071">PAYMENT PAGE</a><br>
+
+				<a href="https://10-ami.imfint.local/">Customer Credit aka AMI</a><br>
+				<a href="https://10-rq.imfint.local/">RabbitMQ</a><br>
+				<a href="https://10-api.imfint.local/dpay">DPAY API</a><br>		<a href="https://10-imd.imfint.local/">IMD GUI</a><br>				<hr style="margin: 10px 0;">
+				<a href="https://10-inzicht2.imfint.local">InZicht2</a><br>
+				<a href="https://10-inzicht2.imfint.local/infomedics_ssp/user">InZicht2 Admin</a><br>
+
+			</td>
+			
+			<!-- IMFINT Environments Column 4: 11 & 14 -->
+			<td class="env-section">
+				<h2>IMFINT11</h2>
+				<a href="https://11-tim.imfint.local">TIM GUI</a><br>
+				<a href="https://11-provider-profiel.imfint.local/idm/#/">IAM PROVIDER</a><br>
+		<a href="https://11-rekening.imfint.local/Betalen?invoice=2192002710071">PAYMENT PAGE</a><br>
+
+				<a href="https://11-ami.imfint.local/">Customer Credit aka AMI</a><br>
+				<a href="https://11-rq.imfint.local/">RabbitMQ</a><br>
+				<a href="https://11-api.imfint.local/dpay">DPAY API</a><br>		<a href="https://11-imd.imfint.local/">IMD GUI</a><br>				<hr style="margin: 10px 0;">
+				<a href="https://11-inzicht2.imfint.local">InZicht2</a><br>
+				<a href="https://11-inzicht2.imfint.local/infomedics_ssp/user">InZicht2 Admin</a><br>
+
+				
+				<h2>IMFINT14</h2>
+				<a href="https://14-tim.imfint.local">TIM GUI</a><br>
+				<a href="https://14-provider-profiel.imfint.local/idm/#/">IAM PROVIDER</a><br>
+		<a href="https://14-rekening.imfint.local/Betalen?invoice=2192002710071">PAYMENT PAGE</a><br>
+
+				<a href="https://14-ami.imfint.local/">Customer Credit aka AMI</a><br>
+				<a href="https://14-rq.imfint.local/">RabbitMQ</a><br>
+				<a href="https://14-api.imfint.local/dpay">DPAY API</a><br>		<a href="https://14-imd.imfint.local/">IMD GUI</a><br>				<hr style="margin: 10px 0;">
+				<a href="https://14-inzicht2.imfint.local">InZicht2</a><br>
+				<a href="https://14-inzicht2.imfint.local/infomedics_ssp/user">InZicht2 Admin</a><br>
+
+			</td>
+		</tr>
+		
+		<!-- DEV Environments Row -->
+		<tr>
+	<td class="dev-y01">
+		<h2>DEV-Y01-01</h2>
+		RDP/DB: DEV-Y01-TIM01.ad.infomedics.dev<br><br>
+		<a href="https://dev-y01-01-tim.infomedics.dev">TIM</a><br>
+		<a href="https://dev-y01-01-inzicht2.infomedics.dev">Inzicht</a><br>
+		<a href="https://dev-y01-01-rekening.infomedics.dev">Rekening</a><br>
+		<a href="https://dev-y01-01-provider-profiel.infomedics.dev">IAM</a><br>
+		<a href="https://dev-y01-01-ami.infomedics.dev">AMI</a><br>
+		<a href="https://dev-y01-01-inloggen.infomedics.dev">IIP2</a><br>
+		<a href="https://dev-y01-01-provider-inloggen.infomedics.dev">IIP</a><br>
+		<a href="https://dev-y01-01-clp.infomedics.dev">CLP</a><br>
+		<a href="https://dev-y01-01-imd.infomedics.dev">IMD</a><br>
+		<a href="https://dev-y01-tim01.ad.infomedics.dev:15671/">RMQ</a><br>
+	</td>
+	
+	<td class="dev-y01">
+		<h2>DEV-Y01-02</h2>
+		RDP/DB: DEV-Y01-TIM02.ad.infomedics.dev<br><br>
+		<a href="https://dev-y01-02-tim.infomedics.dev">TIM</a><br>
+		<a href="https://dev-y01-02-inzicht2.infomedics.dev">Inzicht</a><br>
+		<a href="https://dev-y01-02-rekening.infomedics.dev">Rekening</a><br>
+		<a href="https://dev-y01-02-provider-profiel.infomedics.dev">IAM</a><br>
+		<a href="https://dev-y01-02-ami.infomedics.dev">AMI</a><br>
+		<a href="https://dev-y01-02-inloggen.infomedics.dev">IIP2</a><br>
+		<a href="https://dev-y01-02-provider-inloggen.infomedics.dev">IIP</a><br>
+		<a href="https://dev-y01-02-clp.infomedics.dev">CLP</a><br>
+		<a href="https://dev-y01-02-imd.infomedics.dev">IMD</a><br>
+		<a href="https://dev-y01-tim02.ad.infomedics.dev:15671/">RMQ</a><br>
+	</td>
+	
+	<td class="dev-y01">
+		<h2>DEV-Y01-03</h2>
+		RDP/DB: DEV-Y01-TIM03.ad.infomedics.dev<br><br>
+		<a href="https://dev-y01-03-tim.infomedics.dev">TIM</a><br>
+		<a href="https://dev-y01-03-inzicht2.infomedics.dev">Inzicht</a><br>
+		<a href="https://dev-y01-03-rekening.infomedics.dev">Rekening</a><br>
+		<a href="https://dev-y01-03-provider-profiel.infomedics.dev">IAM</a><br>
+		<a href="https://dev-y01-03-ami.infomedics.dev">AMI</a><br>
+		<a href="https://dev-y01-03-inloggen.infomedics.dev">IIP2</a><br>
+		<a href="https://dev-y01-03-provider-inloggen.infomedics.dev">IIP</a><br>
+		<a href="https://dev-y01-03-clp.infomedics.dev">CLP</a><br>
+		<a href="https://dev-y01-03-imd.infomedics.dev">IMD</a><br>
+		<a href="https://dev-y01-tim03.ad.infomedics.dev:15671/">RMQ</a><br>
+	</td>
+	
+	<td class="dev-y02">
+		<h2>DEV-Y02-01</h2>
+		RDP/DB: DEV-Y02-TIM01.ad.infomedics.dev<br><br>
+		<a href="https://dev-y02-01-tim.infomedics.dev">TIM</a><br>
+		<a href="https://dev-y02-01-inzicht2.infomedics.dev">Inzicht</a><br>
+		<a href="https://dev-y02-01-rekening.infomedics.dev">Rekening</a><br>
+		<a href="https://dev-y02-01-provider-profiel.infomedics.dev">IAM</a><br>
+		<a href="https://dev-y02-01-ami.infomedics.dev">AMI</a><br>
+		<a href="https://dev-y02-01-inloggen.infomedics.dev">IIP2</a><br>
+		<a href="https://dev-y02-01-provider-inloggen.infomedics.dev">IIP</a><br>
+		<a href="https://dev-y02-01-clp.infomedics.dev">CLP</a><br>
+		<a href="https://dev-y02-01-imd.infomedics.dev">IMD</a><br>
+		<a href="https://dev-y02-tim01.ad.infomedics.dev:15671/">RMQ</a><br>
+	</td>
+	
+	<td class="dev-y02">
+		<h2>DEV-Y02-02</h2>
+		RDP/DB: DEV-Y02-TIM02.ad.infomedics.dev<br><br>
+		<a href="https://dev-y02-02-tim.infomedics.dev">TIM</a><br>
+		<a href="https://dev-y02-02-inzicht2.infomedics.dev">Inzicht</a><br>
+		<a href="https://dev-y02-02-rekening.infomedics.dev">Rekening</a><br>
+		<a href="https://dev-y02-02-provider-profiel.infomedics.dev">IAM</a><br>
+		<a href="https://dev-y02-02-ami.infomedics.dev">AMI</a><br>
+		<a href="https://dev-y02-02-inloggen.infomedics.dev">IIP2</a><br>
+		<a href="https://dev-y02-02-provider-inloggen.infomedics.dev">IIP</a><br>
+		<a href="https://dev-y02-02-clp.infomedics.dev">CLP</a><br>
+		<a href="https://dev-y02-02-imd.infomedics.dev">IMD</a><br>
+		<a href="https://dev-y02-tim02.ad.infomedics.dev:15671/">RMQ</a><br>
+	</td>
+	
+	<td class="dev-y02">
+		<h2>DEV-Y02-03</h2>
+		RDP/DB: DEV-Y02-TIM03.ad.infomedics.dev<br><br>
+		<a href="https://dev-y02-03-tim.infomedics.dev">TIM</a><br>
+		<a href="https://dev-y02-03-inzicht2.infomedics.dev">Inzicht</a><br>
+		<a href="https://dev-y02-03-rekening.infomedics.dev">Rekening</a><br>
+		<a href="https://dev-y02-03-provider-profiel.infomedics.dev">IAM</a><br>
+		<a href="https://dev-y02-03-ami.infomedics.dev">AMI</a><br>
+		<a href="https://dev-y02-03-inloggen.infomedics.dev">IIP2</a><br>
+		<a href="https://dev-y02-03-provider-inloggen.infomedics.dev">IIP</a><br>
+		<a href="https://dev-y02-03-clp.infomedics.dev">CLP</a><br>
+		<a href="https://dev-y02-03-imd.infomedics.dev">IMD</a><br>
+		<a href="https://dev-y02-tim03.ad.infomedics.dev:15671/">RMQ</a><br>
+	</td>
+	</table>	
+    <script>
+        // Dutch bank codes for IBAN generation
+        const dutchBankCodes = [
+            'ABNA', 'RABO', 'INGB', 'BUNQ', 'ASNB', 'TRIO', 'SNSB', 'KNAB'
+        ];
+
+        // Calculate IBAN check digits
+        function calculateIBANCheckDigits(countryCode, bankCode, accountNumber) {
+            const rearranged = bankCode + accountNumber + countryCode + '00';
+            
+            let numericString = '';
+            for (let char of rearranged) {
+                if (char >= 'A' && char <= 'Z') {
+                    numericString += (char.charCodeAt(0) - 55).toString();
+                } else {
+                    numericString += char;
+                }
+            }
+            
+            let remainder = 0;
+            for (let i = 0; i < numericString.length; i++) {
+                remainder = (remainder * 10 + parseInt(numericString[i])) % 97;
+            }
+            
+            const checkDigits = 98 - remainder;
+            return checkDigits.toString().padStart(2, '0');
+        }
+
+        // Generate default NL IBAN
+        function generateDefaultIBAN() {
+            const bankCode = 'ABNA';
+            const accountNumber = '0123456789';
+            const checkDigits = calculateIBANCheckDigits('NL', bankCode, accountNumber);
+            const iban = `NL${checkDigits}${bankCode}${accountNumber}`;
+            
+            document.getElementById('ibanResult').innerHTML = iban;
+            document.getElementById('ibanResult').style.display = 'block';
+        }
+
+        // Generate random NL IBAN
+        function generateRandomIBAN() {
+            const bankCode = dutchBankCodes[Math.floor(Math.random() * dutchBankCodes.length)];
+            const accountNumber = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+            const checkDigits = calculateIBANCheckDigits('NL', bankCode, accountNumber);
+            const iban = `NL${checkDigits}${bankCode}${accountNumber}`;
+            
+            document.getElementById('ibanResult').innerHTML = iban;
+            document.getElementById('ibanResult').style.display = 'block';
+        }
+
+        // Validate BSN using 11-test
+        function validateBSN(bsn) {
+            const digits = bsn.toString().split('').map(d => parseInt(d));
+            if (digits.length !== 8 && digits.length !== 9) return false;
+            
+            let sum = 0;
+            for (let i = 0; i < digits.length - 1; i++) {
+                sum += digits[i] * (digits.length - i);
+            }
+            
+            const lastDigit = digits[digits.length - 1];
+            const remainder = sum % 11;
+            
+            return remainder === lastDigit && remainder !== 10;
+        }
+
+        // Generate random valid BSN
+        function generateValidBSN() {
+            let attempts = 0;
+            while (attempts < 1000) {
+                const isNineDigits = Math.random() > 0.3;
+                const length = isNineDigits ? 9 : 8;
+                
+                const firstDigit = isNineDigits ? Math.floor(Math.random() * 9) + 1 : Math.floor(Math.random() * 10);
+                
+                let bsn = firstDigit.toString();
+                for (let i = 1; i < length; i++) {
+                    bsn += Math.floor(Math.random() * 10).toString();
+                }
+                
+                if (validateBSN(bsn)) {
+                    return bsn;
+                }
+                attempts++;
+            }
+            
+            return generateKnownValidBSN();
+        }
+
+        // Generate a BSN using known valid structure
+        function generateKnownValidBSN() {
+            const isNineDigits = Math.random() > 0.3;
+            const length = isNineDigits ? 9 : 8;
+            
+            let digits = [];
+            
+            for (let i = 0; i < length - 1; i++) {
+                if (i === 0 && length === 9) {
+                    digits.push(Math.floor(Math.random() * 9) + 1);
+                } else {
+                    digits.push(Math.floor(Math.random() * 10));
+                }
+            }
+            
+            let sum = 0;
+            for (let i = 0; i < digits.length; i++) {
+                sum += digits[i] * (length - i);
+            }
+            
+            const checkDigit = sum % 11;
+            if (checkDigit < 10) {
+                digits.push(checkDigit);
+                return digits.join('');
+            } else {
+                if (digits[digits.length - 1] > 0) {
+                    digits[digits.length - 1]--;
+                    sum -= 1;
+                    const newCheckDigit = sum % 11;
+                    digits.push(newCheckDigit);
+                    return digits.join('');
+                } else {
+                    return generateKnownValidBSN();
+                }
+            }
+        }
+
+        // Generate single BSN
+        function generateRandomBSN() {
+            const bsn = generateValidBSN();
+            document.getElementById('bsnResult').innerHTML = bsn;
+            document.getElementById('bsnResult').style.display = 'block';
+        }
+
+        // Generate multiple BSNs
+        function generateMultipleBSN() {
+            const bsns = [];
+            for (let i = 0; i < 5; i++) {
+                bsns.push(generateValidBSN());
+            }
+            document.getElementById('bsnResult').innerHTML = bsns.join('<br>');
+            document.getElementById('bsnResult').style.display = 'block';
+        }
+
+        // Generate both IBAN and BSN
+        function generateBatch() {
+            const bankCode = dutchBankCodes[Math.floor(Math.random() * dutchBankCodes.length)];
+            const accountNumber = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+            const checkDigits = calculateIBANCheckDigits('NL', bankCode, accountNumber);
+            const iban = `NL${checkDigits}${bankCode}${accountNumber}`;
+            
+            const bsn = generateValidBSN();
+            const phone = generateValidPhone();
+            
+            document.getElementById('batchResult').innerHTML = 
+                `<strong>IBAN:</strong> ${iban}<br><strong>BSN:</strong> ${bsn}<br><strong>Phone:</strong> ${phone}`;
+            document.getElementById('batchResult').style.display = 'block';
+        }
+
+        // Generate valid Dutch phone number
+        function generateValidPhone() {
+            // Dutch mobile numbers: 316 + 8 digits (international format)
+            const remainingDigits = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+            return `316${remainingDigits}`;
+        }
+
+        // Generate single phone number
+        function generateRandomPhone() {
+            const phone = generateValidPhone();
+            document.getElementById('phoneResult').innerHTML = phone;
+            document.getElementById('phoneResult').style.display = 'block';
+        }
+
+        // Generate multiple phone numbers
+        function generateMultiplePhone() {
+            const phones = [];
+            for (let i = 0; i < 5; i++) {
+                phones.push(generateValidPhone());
+            }
+            document.getElementById('phoneResult').innerHTML = phones.join('<br>');
+            document.getElementById('phoneResult').style.display = 'block';
+        }
+
+        // Initialize with a default IBAN on page load
+        window.addEventListener('load', function() {
+            generateDefaultIBAN();
+        });
+    </script>
+ 
+</body>
+</html>
