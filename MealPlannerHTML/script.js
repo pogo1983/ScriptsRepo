@@ -124,7 +124,7 @@ function generujPlan(){
   let plan = "<div class='result-section'><h2>📅 Jadłospis na tydzień</h2>";
   
   // Desktop: tabela z wrapperem do scroll
-  plan += "<div class='table-wrapper'><table class='plan-table-desktop'><tr><th>Dzień</th><th>Danie</th><th class='person-michalina'>" + namePerson1 + "</th><th class='person-marcin'>" + namePerson2 + "</th><th>Kalorie</th></tr>";
+  plan += "<div class='table-wrapper'><table class='plan-table-desktop'><tr><th>Dzień</th><th>Posiłek</th><th>Danie</th><th class='person-michalina'>" + namePerson1 + "</th><th class='person-marcin'>" + namePerson2 + "</th><th>kcal</th></tr>";
   
   // Mobile: karty
   let mobileCards = "<div class='plan-cards-mobile'>";
@@ -187,10 +187,10 @@ function generujPlan(){
       // Desktop: wiersz tabeli - dzień tylko dla pierwszego posiłku
       plan+="<tr>";
       if(firstMeal) {
-        plan+=`<td class='day-label' rowspan='${posilki.length}'>${dni[i]}</td>`;
+        plan+=`<td class='day-label' rowspan='${posilki.length}'><strong>${dni[i]}</strong></td>`;
         firstMeal = false;
       }
-      plan+=`<td><b>${posilekDisplay}</b><br>${d.nazwa}</td><td class='person-michalina'>`;
+      plan+=`<td>${posilekDisplay}</td><td><strong>${d.nazwa}</strong></td><td class='person-michalina'>`;
       let skladM = [], skladMA = [];
       
       let mealData = {

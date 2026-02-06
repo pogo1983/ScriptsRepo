@@ -948,6 +948,8 @@ tr:hover {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 /* Mobile plan cards - hidden on desktop */
@@ -958,7 +960,26 @@ tr:hover {
 .plan-table-desktop {
   display: table;
   width: 100%;
-  min-width: 600px; /* Ensure table doesn't shrink too much */
+  min-width: 800px;
+  font-size: 14px;
+}
+
+.plan-table-desktop th {
+  white-space: nowrap;
+  font-size: 13px;
+  padding: 10px 8px;
+}
+
+.plan-table-desktop td {
+  padding: 10px 8px;
+  font-size: 13px;
+}
+
+.plan-table-desktop .day-label {
+  font-weight: 700;
+  background: #f0f7ff;
+  vertical-align: middle;
+  text-align: center;
 }
 
 @media (max-width: 768px) {
