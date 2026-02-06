@@ -1177,6 +1177,12 @@ tr:hover {
     min-width: 80px;
   }
   
+  #dropdowns table .day-label {
+    padding: 10px 8px;
+    min-width: 90px;
+    font-weight: 700;
+  }
+  
   #dropdowns table select {
     font-size: 12px;
     padding: 6px 4px;
@@ -1187,10 +1193,8 @@ tr:hover {
   #dropdowns table .day-label {
     position: sticky;
     left: 0;
-    background: white;
+    background: var(--gray-1);
     z-index: 1;
-    min-width: 90px;
-    font-weight: 700;
   }
   
   table {
