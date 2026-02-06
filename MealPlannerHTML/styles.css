@@ -941,7 +941,116 @@ tr:hover {
 
 /* ==================== RESPONSIVE DESIGN ==================== */
 
+/* ==================== RESPONSIVE ==================== */
+
+/* Mobile plan cards - hidden on desktop */
+.plan-cards-mobile {
+  display: none;
+}
+
+.plan-table-desktop {
+  display: table;
+  width: 100%;
+}
+
 @media (max-width: 768px) {
+  /* Hide desktop table on mobile */
+  .plan-table-desktop {
+    display: none;
+  }
+  
+  /* Show mobile cards */
+  .plan-cards-mobile {
+    display: block;
+  }
+  
+  /* Day card styling */
+  .day-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+  
+  .day-card-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1d1d1f;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+  
+  .day-card-meals {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .meal-card {
+    background: #f9f9f9;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  
+  .meal-card-header {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 8px;
+  }
+  
+  .meal-card-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #007AFF;
+    margin-bottom: 12px;
+  }
+  
+  .meal-card-people {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .meal-card-person {
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 8px;
+    background: white;
+    border-radius: 8px;
+  }
+  
+  .meal-card-person strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+  
+  .meal-card-calories {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    padding-top: 8px;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .day-card-summary {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 2px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .day-card-summary strong {
+    font-weight: 700;
+  }
+  
   .container {
     padding: 15px;
     margin: 20px auto;

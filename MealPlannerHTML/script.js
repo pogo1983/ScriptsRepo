@@ -121,16 +121,29 @@ function generujPlan(){
     ["śniadanie","obiad","kolacja"] : 
     ["śniadanie","obiad","podwieczorek","kolacja"];
     
-  let plan = "<div class='result-section'><h2>📅 Jadłospis na tydzień</h2><table><tr><th>Dzień</th><th>Posiłek</th><th class='person-michalina'>" + namePerson1 + "</th><th class='person-marcin'>" + namePerson2 + "</th><th>Kalorie</th></tr>";
+  let plan = "<div class='result-section'><h2>📅 Jadłospis na tydzień</h2>";
+  
+  // Desktop: tabela
+  plan += "<table class='plan-table-desktop'><tr><th>Dzień</th><th>Posiłek</th><th class='person-michalina'>" + namePerson1 + "</th><th class='person-marcin'>" + namePerson2 + "</th><th>Kalorie</th></tr>";
+  
+  // Mobile: karty
+  let mobileCards = "<div class='plan-cards-mobile'>";
+  
   let zakupy = {}; // sumowanie składników
   let totalCalories1 = Array(7).fill(0); // kalorie dla osoby 1 na każdy dzień
   let totalCalories2 = Array(7).fill(0); // kalorie dla osoby 2 na każdy dzień
   
-  // Przechowaj szczegółowe dane dla każdego dnia
+  // Przechowuj szczegółowe dane dla każdego dnia
   let dayMealsData = [];
   
   for(let i=0;i<dni.length;i++){
     let dayMeals = [];
+    
+    // Mobile: rozpocznij kartę dnia
+    mobileCards += `<div class='day-card'>
+      <h3 class='day-card-title'>${dni[i]}</h3>
+      <div class='day-card-meals'>`;
+    
     posilki.forEach(posilek=>{
       const element = document.getElementById(posilek+i);
       if(!element) {
@@ -149,7 +162,6 @@ function generujPlan(){
                           posilek === "podwieczorek" ? "🍎 Podwieczorek" : "🌙 Kolacja";
       
       // Oblicz kalorie proporcjonalnie do gramatur składników
-      // Dla Michaliny używamy pierwszej gramatury, dla Marcina drugiej
       let totalGramsMichalina = 0;
       let totalGramsMarcin = 0;
       
@@ -161,10 +173,7 @@ function generujPlan(){
         }
       }
       
-      // Oblicz stosunek gramatur (jeśli składniki w gramach)
       let gramsRatio = totalGramsMarcin > 0 ? totalGramsMarcin / totalGramsMichalina : 1.5;
-      
-      // Skaluj kalorie bazowe według wybranego celu i proporcji gramatur
       let baseCaloriesForMichalina = d.kalorie || 0;
       let baseCaloriesForMarcin = Math.round((d.kalorie || 0) * gramsRatio);
       
@@ -174,10 +183,10 @@ function generujPlan(){
       totalCalories1[i] += caloriesScaled1;
       totalCalories2[i] += caloriesScaled2;
       
+      // Desktop: wiersz tabeli
       plan+="<tr><td class='day-label'>"+dni[i]+"</td><td><b>"+d.nazwa+"</b></td><td class='person-michalina'>";
       let skladM = [], skladMA = [];
       
-      // Zapisz dane posiłku do struktury dnia
       let mealData = {
         posilek: posilek,
         nazwa: d.nazwa,
@@ -185,24 +194,19 @@ function generujPlan(){
       };
       
       for (const [skladnik,[gramM,gramMA]] of Object.entries(d.skladniki)){
-        // Sprawdź czy to sztuki czy gramy
         let jednostka = skladnik === "Jajka" || skladnik.includes("Baton") ? "szt" : "g";
-        
-        // Przeskaluj gramatury według wybranego celu kalorycznego
         let scaledM = jednostka === "szt" ? gramM : scaleAmount(gramM, false);
         let scaledMA = jednostka === "szt" ? gramMA : scaleAmount(gramMA, true);
         
         skladM.push(skladnik+": "+scaledM+jednostka);
         skladMA.push(skladnik+": "+scaledMA+jednostka);
         
-        // Zapisz do struktury posiłku
         mealData.skladniki[skladnik] = {
           michalina: scaledM,
           marcin: scaledMA,
           jednostka: jednostka
         };
         
-        // dodaj do listy zakupów
         zakupy[skladnik] = zakupy[skladnik] || {michalina:0, marcin:0, jednostka: jednostka};
         zakupy[skladnik].michalina += scaledM;
         zakupy[skladnik].marcin += scaledMA;
@@ -216,7 +220,32 @@ function generujPlan(){
       }
       
       plan+=skladM.join(", ")+"</td><td class='person-marcin'>"+skladMA.join(", ")+"</td><td style='text-align: center;'>"+calorieDisplay+"</td></tr>";
+      
+      // Mobile: karta posiłku
+      mobileCards += `
+        <div class='meal-card'>
+          <div class='meal-card-header'>${posilekDisplay}</div>
+          <div class='meal-card-name'>${d.nazwa}</div>
+          <div class='meal-card-people'>
+            <div class='meal-card-person person-michalina'>
+              <strong>${namePerson1}:</strong> ${skladM.join(", ")}
+            </div>
+            <div class='meal-card-person person-marcin'>
+              <strong>${namePerson2}:</strong> ${skladMA.join(", ")}
+            </div>
+          </div>
+          <div class='meal-card-calories'>${calorieDisplay}</div>
+        </div>`;
     });
+    
+    // Mobile: zakończ kartę dnia z podsumowaniem kalorii
+    mobileCards += `
+      <div class='day-card-summary'>
+        <div class='person-michalina'><strong>${namePerson1}:</strong> ${totalCalories1[i]} kcal</div>
+        <div class='person-marcin'><strong>${namePerson2}:</strong> ${totalCalories2[i]} kcal</div>
+      </div>
+      </div></div>`;
+    
     dayMealsData.push(dayMeals);
   }
   
@@ -234,7 +263,13 @@ function generujPlan(){
     plan += dni[i].substr(0,3) + ": " + totalCalories2[i] + " kcal";
   }
   plan += "</td></tr>";
-  plan+="</table></div>";
+  plan+="</table>";
+  
+  // Zamknij karty mobile
+  mobileCards += "</div>";
+  
+  // Połącz oba widoki
+  plan += mobileCards + "</div>";
 
   // Zapisz pełne dane planu globalnie
   fullPlanData = {
