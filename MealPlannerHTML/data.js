@@ -118,14 +118,74 @@ const dania = {
       skladniki: {'Jabłko/gruszka': [80,120],'Orzechy włoskie':[10,20]}
     },
     {
-      nazwa: "Jogurt z owocami",
-      kalorie: 150,
-      skladniki: {'Jogurt naturalny': [100,150],'Maliny/jagody mrożone':[50,80]}
+      nazwa: "Jogurt skyr z owocami",
+      kalorie: 180,
+      skladniki: {'Jogurt Skyr': [150,200],'Maliny/jagody mrożone':[50,80],'Miód':[5,10]}
+    },
+    {
+      nazwa: "Jogurt grecki z orzechami i miodem",
+      kalorie: 220,
+      skladniki: {'Jogurt grecki': [150,200],'Orzechy włoskie/migdały':[10,20],'Miód':[5,10]}
+    },
+    {
+      nazwa: "Kanapka z masłem orzechowym i bananem",
+      kalorie: 280,
+      skladniki: {'Pieczywo pełnoziarniste':[40,60],'Masło orzechowe':[15,25],'Banan':[60,100]}
+    },
+    {
+      nazwa: "Twarożek z rzodkiewką i szczypiorkiem",
+      kalorie: 200,
+      skladniki: {'Twarożek półtłusty':[100,150],'Rzodkiewka':[30,50],'Szczypiorek':[5,10],'Pieczywo żytnie':[30,50]}
     },
     {
       nazwa: "Batony proteinowe",
       kalorie: 200,
       skladniki: {'Baton proteinowy': [1,1]}
+    },
+    {
+      nazwa: "Jajka na twardo z warzywami",
+      kalorie: 170,
+      skladniki: {'Jajka': [2,2],'Pomidor/papryka':[50,80],'Sól/pieprz':[1,1]}
+    },
+    {
+      nazwa: "Shake proteinowy z owocami",
+      kalorie: 190,
+      skladniki: {'Izolat białka':[20,30],'Mleko/woda':[200,300],'Banan/jagody':[50,80]}
+    },
+    {
+      nazwa: "Kanapka z awokado i jajkiem",
+      kalorie: 260,
+      skladniki: {'Pieczywo pełnoziarniste':[40,60],'Awokado':[40,60],'Jajko':[1,1]}
+    },
+    {
+      nazwa: "Cottage cheese z pomidorkami koktajlowymi",
+      kalorie: 150,
+      skladniki: {'Cottage cheese':[120,180],'Pomidorki koktajlowe':[50,80],'Szczypiorek':[5,10]}
+    },
+    {
+      nazwa: "Hummus z warzywami do maczania",
+      kalorie: 180,
+      skladniki: {'Hummus':[40,80],'Marchewka/papryka/ogórek':[80,120]}
+    },
+    {
+      nazwa: "Jogurt skyr z granolą",
+      kalorie: 230,
+      skladniki: {'Jogurt Skyr': [150,200],'Granola':[20,30],'Jagody':[30,50]}
+    },
+    {
+      nazwa: "Kanapka z serem białym i pomidorem",
+      kalorie: 210,
+      skladniki: {'Pieczywo żytnie':[40,60],'Ser biały/feta':[40,60],'Pomidor':[40,60],'Oliwa':[5,10]}
+    },
+    {
+      nazwa: "Smoothie owocowo-białkowe",
+      kalorie: 200,
+      skladniki: {'Jogurt naturalny':[100,150],'Szpinak (garść)':[20,30],'Banan':[60,100],'Jagody mrożone':[30,50],'Izolat białka':[10,20]}
+    },
+    {
+      nazwa: "Mini wrapy z kurczakiem",
+      kalorie: 250,
+      skladniki: {'Tortilla pełnoziarnista (mała)':[30,50],'Kurczak gotowany':[50,80],'Sałata':[20,30],'Jogurt naturalny':[20,30]}
     }
   ]
 };
