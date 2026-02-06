@@ -1154,12 +1154,14 @@ tr:hover {
 .accordion-content {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease;
+  transition: max-height 0.4s ease-out;
 }
 
-.accordion-content.active {
-  max-height: 5000px;
+.accordion-item .accordion-content.active {
+  max-height: 10000px;
   margin-top: 20px;
+  overflow: visible;
+  transition: max-height 0.6s ease-in;
 }
 
 .day-plan-meals {
