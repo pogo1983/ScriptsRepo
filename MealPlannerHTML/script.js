@@ -107,6 +107,9 @@ function createDropdowns() {
 
 // ---------- GENEROWANIE PLANU I SHOPPING LIST ----------
 
+// Globalne zmienne dla pełnych danych planu
+let fullPlanData = null;
+
 function generujPlan(){
   let posilki = currentMealCount === 3 ? 
     ["śniadanie","obiad","kolacja"] : 
@@ -117,7 +120,11 @@ function generujPlan(){
   let totalCalories1 = Array(7).fill(0); // kalorie dla osoby 1 na każdy dzień
   let totalCalories2 = Array(7).fill(0); // kalorie dla osoby 2 na każdy dzień
   
+  // Przechowaj szczegółowe dane dla każdego dnia
+  let dayMealsData = [];
+  
   for(let i=0;i<dni.length;i++){
+    let dayMeals = [];
     posilki.forEach(posilek=>{
       const element = document.getElementById(posilek+i);
       if(!element) {
@@ -144,6 +151,13 @@ function generujPlan(){
       plan+="<tr><td class='day-label'>"+dni[i]+"</td><td><b>"+d.nazwa+"</b></td><td class='person-michalina'>";
       let skladM = [], skladMA = [];
       
+      // Zapisz dane posiłku do struktury dnia
+      let mealData = {
+        posilek: posilek,
+        nazwa: d.nazwa,
+        skladniki: {}
+      };
+      
       for (const [skladnik,[gramM,gramMA]] of Object.entries(d.skladniki)){
         // Sprawdź czy to sztuki czy gramy
         let jednostka = skladnik === "Jajka" || skladnik.includes("Baton") ? "szt" : "g";
@@ -155,11 +169,20 @@ function generujPlan(){
         skladM.push(skladnik+": "+scaledM+jednostka);
         skladMA.push(skladnik+": "+scaledMA+jednostka);
         
+        // Zapisz do struktury posiłku
+        mealData.skladniki[skladnik] = {
+          michalina: scaledM,
+          marcin: scaledMA,
+          jednostka: jednostka
+        };
+        
         // dodaj do listy zakupów
         zakupy[skladnik] = zakupy[skladnik] || {michalina:0, marcin:0, jednostka: jednostka};
         zakupy[skladnik].michalina += scaledM;
         zakupy[skladnik].marcin += scaledMA;
       }
+      
+      dayMeals.push(mealData);
       
       let calorieDisplay = "";
       if(d.kalorie) {
@@ -168,6 +191,7 @@ function generujPlan(){
       
       plan+=skladM.join(", ")+"</td><td class='person-marcin'>"+skladMA.join(", ")+"</td><td style='text-align: center;'>"+calorieDisplay+"</td></tr>";
     });
+    dayMealsData.push(dayMeals);
   }
   
   // Dodaj podsumowanie kalorii dziennych
@@ -184,16 +208,46 @@ function generujPlan(){
   plan += "</td><td></td></tr>";
   plan+="</table></div>";
 
-  // Generowanie listy zakupów
-  let zakHTML = "<div class='result-section'><h2>🛒 Lista zakupów na tydzień</h2>";
+  // Zapisz pełne dane planu globalnie
+  fullPlanData = {
+    dayMealsData: dayMealsData,
+    totalCalories1: totalCalories1,
+    totalCalories2: totalCalories2
+  };
+
+  // Generowanie listy zakupów dla wszystkich dni (domyślnie)
+  generateShoppingList(zakupy, sortedProducts);
+
+  document.getElementById("plan").innerHTML = plan;
+  
+  // Pokaż sekcję wyboru dni
+  document.getElementById("zakupy-section").style.display = 'block';
+  
+  // Smooth scroll do wyników
+  setTimeout(() => {
+    document.getElementById("plan").scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function generateShoppingList(zakupy, sortedProducts) {
+  // Sortuj alfabetycznie jeśli sortedProducts nie jest dostarczone
+  if (!sortedProducts) {
+    sortedProducts = Object.keys(zakupy).sort();
+  }
+  
+  let zakHTML = "<div class='result-section'><h2>🛒 Lista zakupów</h2>";
   zakHTML += "<div class='export-buttons'>";
   zakHTML += "<button class='btn-export btn-excel' onclick='exportToExcel()'>📊 Eksportuj do Excel (CSV)</button>";
   zakHTML += "<button class='btn-export btn-print' onclick='printShoppingList()'>🖨️ Wydrukuj listę zakupów</button>";
   zakHTML += "</div>";
-  zakHTML += "<table id='shopping-table'><tr><th>Produkt</th><th class='person-michalina'>" + namePerson1 + "</th><th class='person-marcin'>" + namePerson2 + "</th><th>RAZEM</th></tr>";
   
-  // Sortuj alfabetycznie
-  const sortedProducts = Object.keys(zakupy).sort();
+  // Sprawdź które dni są zaznaczone
+  const selectedDays = getSelectedDays();
+  const dayText = selectedDays.length === 7 ? "na cały tydzień" : 
+                  `na wybrane dni: ${selectedDays.map(i => dni[i]).join(", ")}`;
+  
+  zakHTML += `<p style='margin: 10px 0; font-style: italic; color: #666;'>📅 ${dayText}</p>`;
+  zakHTML += "<table id='shopping-table'><tr><th>Produkt</th><th class='person-michalina'>" + namePerson1 + "</th><th class='person-marcin'>" + namePerson2 + "</th><th>RAZEM</th></tr>";
   
   for(const prod of sortedProducts){
     const data = zakupy[prod];
@@ -202,15 +256,73 @@ function generujPlan(){
   }
   zakHTML+="</table></div>";
 
-  document.getElementById("plan").innerHTML = plan;
   document.getElementById("zakupy").innerHTML = zakHTML;
   
   // Zapisz dane zakupów globalnie dla eksportu
-  window.currentShoppingList = {zakupy, sortedProducts};
+  window.currentShoppingList = {zakupy, sortedProducts, selectedDays};
+}
+
+// ---------- FILTROWANIE LISTY ZAKUPÓW ----------
+
+function getSelectedDays() {
+  const checkboxes = document.querySelectorAll('.day-checkbox');
+  const selected = [];
+  checkboxes.forEach(cb => {
+    if(cb.checked) {
+      selected.push(parseInt(cb.value));
+    }
+  });
+  return selected;
+}
+
+function selectAllDays(checked) {
+  const checkboxes = document.querySelectorAll('.day-checkbox');
+  checkboxes.forEach(cb => {
+    cb.checked = checked;
+  });
+}
+
+function filterShoppingList() {
+  if (!fullPlanData) {
+    alert('Najpierw wygeneruj plan tygodniowy!');
+    return;
+  }
   
-  // Smooth scroll do wyników
+  const selectedDays = getSelectedDays();
+  
+  if (selectedDays.length === 0) {
+    alert('Wybierz przynajmniej jeden dzień!');
+    return;
+  }
+  
+  // Przelicz składniki tylko dla wybranych dni
+  let zakupy = {};
+  
+  selectedDays.forEach(dayIndex => {
+    const dayMeals = fullPlanData.dayMealsData[dayIndex];
+    
+    dayMeals.forEach(meal => {
+      for (const [skladnik, data] of Object.entries(meal.skladniki)) {
+        zakupy[skladnik] = zakupy[skladnik] || {
+          michalina: 0, 
+          marcin: 0, 
+          jednostka: data.jednostka
+        };
+        zakupy[skladnik].michalina += data.michalina;
+        zakupy[skladnik].marcin += data.marcin;
+      }
+    });
+  });
+  
+  // Sortuj alfabetycznie
+  const sortedProducts = Object.keys(zakupy).sort();
+  
+  // Generuj nową listę zakupów
+  generateShoppingList(zakupy, sortedProducts);
+  
+  // Scroll do listy zakupów
   setTimeout(() => {
-    document.getElementById("plan").scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById("zakupy").scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 100);
 }
 
@@ -668,7 +780,12 @@ function exportToExcel() {
     return;
   }
   
-  const {zakupy, sortedProducts} = window.currentShoppingList;
+  const {zakupy, sortedProducts, selectedDays} = window.currentShoppingList;
+  
+  // Informacja o wybranych dniach
+  const dayText = selectedDays && selectedDays.length < 7 ? 
+    `Dni: ${selectedDays.map(i => dni[i]).join(", ")}` : 
+    "Dni: Cały tydzień";
   
   // Tworzenie CSV
   let csv = "\uFEFFProdukt;" + namePerson1 + ";" + namePerson2 + ";RAZEM\n"; // \uFEFF to BOM dla UTF-8
@@ -681,6 +798,7 @@ function exportToExcel() {
   
   // Dodaj podsumowanie
   csv += `\n\nWygenerowano: ${new Date().toLocaleDateString('pl-PL')} ${new Date().toLocaleTimeString('pl-PL')}\n`;
+  csv += `${dayText}\n`;
   csv += `Cel kaloryczny - ${namePerson1}: ${currentCaloriesMichalina} kcal, ${namePerson2}: ${currentCaloriesMarcin} kcal\n`;
   
   // Tworzenie pliku do pobrania

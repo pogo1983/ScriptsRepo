@@ -74,6 +74,51 @@
     <button onclick="generujPlan()">📋 Pokaż jadłospis i listę zakupów</button>
 
     <div id="plan"></div>
+    
+    <div id="zakupy-section" style="display: none;">
+      <div class="result-section">
+        <h2>🛒 Opcje listy zakupów</h2>
+        <div class="day-selector">
+          <p><strong>Wybierz dni, na które chcesz zrobić zakupy:</strong></p>
+          <div class="day-checkboxes">
+            <label class="day-checkbox-label">
+              <input type="checkbox" class="day-checkbox" value="0" checked>
+              Poniedziałek
+            </label>
+            <label class="day-checkbox-label">
+              <input type="checkbox" class="day-checkbox" value="1" checked>
+              Wtorek
+            </label>
+            <label class="day-checkbox-label">
+              <input type="checkbox" class="day-checkbox" value="2" checked>
+              Środa
+            </label>
+            <label class="day-checkbox-label">
+              <input type="checkbox" class="day-checkbox" value="3" checked>
+              Czwartek
+            </label>
+            <label class="day-checkbox-label">
+              <input type="checkbox" class="day-checkbox" value="4" checked>
+              Piątek
+            </label>
+            <label class="day-checkbox-label">
+              <input type="checkbox" class="day-checkbox" value="5" checked>
+              Sobota
+            </label>
+            <label class="day-checkbox-label">
+              <input type="checkbox" class="day-checkbox" value="6" checked>
+              Niedziela
+            </label>
+          </div>
+          <div style="margin-top: 15px;">
+            <button class="btn-filter" onclick="filterShoppingList()">🔄 Aktualizuj listę zakupów</button>
+            <button class="btn-filter" onclick="selectAllDays(true)">✅ Zaznacz wszystkie</button>
+            <button class="btn-filter" onclick="selectAllDays(false)">❌ Odznacz wszystkie</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <div id="zakupy"></div>
   </div>
 
