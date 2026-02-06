@@ -8,6 +8,10 @@ const BASE_CALORIES_MARCIN = 2500;
 let currentCaloriesMichalina = 1300;
 let currentCaloriesMarcin = 2500;
 
+// Imiona użytkowników (można edytować)
+let namePerson1 = "Michalina";
+let namePerson2 = "Marcin";
+
 const dni = ["Poniedziałek","Wtorek","Środa","Czwartek","Piątek","Sobota","Niedziela"];
 
 // ---------- FUNKCJE POMOCNICZE ----------
@@ -108,13 +112,22 @@ function generujPlan(){
     ["śniadanie","obiad","kolacja"] : 
     ["śniadanie","obiad","podwieczorek","kolacja"];
     
-  let plan = "<div class='result-section'><h2>📅 Jadłospis na tydzień</h2><table><tr><th>Dzień</th><th>Posiłek</th><th class='person-michalina'>Michalina</th><th class='person-marcin'>Marcin</th></tr>";
+  let plan = "<div class='result-section'><h2>📅 Jadłospis na tydzień</h2><table><tr><th>Dzień</th><th>Posiłek</th><th class='person-michalina'>" + namePerson1 + "</th><th class='person-marcin'>" + namePerson2 + "</th></tr>";
   let zakupy = {}; // sumowanie składników
   
   for(let i=0;i<dni.length;i++){
     posilki.forEach(posilek=>{
-      let idx = +document.getElementById(posilek+i).value;
+      const element = document.getElementById(posilek+i);
+      if(!element) {
+        console.error(`Element ${posilek}${i} nie istnieje!`);
+        return;
+      }
+      let idx = +element.value;
       let d = dania[posilek][idx];
+      if(!d) {
+        console.error(`Danie nie istnieje dla ${posilek} indeks ${idx}`);
+        return;
+      }
       
       let posilekDisplay = posilek === "śniadanie" ? "🌅 Śniadanie" : 
                           posilek === "obiad" ? "🍴 Obiad" : 
@@ -145,7 +158,12 @@ function generujPlan(){
   plan+="</table></div>";
 
   // Generowanie listy zakupów
-  let zakHTML = "<div class='result-section'><h2>🛒 Lista zakupów na tydzień</h2><table><tr><th>Produkt</th><th class='person-michalina'>Michalina</th><th class='person-marcin'>Marcin</th><th>RAZEM</th></tr>";
+  let zakHTML = "<div class='result-section'><h2>🛒 Lista zakupów na tydzień</h2>";
+  zakHTML += "<div class='export-buttons'>";
+  zakHTML += "<button class='btn-export btn-excel' onclick='exportToExcel()'>📊 Eksportuj do Excel (CSV)</button>";
+  zakHTML += "<button class='btn-export btn-print' onclick='printShoppingList()'>🖨️ Wydrukuj listę zakupów</button>";
+  zakHTML += "</div>";
+  zakHTML += "<table id='shopping-table'><tr><th>Produkt</th><th class='person-michalina'>" + namePerson1 + "</th><th class='person-marcin'>" + namePerson2 + "</th><th>RAZEM</th></tr>";
   
   // Sortuj alfabetycznie
   const sortedProducts = Object.keys(zakupy).sort();
@@ -159,6 +177,9 @@ function generujPlan(){
 
   document.getElementById("plan").innerHTML = plan;
   document.getElementById("zakupy").innerHTML = zakHTML;
+  
+  // Zapisz dane zakupów globalnie dla eksportu
+  window.currentShoppingList = {zakupy, sortedProducts};
   
   // Smooth scroll do wyników
   setTimeout(() => {
@@ -217,6 +238,66 @@ function updateMealCount() {
   currentMealCount = parseInt(document.querySelector('input[name="mealCount"]:checked').value);
   createDropdowns();
   zapiszWybor();
+}
+
+// ---------- ZARZĄDZANIE IMIONAMI ----------
+
+function updateNames() {
+  namePerson1 = document.getElementById('namePerson1').value.trim() || "Osoba 1";
+  namePerson2 = document.getElementById('namePerson2').value.trim() || "Osoba 2";
+  
+  // Zapisz w localStorage
+  localStorage.setItem('namePerson1', namePerson1);
+  localStorage.setItem('namePerson2', namePerson2);
+  
+  // Aktualizuj etykiety na stronie
+  updateNameLabels();
+  
+  alert('✅ Imiona zostały zapisane!');
+}
+
+function loadSavedNames() {
+  const saved1 = localStorage.getItem('namePerson1');
+  const saved2 = localStorage.getItem('namePerson2');
+  
+  if(saved1) {
+    namePerson1 = saved1;
+    const input = document.getElementById('namePerson1');
+    if(input) input.value = saved1;
+  }
+  
+  if(saved2) {
+    namePerson2 = saved2;
+    const input = document.getElementById('namePerson2');
+    if(input) input.value = saved2;
+  }
+  
+  updateNameLabels();
+}
+
+function updateNameLabels() {
+  // Aktualizuj wszystkie miejsca gdzie pojawiają się imiona
+  const person1Elements = document.querySelectorAll('.person-michalina-name');
+  person1Elements.forEach(el => {
+    el.textContent = namePerson1;
+  });
+  
+  const person2Elements = document.querySelectorAll('.person-marcin-name');
+  person2Elements.forEach(el => {
+    el.textContent = namePerson2;
+  });
+  
+  // Regeneruj dropdowns jeśli są widoczne
+  const dropdowns = document.getElementById('dropdowns');
+  if(dropdowns && dropdowns.innerHTML) {
+    createDropdowns();
+  }
+  
+  // Regeneruj plan jeśli jest widoczny
+  const planElement = document.getElementById('plan');
+  if(planElement.innerHTML) {
+    generujPlan();
+  }
 }
 
 // ---------- ZARZĄDZANIE ZAKŁADKAMI ----------
@@ -295,7 +376,7 @@ function displayDishList() {
   
   ['śniadanie', 'obiad', 'podwieczorek', 'kolacja'].forEach(type => {
     if(dania[type] && dania[type].length > 0) {
-      html += `<h4 style="color: #236be8; margin-top: 20px;">${type.charAt(0).toUpperCase() + type.slice(1)}</h4>`;
+      html += `<h4 style="color: #1d1d1f; font-weight: 700; margin-top: 24px; margin-bottom: 16px; font-size: 1.2rem;">${type.charAt(0).toUpperCase() + type.slice(1)}</h4>`;
       
       dania[type].forEach((dish, idx) => {
         html += `<div class="dish-item">`;
@@ -538,9 +619,60 @@ function displaySavedPlans() {
   container.innerHTML = html;
 }
 
+// ---------- EKSPORT I WYDRUK ----------
+
+function exportToExcel() {
+  if(!window.currentShoppingList) {
+    alert('❌ Najpierw wygeneruj listę zakupów!');
+    return;
+  }
+  
+  const {zakupy, sortedProducts} = window.currentShoppingList;
+  
+  // Tworzenie CSV
+  let csv = "\uFEFFProdukt;" + namePerson1 + ";" + namePerson2 + ";RAZEM\n"; // \uFEFF to BOM dla UTF-8
+  
+  for(const prod of sortedProducts){
+    const data = zakupy[prod];
+    const suma = data.michalina + data.marcin;
+    csv += `${prod};${data.michalina} ${data.jednostka};${data.marcin} ${data.jednostka};${suma} ${data.jednostka}\n`;
+  }
+  
+  // Dodaj podsumowanie
+  csv += `\n\nWygenerowano: ${new Date().toLocaleDateString('pl-PL')} ${new Date().toLocaleTimeString('pl-PL')}\n`;
+  csv += `Cel kaloryczny - ${namePerson1}: ${currentCaloriesMichalina} kcal, ${namePerson2}: ${currentCaloriesMarcin} kcal\n`;
+  
+  // Tworzenie pliku do pobrania
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  const fileName = `lista_zakupow_${new Date().toISOString().split('T')[0]}.csv`;
+  link.setAttribute('href', url);
+  link.setAttribute('download', fileName);
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  alert('✅ Lista zakupów została wyeksportowana do pliku CSV!\n\nMożesz otworzyć go w Excel lub Google Sheets.');
+}
+
+function printShoppingList() {
+  if(!window.currentShoppingList) {
+    alert('❌ Najpierw wygeneruj listę zakupów!');
+    return;
+  }
+  
+  // Otwórz okno wydruku
+  window.print();
+}
+
 // ---------- INICJALIZACJA ----------
 
 // Wczytaj przy starcie
 loadCustomDishes();
 loadSavedCalories();
+loadSavedNames();
 createDropdowns();

@@ -3,14 +3,17 @@ const dania = {
   "śniadanie": [
     {
       nazwa: "Owsianka z bananem i orzechami",
+      kalorie: 350,
       skladniki: {'Płatki owsiane': [40,70],'Mleko 2%': [120,200],'Banan': [60,100],'Orzechy włoskie':[5,10],'Izolat białka':[0,20]}
     },
     {
       nazwa: "Jajecznica z papryką",
+      kalorie: 320,
       skladniki: {'Jajka': [2,3],'Papryka':[40,80],'Chleb pełnoziarnisty':[40,80],'Masło':[5,10]}
     },
     {
       nazwa: "Musli z jogurtem greckim i jagodami",
+      kalorie: 340,
       skladniki: {'Musli': [40,70],'Jogurt grecki': [100,200],'Maliny/jagody mrożone': [50,100]}
     },
     {
