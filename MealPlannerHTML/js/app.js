@@ -61,6 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
   loadSavedNames();
   loadCustomDishes();
   
+  // Initialize meal planner dropdowns
+  createDropdowns();
+  
   updateStatsSummary();
   displayTrainingHistory();
   updateActivityTypeFilter();
