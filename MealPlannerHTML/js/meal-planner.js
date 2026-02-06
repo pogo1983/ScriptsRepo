@@ -82,13 +82,13 @@ function generujPlan(){
   for(let i=0;i<dni.length;i++){
     let dayMeals = [];
     
-    // Rozpocznij kartę dnia z accordion
+    // Rozpocznij kartę dnia z accordion (domyślnie zwinięte)
     plan += `<div class='day-plan-card accordion-item'>
       <h3 class='day-plan-title accordion-header' onclick='toggleDay(${i})'>
-        <span><span class='accordion-icon'>▼</span> ${dni[i]}</span>
+        <span><span class='accordion-icon'>▶</span> ${dni[i]}</span>
         <span class='day-calories-preview'>... kcal</span>
       </h3>
-      <div class='day-plan-meals accordion-content active' id='day-content-${i}'>`;
+      <div class='day-plan-meals accordion-content' id='day-content-${i}'>`;
     
     posilki.forEach(posilek=>{
       const element = document.getElementById(posilek+i);
