@@ -1113,6 +1113,36 @@ tr:hover {
     grid-template-columns: 1fr;
   }
   
+  /* Fix meal selection table on mobile */
+  #dropdowns table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  #dropdowns table th,
+  #dropdowns table td {
+    font-size: 11px;
+    padding: 6px 4px;
+    min-width: 80px;
+  }
+  
+  #dropdowns table select {
+    font-size: 12px;
+    padding: 6px 4px;
+    width: 100%;
+    min-width: 100px;
+  }
+  
+  #dropdowns table .day-label {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 1;
+    min-width: 90px;
+    font-weight: 700;
+  }
+  
   table {
     font-size: 12px;
   }
