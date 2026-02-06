@@ -48,6 +48,9 @@
 
   <div class="tabs">
     <button class="tab active" onclick="switchTab('planner')">📅 Planner</button>
+    <button class="tab" onclick="switchTab('activity')">🏃‍♂️ Aktywność</button>
+    <button class="tab" onclick="switchTab('fridge')">🧊 Lodówka</button>
+    <button class="tab" onclick="switchTab('training')">💪 Trening</button>
     <button class="tab" onclick="switchTab('manage')">⚙️ Zarządzaj danymi</button>
   </div>
 
@@ -120,6 +123,266 @@
     </div>
     
     <div id="zakupy"></div>
+  </div>
+
+  <div id="activity-tab" class="tab-content">
+    <h2>🏃‍♂️ Aktywność i Zdrowie</h2>
+    
+    <!-- Kalkulator spalonych kalorii -->
+    <div class="card">
+      <h3>🔥 Kalkulator spalonych kalorii</h3>
+      <div class="form-group">
+        <label>Kto trenował?</label>
+        <select id="activityPerson">
+          <option value="person1"><span class="person-michalina-name">Michalina</span></option>
+          <option value="person2"><span class="person-marcin-name">Marcin</span></option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Waga (kg):</label>
+        <input type="number" id="activityWeight" placeholder="np. 70" min="30" max="200">
+      </div>
+      <div class="form-group">
+        <label>Rodzaj aktywności:</label>
+        <select id="activityType">
+          <option value="3.8">Spacer powolny (3-4 km/h)</option>
+          <option value="4.3">Spacer średni (5-6 km/h)</option>
+          <option value="5.0">Spacer szybki (6-7 km/h)</option>
+          <option value="7.0">Bieg powolny (8 km/h)</option>
+          <option value="10.0">Bieg średni (10 km/h)</option>
+          <option value="12.5">Bieg szybki (12+ km/h)</option>
+          <option value="6.0">Rower rekreacyjny</option>
+          <option value="8.0">Rower intensywny</option>
+          <option value="8.0">Siłownia (umiarkowana)</option>
+          <option value="10.0">Siłownia (intensywna)</option>
+          <option value="8.0">Pływanie rekreacyjne</option>
+          <option value="11.0">Pływanie intensywne</option>
+          <option value="7.0">Joga/Pilates</option>
+          <option value="12.0">Crossfit/HIIT</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Czas trwania (minuty):</label>
+        <input type="number" id="activityDuration" placeholder="np. 45" min="1" max="300">
+      </div>
+      <button onclick="calculateCalories()" class="btn-primary">🔥 Oblicz spalone kalorie</button>
+      <div id="caloriesResult" style="margin-top: 15px;"></div>
+      <button onclick="saveActivity()" class="btn-success" style="margin-top: 10px; display: none;" id="saveActivityBtn">💾 Zapisz aktywność</button>
+    </div>
+
+    <!-- Dziennik aktywności -->
+    <div class="card">
+      <h3>📊 Dziennik aktywności (tydzień)</h3>
+      <div id="activityLog"></div>
+      <div id="activitySummary" style="margin-top: 15px;"></div>
+    </div>
+
+    <!-- Tracker wagi -->
+    <div class="card">
+      <h3>⚖️ Dziennik wagi i pomiarów</h3>
+      <div class="form-group">
+        <label>Wybierz osobę:</label>
+        <select id="weightPerson">
+          <option value="person1"><span class="person-michalina-name">Michalina</span></option>
+          <option value="person2"><span class="person-marcin-name">Marcin</span></option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Data:</label>
+        <input type="date" id="weightDate">
+      </div>
+      <div class="form-group">
+        <label>Waga (kg):</label>
+        <input type="number" id="weightValue" step="0.1" placeholder="np. 72.5">
+      </div>
+      <button onclick="saveWeight()" class="btn-success">💾 Zapisz wagę</button>
+      <div id="weightHistory" style="margin-top: 20px;"></div>
+    </div>
+
+    <!-- Tracker wody -->
+    <div class="card">
+      <h3>💧 Tracker wody - dziś</h3>
+      <div class="form-group">
+        <label>Wybierz osobę:</label>
+        <select id="waterPerson">
+          <option value="person1"><span class="person-michalina-name">Michalina</span></option>
+          <option value="person2"><span class="person-marcin-name">Marcin</span></option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Cel dzienny (litry):</label>
+        <input type="number" id="waterGoal" value="2.5" step="0.1" min="1" max="5">
+      </div>
+      <div class="water-buttons">
+        <button onclick="addWater(0.25)" class="btn-water">+250ml</button>
+        <button onclick="addWater(0.5)" class="btn-water">+500ml</button>
+        <button onclick="addWater(0.75)" class="btn-water">+750ml</button>
+        <button onclick="resetWater()" class="btn-reset-small">🔄 Reset</button>
+      </div>
+      <div id="waterProgress" style="margin-top: 20px;"></div>
+    </div>
+
+    <!-- Analiza makroskładników -->
+    <div class="card">
+      <h3>📊 Analiza makroskładników - plan tygodniowy</h3>
+      <p style="color: #666; font-style: italic;">Generuj plan tygodniowy w zakładce "Planner", aby zobaczyć analizę makroskładników</p>
+      <div id="macroAnalysis"></div>
+    </div>
+  </div>
+
+  <div id="fridge-tab" class="tab-content">
+    <h2>🧊 Lodówka i zakupy</h2>
+    
+    <!-- Zarządzanie lodówką -->
+    <div class="card">
+      <h3>🧊 Co mam w lodówce?</h3>
+      <div class="form-group">
+        <label>Dodaj produkt:</label>
+        <input type="text" id="fridgeProduct" placeholder="np. Mleko">
+      </div>
+      <div class="form-group">
+        <label>Ilość (g/ml/szt):</label>
+        <input type="number" id="fridgeAmount" placeholder="np. 1000">
+      </div>
+      <div class="form-group">
+        <label>Jednostka:</label>
+        <select id="fridgeUnit">
+          <option value="g">gramy (g)</option>
+          <option value="ml">mililitry (ml)</option>
+          <option value="szt">sztuki (szt)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Data ważności (opcjonalnie):</label>
+        <input type="date" id="fridgeExpiry">
+      </div>
+      <button onclick="addToFridge()" class="btn-success">➕ Dodaj do lodówki</button>
+      <div id="fridgeList" style="margin-top: 20px;"></div>
+    </div>
+
+    <!-- Sugestie dań -->
+    <div class="card">
+      <h3>💡 Sugestie dań z dostępnych produktów</h3>
+      <button onclick="suggestDishes()" class="btn-primary">🔍 Znajdź dania</button>
+      <div id="dishSuggestions" style="margin-top: 15px;"></div>
+    </div>
+
+    <!-- Lista zakupów z cenami -->
+    <div class="card">
+      <h3>💰 Zarządzaj cenami produktów</h3>
+      <p style="color: #666; font-style: italic;">Dodaj ceny produktów, aby szacować koszt zakupów</p>
+      <div class="form-group">
+        <label>Produkt:</label>
+        <input type="text" id="priceProduct" placeholder="np. Mleko 2%">
+      </div>
+      <div class="form-group">
+        <label>Cena za 100g/100ml (zł):</label>
+        <input type="number" id="priceValue" step="0.01" placeholder="np. 0.50">
+      </div>
+      <div class="form-group">
+        <label>Sklep:</label>
+        <input type="text" id="priceShop" placeholder="np. Biedronka">
+      </div>
+      <button onclick="savePrice()" class="btn-success">💾 Zapisz cenę</button>
+      <div id="priceList" style="margin-top: 20px;"></div>
+    </div>
+
+    <!-- Szacowany koszt -->
+    <div class="card">
+      <h3>💵 Szacowany koszt zakupów</h3>
+      <p style="color: #666; font-style: italic;">Generuj listę zakupów w zakładce "Planner", aby zobaczyć szacowany koszt</p>
+      <div id="costEstimate"></div>
+    </div>
+  </div>
+
+  <div id="training-tab" class="tab-content">
+    <h2>💪 Plan treningowy</h2>
+    
+    <!-- Planner treningowy -->
+    <div class="card">
+      <h3>📅 Plan treningów na tydzień</h3>
+      <div id="trainingPlanner"></div>
+    </div>
+
+    <!-- Dodaj trening -->
+    <div class="card">
+      <h3>➕ Dodaj trening</h3>
+      <div class="form-group">
+        <label>Dzień tygodnia:</label>
+        <select id="trainingDay">
+          <option value="0">Poniedziałek</option>
+          <option value="1">Wtorek</option>
+          <option value="2">Środa</option>
+          <option value="3">Czwartek</option>
+          <option value="4">Piątek</option>
+          <option value="5">Sobota</option>
+          <option value="6">Niedziela</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Kto trenuje?</label>
+        <select id="trainingPerson">
+          <option value="person1"><span class="person-michalina-name">Michalina</span></option>
+          <option value="person2"><span class="person-marcin-name">Marcin</span></option>
+          <option value="both">Oboje</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Rodzaj treningu:</label>
+        <select id="trainingType">
+          <option value="Cardio">Cardio (bieg, rower, orbitrek)</option>
+          <option value="Siłowy">Siłowy (FBW, Split)</option>
+          <option value="Funkcjonalny">Funkcjonalny (Crossfit, HIIT)</option>
+          <option value="Rozciąganie">Rozciąganie/Yoga</option>
+          <option value="Sport">Sport (piłka, pływanie, itp.)</option>
+          <option value="Własny">Własny</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Nazwa/Opis treningu:</label>
+        <input type="text" id="trainingName" placeholder="np. Bieg interwałowy 5km">
+      </div>
+      <div class="form-group">
+        <label>Czas (minuty):</label>
+        <input type="number" id="trainingTime" placeholder="np. 45" min="5">
+      </div>
+      <button onclick="saveTraining()" class="btn-success">💾 Dodaj trening do planu</button>
+    </div>
+
+    <!-- Biblioteka ćwiczeń -->
+    <div class="card">
+      <h3>📚 Biblioteka ćwiczeń</h3>
+      <div class="exercise-categories">
+        <button onclick="showExercises('chest')" class="btn-exercise">💪 Klatka piersiowa</button>
+        <button onclick="showExercises('back')" class="btn-exercise">🏋️ Plecy</button>
+        <button onclick="showExercises('legs')" class="btn-exercise">🦵 Nogi</button>
+        <button onclick="showExercises('arms')" class="btn-exercise">💪 Ramiona</button>
+        <button onclick="showExercises('core')" class="btn-exercise">🎯 Brzuch/Core</button>
+        <button onclick="showExercises('cardio')" class="btn-exercise">🏃 Cardio</button>
+      </div>
+      <div id="exerciseList" style="margin-top: 20px;"></div>
+    </div>
+
+    <!-- Garmin Connect Integration -->
+    <div class="card">
+      <h3>⌚ Garmin Connect</h3>
+      <p style="color: #666; margin-bottom: 15px;">Importuj dane treningowe z Garmin Connect:</p>
+      <div class="garmin-info">
+        <div class="info-item">
+          <strong>📱 Aplikacja mobilna:</strong>
+          <p>Pobierz aplikację Garmin Connect z App Store lub Google Play</p>
+        </div>
+        <div class="info-item">
+          <strong>💻 Wersja webowa:</strong>
+          <p><a href="https://connect.garmin.com" target="_blank" class="garmin-link">connect.garmin.com</a></p>
+        </div>
+        <div class="info-item">
+          <strong>📊 Eksport danych:</strong>
+          <p>W Garmin Connect: Aktywność → Eksportuj do CSV → Skopiuj dane spalonych kalorii</p>
+        </div>
+      </div>
+      <button onclick="window.open('https://connect.garmin.com', '_blank')" class="btn-primary" style="margin-top: 15px;">🔗 Otwórz Garmin Connect</button>
+    </div>
   </div>
 
   <div id="manage-tab" class="tab-content">

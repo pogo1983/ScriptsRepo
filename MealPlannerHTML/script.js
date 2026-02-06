@@ -455,11 +455,38 @@ function switchTab(tabName) {
   
   // Pokaż wybraną zakładkę
   document.getElementById(tabName + '-tab').classList.add('active');
-  event.target.classList.add('active');
   
+  // Zaznacz aktywny przycisk
+  document.querySelectorAll('.tab').forEach(button => {
+    if(button.textContent.includes(getTabIcon(tabName))) {
+      button.classList.add('active');
+    }
+  });
+  
+  // Inicjalizuj widoki przy przełączaniu
   if(tabName === 'manage') {
     displayDishList();
+  } else if(tabName === 'activity') {
+    displayActivityLog();
+    displayWeightHistory();
+    displayWaterProgress();
+  } else if(tabName === 'fridge') {
+    displayFridge();
+    displayPrices();
+  } else if(tabName === 'training') {
+    displayTrainingPlanner();
   }
+}
+
+function getTabIcon(tabName) {
+  const icons = {
+    'planner': '📅',
+    'activity': '🏃',
+    'fridge': '🧊',
+    'training': '💪',
+    'manage': '⚙️'
+  };
+  return icons[tabName] || '';
 }
 
 // ---------- ZARZĄDZANIE DANIAMI ----------
@@ -831,6 +858,623 @@ function printShoppingList() {
   window.print();
 }
 
+// ---------- AKTYWNOŚĆ FIZYCZNA ----------
+
+let currentActivityData = null;
+
+function calculateCalories() {
+  const person = document.getElementById('activityPerson').value;
+  const weight = parseFloat(document.getElementById('activityWeight').value);
+  const met = parseFloat(document.getElementById('activityType').value);
+  const duration = parseInt(document.getElementById('activityDuration').value);
+  
+  if(!weight || !duration) {
+    alert('Wypełnij wszystkie pola!');
+    return;
+  }
+  
+  // Wzór: Spalone kalorie = MET × waga (kg) × czas (h)
+  const hours = duration / 60;
+  const calories = Math.round(met * weight * hours);
+  
+  const activityName = document.getElementById('activityType').options[document.getElementById('activityType').selectedIndex].text;
+  const personName = person === 'person1' ? namePerson1 : namePerson2;
+  
+  currentActivityData = {
+    person: person,
+    personName: personName,
+    weight: weight,
+    activity: activityName,
+    met: met,
+    duration: duration,
+    calories: calories,
+    date: new Date().toISOString().split('T')[0],
+    dayOfWeek: new Date().getDay()
+  };
+  
+  const resultDiv = document.getElementById('caloriesResult');
+  resultDiv.innerHTML = `
+    <div class="result-box">
+      <h4>🔥 Wynik</h4>
+      <p><strong>${personName}</strong> spalił(a):</p>
+      <div class="result-value">${calories} kcal</div>
+      <p style="font-size: 14px; color: #666; margin-top: 10px;">
+        Aktywność: ${activityName}<br>
+        Czas: ${duration} minut<br>
+        Waga: ${weight} kg
+      </p>
+    </div>
+  `;
+  
+  document.getElementById('saveActivityBtn').style.display = 'block';
+}
+
+function saveActivity() {
+  if(!currentActivityData) return;
+  
+  let activities = JSON.parse(localStorage.getItem('activities') || '[]');
+  activities.push(currentActivityData);
+  localStorage.setItem('activities', JSON.stringify(activities));
+  
+  alert('✅ Aktywność zapisana!');
+  displayActivityLog();
+  currentActivityData = null;
+  document.getElementById('saveActivityBtn').style.display = 'none';
+}
+
+function displayActivityLog() {
+  const activities = JSON.parse(localStorage.getItem('activities') || '[]');
+  const logDiv = document.getElementById('activityLog');
+  const summaryDiv = document.getElementById('activitySummary');
+  
+  if(activities.length === 0) {
+    logDiv.innerHTML = '<p style="color: #666; font-style: italic;">Brak zapisanych aktywności</p>';
+    summaryDiv.innerHTML = '';
+    return;
+  }
+  
+  // Pogrupuj po dniach
+  const byDay = {};
+  dni.forEach((day, idx) => {
+    byDay[idx] = [];
+  });
+  
+  activities.forEach(act => {
+    const day = act.dayOfWeek === 0 ? 6 : act.dayOfWeek - 1; // Konwersja na nasz system
+    byDay[day].push(act);
+  });
+  
+  let html = '';
+  dni.forEach((day, idx) => {
+    if(byDay[idx].length > 0) {
+      html += `<div class="training-day"><strong>${day}</strong>`;
+      byDay[idx].forEach((act, actIdx) => {
+        html += `
+          <div class="activity-item">
+            <div>
+              <strong>${act.personName}</strong>: ${act.activity}<br>
+              <small>${act.duration} min • ${act.calories} kcal</small>
+            </div>
+            <button class="activity-delete" onclick="deleteActivity(${idx}, ${actIdx})">❌</button>
+          </div>
+        `;
+      });
+      html += '</div>';
+    }
+  });
+  
+  logDiv.innerHTML = html;
+  
+  // Podsumowanie
+  const totalCalories1 = activities.filter(a => a.person === 'person1').reduce((sum, a) => sum + a.calories, 0);
+  const totalCalories2 = activities.filter(a => a.person === 'person2').reduce((sum, a) => sum + a.calories, 0);
+  
+  summaryDiv.innerHTML = `
+    <div class="result-box">
+      <h4>📊 Podsumowanie tygodnia</h4>
+      <p><strong>${namePerson1}:</strong> ${totalCalories1} kcal spalonych</p>
+      <p><strong>${namePerson2}:</strong> ${totalCalories2} kcal spalonych</p>
+    </div>
+  `;
+}
+
+function deleteActivity(dayIdx, actIdx) {
+  let activities = JSON.parse(localStorage.getItem('activities') || '[]');
+  const filtered = activities.filter((act, idx) => {
+    const actDay = act.dayOfWeek === 0 ? 6 : act.dayOfWeek - 1;
+    return actDay !== dayIdx || idx !== actIdx;
+  });
+  localStorage.setItem('activities', JSON.stringify(filtered));
+  displayActivityLog();
+}
+
+// ---------- WAGA ----------
+
+function saveWeight() {
+  const person = document.getElementById('weightPerson').value;
+  const date = document.getElementById('weightDate').value;
+  const weight = parseFloat(document.getElementById('weightValue').value);
+  
+  if(!date || !weight) {
+    alert('Wypełnij wszystkie pola!');
+    return;
+  }
+  
+  const personName = person === 'person1' ? namePerson1 : namePerson2;
+  let weights = JSON.parse(localStorage.getItem('weights') || '[]');
+  
+  weights.push({
+    person: person,
+    personName: personName,
+    date: date,
+    weight: weight
+  });
+  
+  weights.sort((a, b) => new Date(b.date) - new Date(a.date));
+  localStorage.setItem('weights', JSON.stringify(weights));
+  
+  alert('✅ Waga zapisana!');
+  displayWeightHistory();
+  document.getElementById('weightValue').value = '';
+}
+
+function displayWeightHistory() {
+  const weights = JSON.parse(localStorage.getItem('weights') || '[]');
+  const historyDiv = document.getElementById('weightHistory');
+  
+  if(weights.length === 0) {
+    historyDiv.innerHTML = '<p style="color: #666; font-style: italic;">Brak zapisanych pomiarów</p>';
+    return;
+  }
+  
+  let html = '<h4>📈 Historia pomiarów:</h4>';
+  
+  // Pogrupuj po osobach
+  const person1Weights = weights.filter(w => w.person === 'person1');
+  const person2Weights = weights.filter(w => w.person === 'person2');
+  
+  if(person1Weights.length > 0) {
+    html += `<h5 class="person-michalina">${namePerson1}</h5>`;
+    person1Weights.slice(0, 10).forEach((w, idx) => {
+      const trend = idx < person1Weights.length - 1 ? 
+        (w.weight < person1Weights[idx + 1].weight ? '📉 ' : w.weight > person1Weights[idx + 1].weight ? '📈 ' : '➡️ ') : '';
+      html += `
+        <div class="weight-entry">
+          <span>${trend}${w.date}: <strong>${w.weight} kg</strong></span>
+          <button class="weight-delete" onclick="deleteWeight(${weights.indexOf(w)})">❌</button>
+        </div>
+      `;
+    });
+  }
+  
+  if(person2Weights.length > 0) {
+    html += `<h5 class="person-marcin">${namePerson2}</h5>`;
+    person2Weights.slice(0, 10).forEach((w, idx) => {
+      const trend = idx < person2Weights.length - 1 ? 
+        (w.weight < person2Weights[idx + 1].weight ? '📉 ' : w.weight > person2Weights[idx + 1].weight ? '📈 ' : '➡️ ') : '';
+      html += `
+        <div class="weight-entry">
+          <span>${trend}${w.date}: <strong>${w.weight} kg</strong></span>
+          <button class="weight-delete" onclick="deleteWeight(${weights.indexOf(w)})">❌</button>
+        </div>
+      `;
+    });
+  }
+  
+  historyDiv.innerHTML = html;
+}
+
+function deleteWeight(idx) {
+  let weights = JSON.parse(localStorage.getItem('weights') || '[]');
+  weights.splice(idx, 1);
+  localStorage.setItem('weights', JSON.stringify(weights));
+  displayWeightHistory();
+}
+
+// ---------- TRACKER WODY ----------
+
+function addWater(amount) {
+  const person = document.getElementById('waterPerson').value;
+  const today = new Date().toISOString().split('T')[0];
+  
+  let waterData = JSON.parse(localStorage.getItem('waterData') || '{}');
+  const key = `${person}_${today}`;
+  
+  waterData[key] = (waterData[key] || 0) + amount;
+  localStorage.setItem('waterData', JSON.stringify(waterData));
+  
+  displayWaterProgress();
+}
+
+function resetWater() {
+  const person = document.getElementById('waterPerson').value;
+  const today = new Date().toISOString().split('T')[0];
+  
+  let waterData = JSON.parse(localStorage.getItem('waterData') || '{}');
+  const key = `${person}_${today}`;
+  
+  delete waterData[key];
+  localStorage.setItem('waterData', JSON.stringify(waterData));
+  
+  displayWaterProgress();
+}
+
+function displayWaterProgress() {
+  const person = document.getElementById('waterPerson').value;
+  const goal = parseFloat(document.getElementById('waterGoal').value);
+  const today = new Date().toISOString().split('T')[0];
+  
+  let waterData = JSON.parse(localStorage.getItem('waterData') || '{}');
+  const key = `${person}_${today}`;
+  const current = waterData[key] || 0;
+  
+  const percentage = Math.min((current / goal) * 100, 100);
+  const personName = person === 'person1' ? namePerson1 : namePerson2;
+  
+  const progressDiv = document.getElementById('waterProgress');
+  progressDiv.innerHTML = `
+    <h4>${personName} - Dziś: ${current.toFixed(2)}L / ${goal}L</h4>
+    <div class="water-progress-bar">
+      <div class="water-progress-fill" style="width: ${percentage}%">
+        ${percentage.toFixed(0)}%
+      </div>
+    </div>
+    <p style="margin-top: 10px; color: #666;">
+      ${current >= goal ? '🎉 Cel osiągnięty!' : `💧 Pozostało: ${(goal - current).toFixed(2)}L`}
+    </p>
+  `;
+}
+
+// ---------- LODÓWKA ----------
+
+function addToFridge() {
+  const product = document.getElementById('fridgeProduct').value.trim();
+  const amount = parseFloat(document.getElementById('fridgeAmount').value);
+  const unit = document.getElementById('fridgeUnit').value;
+  const expiry = document.getElementById('fridgeExpiry').value;
+  
+  if(!product || !amount) {
+    alert('Wypełnij nazwę i ilość!');
+    return;
+  }
+  
+  let fridge = JSON.parse(localStorage.getItem('fridge') || '[]');
+  
+  fridge.push({
+    product: product,
+    amount: amount,
+    unit: unit,
+    expiry: expiry,
+    addedDate: new Date().toISOString().split('T')[0]
+  });
+  
+  localStorage.setItem('fridge', JSON.stringify(fridge));
+  
+  alert('✅ Dodano do lodówki!');
+  displayFridge();
+  
+  document.getElementById('fridgeProduct').value = '';
+  document.getElementById('fridgeAmount').value = '';
+  document.getElementById('fridgeExpiry').value = '';
+}
+
+function displayFridge() {
+  const fridge = JSON.parse(localStorage.getItem('fridge') || '[]');
+  const listDiv = document.getElementById('fridgeList');
+  
+  if(fridge.length === 0) {
+    listDiv.innerHTML = '<p style="color: #666; font-style: italic;">Lodówka jest pusta</p>';
+    return;
+  }
+  
+  const today = new Date();
+  let html = '<h4>📦 Zawartość lodówki:</h4>';
+  
+  fridge.forEach((item, idx) => {
+    let expiryClass = '';
+    let expiryText = '';
+    
+    if(item.expiry) {
+      const expiryDate = new Date(item.expiry);
+      const daysLeft = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+      
+      if(daysLeft < 0) {
+        expiryClass = 'expired';
+        expiryText = `⚠️ Przeterminowane ${Math.abs(daysLeft)} dni temu`;
+      } else if(daysLeft <= 3) {
+        expiryClass = 'expiring';
+        expiryText = `⏰ Ważne jeszcze ${daysLeft} dni`;
+      } else {
+        expiryText = `Ważne do: ${item.expiry}`;
+      }
+    }
+    
+    html += `
+      <div class="fridge-item ${expiryClass}">
+        <div>
+          <strong>${item.product}</strong>: ${item.amount} ${item.unit}<br>
+          <small>${expiryText}</small>
+        </div>
+        <button class="fridge-delete" onclick="deleteFromFridge(${idx})">❌</button>
+      </div>
+    `;
+  });
+  
+  listDiv.innerHTML = html;
+}
+
+function deleteFromFridge(idx) {
+  let fridge = JSON.parse(localStorage.getItem('fridge') || '[]');
+  fridge.splice(idx, 1);
+  localStorage.setItem('fridge', JSON.stringify(fridge));
+  displayFridge();
+}
+
+function suggestDishes() {
+  const fridge = JSON.parse(localStorage.getItem('fridge') || '[]');
+  const suggestionsDiv = document.getElementById('dishSuggestions');
+  
+  if(fridge.length === 0) {
+    suggestionsDiv.innerHTML = '<p style="color: #666;">Dodaj produkty do lodówki!</p>';
+    return;
+  }
+  
+  const fridgeProducts = fridge.map(item => item.product.toLowerCase());
+  const suggestions = [];
+  
+  // Sprawdź wszystkie dania
+  ['śniadanie', 'obiad', 'kolacja', 'podwieczorek'].forEach(mealType => {
+    if(dania[mealType]) {
+      dania[mealType].forEach(dish => {
+        const dishIngredients = Object.keys(dish.skladniki).map(ing => ing.toLowerCase());
+        const matchCount = dishIngredients.filter(ing => 
+          fridgeProducts.some(fp => fp.includes(ing) || ing.includes(fp))
+        ).length;
+        
+        if(matchCount > 0) {
+          suggestions.push({
+            name: dish.nazwa,
+            type: mealType,
+            matchCount: matchCount,
+            totalIngredients: dishIngredients.length,
+            matchPercent: Math.round((matchCount / dishIngredients.length) * 100)
+          });
+        }
+      });
+    }
+  });
+  
+  suggestions.sort((a, b) => b.matchPercent - a.matchPercent);
+  
+  let html = '<h4>💡 Sugerowane dania:</h4>';
+  
+  if(suggestions.length === 0) {
+    html += '<p style="color: #666;">Brak pasujących dań :(</p>';
+  } else {
+    suggestions.slice(0, 10).forEach(sug => {
+      html += `
+        <div class="fridge-item">
+          <div>
+            <strong>${sug.name}</strong> (${sug.type})<br>
+            <small>Masz ${sug.matchCount}/${sug.totalIngredients} składników (${sug.matchPercent}%)</small>
+          </div>
+        </div>
+      `;
+    });
+  }
+  
+  suggestionsDiv.innerHTML = html;
+}
+
+// ---------- CENY PRODUKTÓW ----------
+
+function savePrice() {
+  const product = document.getElementById('priceProduct').value.trim();
+  const price = parseFloat(document.getElementById('priceValue').value);
+  const shop = document.getElementById('priceShop').value.trim();
+  
+  if(!product || !price) {
+    alert('Wypełnij nazwę produktu i cenę!');
+    return;
+  }
+  
+  let prices = JSON.parse(localStorage.getItem('prices') || '{}');
+  
+  prices[product] = {
+    price: price,
+    shop: shop || 'Nieznany',
+    updated: new Date().toISOString().split('T')[0]
+  };
+  
+  localStorage.setItem('prices', JSON.stringify(prices));
+  
+  alert('✅ Cena zapisana!');
+  displayPrices();
+  
+  document.getElementById('priceProduct').value = '';
+  document.getElementById('priceValue').value = '';
+  document.getElementById('priceShop').value = '';
+}
+
+function displayPrices() {
+  const prices = JSON.parse(localStorage.getItem('prices') || '{}');
+  const listDiv = document.getElementById('priceList');
+  
+  const priceEntries = Object.entries(prices);
+  
+  if(priceEntries.length === 0) {
+    listDiv.innerHTML = '<p style="color: #666; font-style: italic;">Brak zapisanych cen</p>';
+    return;
+  }
+  
+  let html = '<h4>💰 Zapisane ceny:</h4>';
+  
+  priceEntries.sort((a, b) => a[0].localeCompare(b[0])).forEach(([product, data]) => {
+    html += `
+      <div class="price-item">
+        <div>
+          <strong>${product}</strong>: ${data.price.toFixed(2)} zł/100g<br>
+          <small>${data.shop} • ${data.updated}</small>
+        </div>
+        <button class="price-delete" onclick="deletePrice('${product}')">❌</button>
+      </div>
+    `;
+  });
+  
+  listDiv.innerHTML = html;
+}
+
+function deletePrice(product) {
+  let prices = JSON.parse(localStorage.getItem('prices') || '{}');
+  delete prices[product];
+  localStorage.setItem('prices', JSON.stringify(prices));
+  displayPrices();
+}
+
+// ---------- TRENING ----------
+
+function saveTraining() {
+  const day = parseInt(document.getElementById('trainingDay').value);
+  const person = document.getElementById('trainingPerson').value;
+  const type = document.getElementById('trainingType').value;
+  const name = document.getElementById('trainingName').value.trim();
+  const time = parseInt(document.getElementById('trainingTime').value);
+  
+  if(!name || !time) {
+    alert('Wypełnij nazwę i czas treningu!');
+    return;
+  }
+  
+  let trainings = JSON.parse(localStorage.getItem('trainings') || '{}');
+  
+  if(!trainings[day]) trainings[day] = [];
+  
+  trainings[day].push({
+    person: person,
+    type: type,
+    name: name,
+    time: time
+  });
+  
+  localStorage.setItem('trainings', JSON.stringify(trainings));
+  
+  alert('✅ Trening dodany do planu!');
+  displayTrainingPlanner();
+  
+  document.getElementById('trainingName').value = '';
+  document.getElementById('trainingTime').value = '';
+}
+
+function displayTrainingPlanner() {
+  const trainings = JSON.parse(localStorage.getItem('trainings') || '{}');
+  const plannerDiv = document.getElementById('trainingPlanner');
+  
+  let html = '';
+  
+  dni.forEach((day, idx) => {
+    html += `<div class="training-day"><strong>${day}</strong>`;
+    
+    if(trainings[idx] && trainings[idx].length > 0) {
+      trainings[idx].forEach((training, tIdx) => {
+        const personName = training.person === 'person1' ? namePerson1 : 
+                          training.person === 'person2' ? namePerson2 : 'Oboje';
+        html += `
+          <div class="training-item">
+            <div>
+              <strong>${training.name}</strong> (${training.type})<br>
+              <small>${personName} • ${training.time} min</small>
+            </div>
+            <button class="training-delete" onclick="deleteTraining(${idx}, ${tIdx})">❌</button>
+          </div>
+        `;
+      });
+    } else {
+      html += '<p style="color: #999; font-style: italic; margin: 8px 0;">Brak treningów</p>';
+    }
+    
+    html += '</div>';
+  });
+  
+  plannerDiv.innerHTML = html;
+}
+
+function deleteTraining(dayIdx, trainIdx) {
+  let trainings = JSON.parse(localStorage.getItem('trainings') || '{}');
+  if(trainings[dayIdx]) {
+    trainings[dayIdx].splice(trainIdx, 1);
+    if(trainings[dayIdx].length === 0) delete trainings[dayIdx];
+  }
+  localStorage.setItem('trainings', JSON.stringify(trainings));
+  displayTrainingPlanner();
+}
+
+// ---------- BIBLIOTEKA ĆWICZEŃ ----------
+
+const exercises = {
+  chest: [
+    { name: 'Wyciskanie sztangi na ławce płaskiej', sets: '4x8-12', equipment: 'Sztanga' },
+    { name: 'Wyciskanie hantli na ławce skośnej', sets: '3x10-12', equipment: 'Hantle' },
+    { name: 'Rozpiętki na ławce', sets: '3x12-15', equipment: 'Hantle' },
+    { name: 'Pompki', sets: '3xmax', equipment: 'Ciężar ciała' },
+    { name: 'Dipy na poręczach', sets: '3x8-12', equipment: 'Poręcze' }
+  ],
+  back: [
+    { name: 'Podciąganie na drążku', sets: '4x6-10', equipment: 'Drążek' },
+    { name: 'Wiosłowanie sztangą w opadzie', sets: '4x8-12', equipment: 'Sztanga' },
+    { name: 'Wiosłowanie hantlem', sets: '3x10-12', equipment: 'Hantel' },
+    { name: 'Ściąganie drążka wyciągu górnego', sets: '3x12-15', equipment: 'Wyciąg' },
+    { name: 'Martwy ciąg', sets: '3x6-8', equipment: 'Sztanga' }
+  ],
+  legs: [
+    { name: 'Przysiad ze sztangą', sets: '4x8-12', equipment: 'Sztanga' },
+    { name: 'Wypychanie nóg na maszynie', sets: '3x12-15', equipment: 'Maszyna' },
+    { name: 'Martwy ciąg rumuński', sets: '3x10-12', equipment: 'Sztanga' },
+    { name: 'Wykroki z hantlami', sets: '3x12 każda noga', equipment: 'Hantle' },
+    { name: 'Prostowanie/zginanie nóg', sets: '3x12-15', equipment: 'Maszyna' }
+  ],
+  arms: [
+    { name: 'Uginanie ramion ze sztangą', sets: '3x10-12', equipment: 'Sztanga' },
+    { name: 'Uginanie ramion z hantlami', sets: '3x12-15', equipment: 'Hantle' },
+    { name: 'Wyciskanie francuskie', sets: '3x10-12', equipment: 'Sztanga/Hantle' },
+    { name: 'Prostowanie ramion na wyciągu', sets: '3x12-15', equipment: 'Wyciąg' },
+    { name: 'Uginanie ramion młotkiem', sets: '3x12-15', equipment: 'Hantle' }
+  ],
+  core: [
+    { name: 'Plank', sets: '3x60s', equipment: 'Ciężar ciała' },
+    { name: 'Spięcia brzucha', sets: '3x15-20', equipment: 'Ciężar ciała' },
+    { name: 'Unoszenie nóg w zwisie', sets: '3x10-15', equipment: 'Drążek' },
+    { name: 'Russian twist', sets: '3x20', equipment: 'Ciężar ciała/Obciążenie' },
+    { name: 'Mountain climbers', sets: '3x30s', equipment: 'Ciężar ciała' }
+  ],
+  cardio: [
+    { name: 'Bieg ciągły', sets: '20-45 min', equipment: 'Bieżnia/Zewnątrz' },
+    { name: 'Interwały biegowe', sets: '10x1min intensywnie', equipment: 'Bieżnia' },
+    { name: 'Rower stacjonarny', sets: '30-45 min', equipment: 'Rower' },
+    { name: 'Burpees', sets: '3x15-20', equipment: 'Ciężar ciała' },
+    { name: 'Jumping jacks', sets: '3x30-60s', equipment: 'Ciężar ciała' }
+  ]
+};
+
+function showExercises(category) {
+  const listDiv = document.getElementById('exerciseList');
+  const exList = exercises[category];
+  
+  let html = `<h4>📝 Ćwiczenia - ${category}</h4>`;
+  
+  exList.forEach(ex => {
+    html += `
+      <div class="fridge-item">
+        <div>
+          <strong>${ex.name}</strong><br>
+          <small>Seria: ${ex.sets} • Sprzęt: ${ex.equipment}</small>
+        </div>
+      </div>
+    `;
+  });
+  
+  listDiv.innerHTML = html;
+}
+
 // ---------- INICJALIZACJA ----------
 
 // Wczytaj przy starcie
@@ -838,3 +1482,10 @@ loadCustomDishes();
 loadSavedCalories();
 loadSavedNames();
 createDropdowns();
+
+// Ustaw dzisiejszą datę w polu wagi
+document.getElementById('weightDate').value = new Date().toISOString().split('T')[0];
+
+// Event listeners dla trackera wody - aktualizuj przy zmianie osoby lub celu
+document.getElementById('waterPerson').addEventListener('change', displayWaterProgress);
+document.getElementById('waterGoal').addEventListener('change', displayWaterProgress);
