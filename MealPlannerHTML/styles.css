@@ -1013,3 +1013,24 @@ tr:hover {
     color: #000 !important;
   }
 }
+/* ========================================
+   STATISTICS & GARMIN TAB
+   ======================================== */
+
+.import-section {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid var(--gray-3);
+  text-align: center;
+}
+
+.import-section h4 {
+  margin-bottom: 15px;
+  color: var(--gray-6);
+}
+
+#caloriesChart {
+  width: 100%;
+  min-height: 300px;
+}
