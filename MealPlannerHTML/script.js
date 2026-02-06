@@ -215,6 +215,9 @@ function generujPlan(){
     totalCalories2: totalCalories2
   };
 
+  // Sortuj produkty alfabetycznie
+  const sortedProducts = Object.keys(zakupy).sort();
+
   // Generowanie listy zakupów dla wszystkich dni (domyślnie)
   generateShoppingList(zakupy, sortedProducts);
 
