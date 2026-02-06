@@ -518,20 +518,22 @@ button {
 }
 
 .meal-count-selector label:first-child {
+  display: block;
   font-weight: 700;
-  color: var(--gray-6);
+  color: #1d1d1f;
   margin-bottom: 12px;
-  font-size: 15px;
+  font-size: 16px;
 }
 
-.meal-count-selector label {
+.meal-count-selector label:not(:first-child) {
   display: inline-flex;
   align-items: center;
   margin-right: 24px;
   margin-top: 8px;
   cursor: pointer;
-  color: var(--gray-6);
+  color: #1d1d1f;
   font-weight: 500;
+  font-size: 15px;
 }
 
 .meal-count-selector input[type="radio"] {
@@ -1006,6 +1008,125 @@ tr:hover {
 
 /* ==================== RESPONSIVE DESIGN ==================== */
 
+/* ==================== MEAL PLAN CARDS ==================== */
+
+.week-plan-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.day-plan-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-light);
+}
+
+.day-plan-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 3px solid var(--primary-blue);
+}
+
+.day-plan-meals {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.meal-plan-card {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 16px;
+  border-left: 4px solid var(--primary-blue);
+}
+
+.meal-plan-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.meal-plan-icon {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.meal-plan-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-blue);
+}
+
+.meal-plan-people {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.meal-plan-person {
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+}
+
+.meal-plan-person strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+.meal-plan-calories {
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.day-plan-summary {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 2px solid #e0e0e0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.day-plan-summary strong {
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .meal-plan-people {
+    grid-template-columns: 1fr;
+  }
+  
+  .day-plan-summary {
+    grid-template-columns: 1fr;
+  }
+  
+  .day-plan-card {
+    padding: 16px;
+  }
+  
+  .day-plan-title {
+    font-size: 22px;
+  }
+}
+
 /* ==================== RESPONSIVE ==================== */
 
 /* Table wrapper for horizontal scroll */
@@ -1045,6 +1166,12 @@ tr:hover {
   background: #f0f7ff;
   vertical-align: middle;
   text-align: center;
+  padding: 12px 15px;
+}
+
+.plan-table-desktop .day-label strong {
+  display: inline;
+  font-weight: 700;
 }
 
 @media (max-width: 768px) {

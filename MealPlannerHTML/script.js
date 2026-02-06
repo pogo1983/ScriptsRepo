@@ -123,11 +123,8 @@ function generujPlan(){
     
   let plan = "<div class='result-section'><h2>📅 Jadłospis na tydzień</h2>";
   
-  // Desktop: tabela z wrapperem do scroll
-  plan += "<div class='table-wrapper'><table class='plan-table-desktop'><tr><th>Dzień</th><th>Posiłek</th><th>Danie</th><th class='person-michalina'>" + namePerson1 + "</th><th class='person-marcin'>" + namePerson2 + "</th><th>kcal</th></tr>";
-  
-  // Mobile: karty
-  let mobileCards = "<div class='plan-cards-mobile'>";
+  // Karty dla każdego dnia
+  plan += "<div class='week-plan-cards'>";
   
   let zakupy = {}; // sumowanie składników
   let totalCalories1 = Array(7).fill(0); // kalorie dla osoby 1 na każdy dzień
@@ -138,12 +135,11 @@ function generujPlan(){
   
   for(let i=0;i<dni.length;i++){
     let dayMeals = [];
-    let firstMeal = true;
     
-    // Mobile: rozpocznij kartę dnia
-    mobileCards += `<div class='day-card'>
-      <h3 class='day-card-title'>${dni[i]}</h3>
-      <div class='day-card-meals'>`;
+    // Rozpocznij kartę dnia
+    plan += `<div class='day-plan-card'>
+      <h3 class='day-plan-title'>${dni[i]}</h3>
+      <div class='day-plan-meals'>`;
     
     posilki.forEach(posilek=>{
       const element = document.getElementById(posilek+i);
@@ -184,13 +180,6 @@ function generujPlan(){
       totalCalories1[i] += caloriesScaled1;
       totalCalories2[i] += caloriesScaled2;
       
-      // Desktop: wiersz tabeli - dzień tylko dla pierwszego posiłku
-      plan+="<tr>";
-      if(firstMeal) {
-        plan+=`<td class='day-label' rowspan='${posilki.length}'><strong>${dni[i]}</strong></td>`;
-        firstMeal = false;
-      }
-      plan+=`<td>${posilekDisplay}</td><td><strong>${d.nazwa}</strong></td><td class='person-michalina'>`;
       let skladM = [], skladMA = [];
       
       let mealData = {
@@ -225,28 +214,28 @@ function generujPlan(){
         calorieDisplay = `<span class='person-michalina'>${caloriesScaled1}</span> / <span class='person-marcin'>${caloriesScaled2}</span> kcal`;
       }
       
-      plan+=skladM.join(", ")+"</td><td class='person-marcin'>"+skladMA.join(", ")+"</td><td style='text-align: center;'>"+calorieDisplay+"</td></tr>";
-      
-      // Mobile: karta posiłku
-      mobileCards += `
-        <div class='meal-card'>
-          <div class='meal-card-header'>${posilekDisplay}</div>
-          <div class='meal-card-name'>${d.nazwa}</div>
-          <div class='meal-card-people'>
-            <div class='meal-card-person person-michalina'>
+      // Karta posiłku
+      plan += `
+        <div class='meal-plan-card'>
+          <div class='meal-plan-header'>
+            <span class='meal-plan-icon'>${posilekDisplay}</span>
+            <span class='meal-plan-name'>${d.nazwa}</span>
+          </div>
+          <div class='meal-plan-people'>
+            <div class='meal-plan-person person-michalina'>
               <strong>${namePerson1}:</strong> ${skladM.join(", ")}
             </div>
-            <div class='meal-card-person person-marcin'>
+            <div class='meal-plan-person person-marcin'>
               <strong>${namePerson2}:</strong> ${skladMA.join(", ")}
             </div>
           </div>
-          <div class='meal-card-calories'>${calorieDisplay}</div>
+          <div class='meal-plan-calories'>${calorieDisplay}</div>
         </div>`;
     });
     
-    // Mobile: zakończ kartę dnia z podsumowaniem kalorii
-    mobileCards += `
-      <div class='day-card-summary'>
+    // Zakończ kartę dnia z podsumowaniem kalorii
+    plan += `
+      <div class='day-plan-summary'>
         <div class='person-michalina'><strong>${namePerson1}:</strong> ${totalCalories1[i]} kcal</div>
         <div class='person-marcin'><strong>${namePerson2}:</strong> ${totalCalories2[i]} kcal</div>
       </div>
@@ -255,27 +244,8 @@ function generujPlan(){
     dayMealsData.push(dayMeals);
   }
   
-  // Dodaj podsumowanie kalorii dziennych - osobne wiersze dla każdej osoby
-  plan += "<tr style='background: #f0f7ff; font-weight: 700;'><td colspan='2' style='text-align: right; padding-right: 20px;'><b>Suma kalorii - " + namePerson1 + ":</b></td><td colspan='3' class='person-michalina' style='text-align: left; padding-left: 20px;'>";
-  for(let i = 0; i < 7; i++) {
-    if(i > 0) plan += " | ";
-    plan += dni[i].substr(0,3) + ": " + totalCalories1[i] + " kcal";
-  }
-  plan += "</td></tr>";
-  
-  plan += "<tr style='background: #e3f2fd; font-weight: 700;'><td colspan='2' style='text-align: right; padding-right: 20px;'><b>Suma kalorii - " + namePerson2 + ":</b></td><td colspan='3' class='person-marcin' style='text-align: left; padding-left: 20px;'>";
-  for(let i = 0; i < 7; i++) {
-    if(i > 0) plan += " | ";
-    plan += dni[i].substr(0,3) + ": " + totalCalories2[i] + " kcal";
-  }
-  plan += "</td></tr>";
-  plan+="</table></div>";
-  
-  // Zamknij karty mobile
-  mobileCards += "</div>";
-  
-  // Połącz oba widoki
-  plan += mobileCards + "</div>";
+  // Zamknij wszystkie karty
+  plan += "</div></div>";
 
   // Zapisz pełne dane planu globalnie
   fullPlanData = {
