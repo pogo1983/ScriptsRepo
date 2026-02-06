@@ -412,6 +412,15 @@ button {
   background: var(--gray-5);
 }
 
+.btn-ios {
+  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+  color: white;
+}
+
+.btn-ios:hover {
+  background: linear-gradient(135deg, #0051D5 0%, #003DA5 100%);
+}
+
 .btn-filter {
   padding: 12px 20px;
   font-size: 14px;

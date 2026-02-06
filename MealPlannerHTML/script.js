@@ -281,6 +281,7 @@ function generateShoppingList(zakupy, sortedProducts) {
   zakHTML += "<div class='export-buttons'>";
   zakHTML += "<button class='btn-export btn-excel' onclick='exportToExcel()'>📊 Eksportuj do Excel (CSV)</button>";
   zakHTML += "<button class='btn-export btn-print' onclick='printShoppingList()'>🖨️ Wydrukuj listę zakupów</button>";
+  zakHTML += "<button class='btn-export btn-ios' onclick='exportToiOSReminders()'>📱 Eksportuj do iOS Reminders</button>";
   zakHTML += "</div>";
   
   // Sprawdź które dni są zaznaczone
@@ -900,6 +901,140 @@ function printShoppingList() {
   
   // Otwórz okno wydruku
   window.print();
+}
+
+// ---------- EKSPORT DO iOS REMINDERS ----------
+
+function exportToiOSReminders() {
+  if(!window.currentShoppingList) {
+    alert('❌ Najpierw wygeneruj listę zakupów!');
+    return;
+  }
+  
+  const {zakupy, sortedProducts, selectedDays} = window.currentShoppingList;
+  
+  // Stwórz tytuł listy
+  const dayText = selectedDays.length === 7 ? "cały tydzień" : 
+                  selectedDays.map(i => dni[i]).join(", ");
+  const listTitle = `🛒 Zakupy: ${dayText}`;
+  
+  // Formatuj listę zakupów
+  let shoppingText = listTitle + "\n\n";
+  
+  sortedProducts.forEach(prod => {
+    const data = zakupy[prod];
+    const suma = data.michalina + data.marcin;
+    // Format: - Produkt: ilość jednostka
+    shoppingText += `☐ ${prod}: ${suma} ${data.jednostka}\n`;
+  });
+  
+  shoppingText += `\n📅 Wygenerowano: ${new Date().toLocaleDateString('pl-PL')}`;
+  
+  // Sprawdź czy urządzenie wspiera Web Share API (iOS/macOS)
+  if (navigator.share) {
+    // iOS Share Sheet - użytkownik może wybrać Reminders
+    navigator.share({
+      title: listTitle,
+      text: shoppingText
+    })
+    .then(() => {
+      // Sukces - nic nie rób
+    })
+    .catch((error) => {
+      // Jeśli anulowano lub błąd, pokaż fallback
+      if (error.name !== 'AbortError') {
+        copyToClipboardFallback(shoppingText);
+      }
+    });
+  } else {
+    // Fallback - skopiuj do schowka
+    copyToClipboardFallback(shoppingText);
+  }
+}
+
+function copyToClipboardFallback(text) {
+  // Spróbuj użyć Clipboard API
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        alert('✅ Lista zakupów skopiowana do schowka!\n\nOtwórz aplikację Przypomnienia i wklej listę (Cmd+V / Ctrl+V)');
+      })
+      .catch(() => {
+        // Jeśli nie działa, użyj starej metody
+        fallbackCopyToClipboard(text);
+      });
+  } else {
+    fallbackCopyToClipboard(text);
+  }
+}
+
+function fallbackCopyToClipboard(text) {
+  // Stara metoda - stwórz textarea i skopiuj
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-999999px';
+  textArea.style.top = '-999999px';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  
+  try {
+    document.execCommand('copy');
+    alert('✅ Lista zakupów skopiowana do schowka!\n\nOtwórz aplikację Przypomnienia i wklej listę (Cmd+V / Ctrl+V)');
+  } catch (err) {
+    // Jeśli to też nie działa, pokaż modal z tekstem
+    showTextModal(text);
+  }
+  
+  document.body.removeChild(textArea);
+}
+
+function showTextModal(text) {
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+  `;
+  
+  const content = document.createElement('div');
+  content.style.cssText = `
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+  `;
+  
+  content.innerHTML = `
+    <h3 style="margin-top: 0;">📋 Lista zakupów</h3>
+    <p style="color: #666;">Skopiuj poniższą listę i wklej do aplikacji Przypomnienia:</p>
+    <textarea readonly style="width: 100%; min-height: 300px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px;">${text}</textarea>
+    <div style="margin-top: 16px; text-align: right;">
+      <button onclick="this.parentElement.parentElement.parentElement.remove()" style="padding: 10px 20px; background: #007AFF; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px;">Zamknij</button>
+    </div>
+  `;
+  
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+  
+  // Zamknij po kliknięciu tła
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
 }
 
 // ---------- AKTYWNOŚĆ FIZYCZNA ----------
