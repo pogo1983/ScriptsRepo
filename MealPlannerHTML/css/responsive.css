@@ -277,6 +277,12 @@
     z-index: 1;
   }
   
+  /* Filter buttons responsive */
+  .filter-buttons .btn-filter {
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+  
   table {
     font-size: 12px;
   }

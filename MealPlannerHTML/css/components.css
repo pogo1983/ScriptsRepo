@@ -250,6 +250,20 @@ button {
   box-shadow: var(--shadow-medium);
 }
 
+.filter-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-buttons .btn-filter {
+  margin-right: 0;
+  flex: 0 1 auto;
+  white-space: nowrap;
+}
+
 /* Water buttons */
 .water-buttons {
   display: flex;
