@@ -112,8 +112,10 @@ function generujPlan(){
     ["śniadanie","obiad","kolacja"] : 
     ["śniadanie","obiad","podwieczorek","kolacja"];
     
-  let plan = "<div class='result-section'><h2>📅 Jadłospis na tydzień</h2><table><tr><th>Dzień</th><th>Posiłek</th><th class='person-michalina'>" + namePerson1 + "</th><th class='person-marcin'>" + namePerson2 + "</th></tr>";
+  let plan = "<div class='result-section'><h2>📅 Jadłospis na tydzień</h2><table><tr><th>Dzień</th><th>Posiłek</th><th class='person-michalina'>" + namePerson1 + "</th><th class='person-marcin'>" + namePerson2 + "</th><th>Kalorie</th></tr>";
   let zakupy = {}; // sumowanie składników
+  let totalCalories1 = Array(7).fill(0); // kalorie dla osoby 1 na każdy dzień
+  let totalCalories2 = Array(7).fill(0); // kalorie dla osoby 2 na każdy dzień
   
   for(let i=0;i<dni.length;i++){
     posilki.forEach(posilek=>{
@@ -132,6 +134,12 @@ function generujPlan(){
       let posilekDisplay = posilek === "śniadanie" ? "🌅 Śniadanie" : 
                           posilek === "obiad" ? "🍴 Obiad" : 
                           posilek === "podwieczorek" ? "🍎 Podwieczorek" : "🌙 Kolacja";
+      
+      // Skaluj kalorie
+      let caloriesScaled1 = d.kalorie ? Math.round(d.kalorie * (currentCaloriesMichalina / BASE_CALORIES_MICHALINA)) : 0;
+      let caloriesScaled2 = d.kalorie ? Math.round(d.kalorie * (currentCaloriesMarcin / BASE_CALORIES_MARCIN)) : 0;
+      totalCalories1[i] += caloriesScaled1;
+      totalCalories2[i] += caloriesScaled2;
       
       plan+="<tr><td class='day-label'>"+dni[i]+"</td><td><b>"+d.nazwa+"</b></td><td class='person-michalina'>";
       let skladM = [], skladMA = [];
@@ -152,9 +160,28 @@ function generujPlan(){
         zakupy[skladnik].michalina += scaledM;
         zakupy[skladnik].marcin += scaledMA;
       }
-      plan+=skladM.join(", ")+"</td><td class='person-marcin'>"+skladMA.join(", ")+"</td></tr>";
+      
+      let calorieDisplay = "";
+      if(d.kalorie) {
+        calorieDisplay = `<span class='person-michalina'>${caloriesScaled1}</span> / <span class='person-marcin'>${caloriesScaled2}</span> kcal`;
+      }
+      
+      plan+=skladM.join(", ")+"</td><td class='person-marcin'>"+skladMA.join(", ")+"</td><td style='text-align: center;'>"+calorieDisplay+"</td></tr>";
     });
   }
+  
+  // Dodaj podsumowanie kalorii dziennych
+  plan += "<tr style='background: #f0f7ff; font-weight: 700;'><td colspan='2' style='text-align: right; padding-right: 20px;'><b>Podsumowanie kalorii:</b></td><td class='person-michalina' style='text-align: center;'>";
+  for(let i = 0; i < 7; i++) {
+    if(i > 0) plan += " | ";
+    plan += dni[i].substr(0,3) + ": " + totalCalories1[i] + " kcal";
+  }
+  plan += "</td><td class='person-marcin' style='text-align: center;'>";
+  for(let i = 0; i < 7; i++) {
+    if(i > 0) plan += " | ";
+    plan += dni[i].substr(0,3) + ": " + totalCalories2[i] + " kcal";
+  }
+  plan += "</td><td></td></tr>";
   plan+="</table></div>";
 
   // Generowanie listy zakupów
@@ -327,6 +354,7 @@ function addNewDish() {
   const name = document.getElementById('newDishName').value.trim();
   const recipe = document.getElementById('newDishRecipe').value.trim();
   const ingredientsText = document.getElementById('newDishIngredients').value.trim();
+  const calories = parseInt(document.getElementById('newDishCalories').value) || 0;
   
   if(!name) {
     alert('Proszę podać nazwę dania!');
@@ -338,12 +366,18 @@ function addNewDish() {
     return;
   }
   
+  if(!calories || calories <= 0) {
+    alert('Proszę podać prawidłową wartość kalorii!');
+    return;
+  }
+  
   try {
     // Parsuj składniki
     const ingredients = eval('(' + ingredientsText + ')');
     
     const newDish = {
       nazwa: name,
+      kalorie: calories,
       skladniki: ingredients
     };
     
@@ -362,6 +396,7 @@ function addNewDish() {
     document.getElementById('newDishName').value = '';
     document.getElementById('newDishRecipe').value = '';
     document.getElementById('newDishIngredients').value = '';
+    document.getElementById('newDishCalories').value = '';
     
     alert('✅ Danie zostało dodane!');
     createDropdowns();
@@ -381,6 +416,12 @@ function displayDishList() {
       dania[type].forEach((dish, idx) => {
         html += `<div class="dish-item">`;
         html += `<h4>${dish.nazwa}</h4>`;
+        
+        if(dish.kalorie) {
+          const scaledCalories1 = Math.round(dish.kalorie * (currentCaloriesMichalina / BASE_CALORIES_MICHALINA));
+          const scaledCalories2 = Math.round(dish.kalorie * (currentCaloriesMarcin / BASE_CALORIES_MARCIN));
+          html += `<p style="color: #007AFF; font-weight: 600; font-size: 15px;">🔥 Kalorie: <span class="person-michalina">${scaledCalories1} kcal</span> / <span class="person-marcin">${scaledCalories2} kcal</span></p>`;
+        }
         
         if(dish.przepis) {
           html += `<p><strong>Przepis:</strong> ${dish.przepis}</p>`;
