@@ -1,0 +1,1015 @@
+/* ========================================
+   MEAL PLANNER APP - STYLES
+   Apple iOS 26 Design System
+   ======================================== */
+
+/* ==================== RESET & VARIABLES ==================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Apple System Colors */
+  --primary-blue: #007AFF;
+  --secondary-blue: #5AC8FA;
+  --purple: #AF52DE;
+  --pink: #FF2D55;
+  --green: #34C759;
+  --orange: #FF9500;
+  
+  /* Gray Scale */
+  --gray-1: #F2F2F7;
+  --gray-2: #E5E5EA;
+  --gray-3: #D1D1D6;
+  --gray-4: #C7C7CC;
+  --gray-5: #8E8E93;
+  --gray-6: #636366;
+  
+  /* Card Background with high opacity for better readability */
+  --card-bg: rgba(255, 255, 255, 1);
+  --card-bg-semi: rgba(255, 255, 255, 0.95);
+  
+  /* Shadows */
+  --shadow-light: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-heavy: 0 16px 48px rgba(0, 0, 0, 0.16);
+}
+
+/* ==================== BASE LAYOUT ==================== */
+
+body { 
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  position: relative;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  z-index: 1;
+}
+
+/* ==================== TYPOGRAPHY ==================== */
+
+h1 { 
+  color: white;
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+}
+
+h2 {
+  color: #1d1d1f;
+  margin-bottom: 20px;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+}
+
+h3 {
+  color: #1d1d1f;
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+h4 {
+  color: var(--gray-6);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+h5 {
+  color: var(--gray-6);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 16px 0 8px 0;
+}
+
+.intro {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 32px;
+  line-height: 1.6;
+  font-size: 1.05rem;
+  font-weight: 500;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--gray-6);
+  font-size: 14px;
+}
+
+small {
+  font-size: 13px;
+  color: var(--gray-5);
+}
+
+/* ==================== CARDS & CONTAINERS ==================== */
+
+.card,
+.info-box,
+.result-section {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-medium);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-heavy);
+}
+
+/* Semi-transparent cards for special sections */
+.tab-content > div[style*="background"] {
+  background: var(--card-bg-semi) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* ==================== TABS NAVIGATION ==================== */
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  padding: 8px;
+  border-radius: 16px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  flex: 1;
+  min-width: 120px;
+  padding: 14px 20px;
+  background: transparent;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.tab:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tab.active {
+  background: white;
+  color: var(--primary-blue);
+  box-shadow: var(--shadow-light);
+  text-shadow: none;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==================== FORM ELEMENTS ==================== */
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--gray-3);
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+  color: #1d1d1f;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* ==================== BUTTONS ==================== */
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--primary-blue);
+  color: white;
+  font-size: 15px;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-primary:hover {
+  background: #0062cc;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-success {
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--green);
+  color: white;
+  font-size: 15px;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-success:hover {
+  background: #2db24f;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin: 24px 0;
+  flex-wrap: wrap;
+}
+
+.btn-action {
+  flex: 1;
+  min-width: 200px;
+  padding: 14px 20px;
+  font-size: 15px;
+  background: white;
+  color: var(--primary-blue);
+  border: 2px solid var(--primary-blue);
+}
+
+.btn-action:hover {
+  background: var(--primary-blue);
+  color: white;
+}
+
+.btn-randomize {
+  background: var(--purple);
+  color: white;
+  border-color: var(--purple);
+}
+
+.btn-randomize:hover {
+  background: #9742cc;
+  border-color: #9742cc;
+}
+
+.btn-reset {
+  background: var(--orange);
+  color: white;
+  border-color: var(--orange);
+}
+
+.btn-reset:hover {
+  background: #e68600;
+  border-color: #e68600;
+}
+
+.btn-save {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+}
+
+.btn-save:hover {
+  background: #2db24f;
+  border-color: #2db24f;
+}
+
+.btn-load {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+}
+
+.btn-load:hover {
+  background: #0062cc;
+  border-color: #0062cc;
+}
+
+/* Export Buttons */
+.export-buttons {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-export {
+  padding: 12px 24px;
+  font-size: 15px;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-export:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-excel {
+  background: #217346;
+  color: white;
+}
+
+.btn-excel:hover {
+  background: #1a5c37;
+}
+
+.btn-print {
+  background: var(--gray-6);
+  color: white;
+}
+
+.btn-print:hover {
+  background: var(--gray-5);
+}
+
+.btn-filter {
+  padding: 12px 20px;
+  font-size: 14px;
+  margin-right: 8px;
+  background: var(--primary-blue);
+  color: white;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-filter:hover {
+  background: #0062cc;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Water buttons */
+.water-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-water {
+  flex: 1;
+  min-width: 100px;
+  padding: 12px 16px;
+  background: var(--secondary-blue);
+  color: white;
+  font-size: 14px;
+}
+
+.btn-water:hover {
+  background: #48B0E6;
+  transform: translateY(-1px);
+}
+
+.btn-reset-small {
+  padding: 12px 16px;
+  background: var(--orange);
+  color: white;
+  font-size: 14px;
+}
+
+.btn-reset-small:hover {
+  background: #e68600;
+}
+
+/* Exercise category buttons */
+.exercise-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.btn-exercise {
+  padding: 14px 18px;
+  background: white;
+  color: var(--gray-6);
+  border: 2px solid var(--gray-3);
+  font-size: 14px;
+}
+
+.btn-exercise:hover {
+  background: var(--purple);
+  color: white;
+  border-color: var(--purple);
+  transform: translateY(-2px);
+}
+
+/* Delete buttons */
+.training-delete,
+.activity-delete,
+.fridge-delete,
+.weight-delete,
+.price-delete {
+  background: var(--pink);
+  color: white;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.training-delete:hover,
+.activity-delete:hover,
+.fridge-delete:hover,
+.weight-delete:hover,
+.price-delete:hover {
+  background: #e6194b;
+}
+
+.weight-delete {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+/* ==================== MEAL COUNT SELECTOR ==================== */
+
+.meal-count-selector {
+  background: var(--gray-1);
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  border: 1px solid var(--gray-2);
+}
+
+.meal-count-selector label:first-child {
+  font-weight: 700;
+  color: var(--gray-6);
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.meal-count-selector label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 24px;
+  margin-top: 8px;
+  cursor: pointer;
+  color: var(--gray-6);
+  font-weight: 500;
+}
+
+.meal-count-selector input[type="radio"] {
+  margin-right: 8px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--primary-blue);
+}
+
+/* ==================== DROPDOWNS & SELECTS ==================== */
+
+.day-row {
+  margin-bottom: 32px;
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-light);
+  border: 1px solid var(--gray-2);
+}
+
+.day-label {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--primary-blue);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.meal-selector {
+  margin-bottom: 16px;
+}
+
+.meal-selector label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-6);
+  margin-bottom: 8px;
+}
+
+.meal-selector select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--gray-3);
+  border-radius: 10px;
+  font-size: 14px;
+  background: white;
+}
+
+.meal-selector select:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+}
+
+/* ==================== DAY SELECTOR (Shopping List) ==================== */
+
+.day-selector {
+  background: var(--gray-1);
+  padding: 24px;
+  border-radius: 16px;
+  margin: 20px 0;
+  border: 2px solid var(--primary-blue);
+}
+
+.day-selector p {
+  margin: 0 0 16px 0;
+  font-weight: 600;
+  color: var(--gray-6);
+  font-size: 15px;
+}
+
+.day-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.day-checkbox-label {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  background: white;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid var(--gray-3);
+  font-weight: 500;
+  color: var(--gray-6);
+}
+
+.day-checkbox-label:hover {
+  background: var(--gray-1);
+  border-color: var(--primary-blue);
+  transform: translateY(-1px);
+}
+
+.day-checkbox-label input[type="checkbox"] {
+  margin-right: 10px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--primary-blue);
+}
+
+.day-checkbox-label:has(input[type="checkbox"]:checked) {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+}
+
+/* ==================== TABLES ==================== */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+}
+
+th {
+  background: var(--primary-blue);
+  color: white;
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--gray-2);
+  color: #1d1d1f;
+  font-size: 14px;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover {
+  background: var(--gray-1);
+}
+
+.person-michalina {
+  color: var(--pink);
+  font-weight: 600;
+}
+
+.person-marcin {
+  color: var(--primary-blue);
+  font-weight: 600;
+}
+
+/* ==================== SAVED PLANS ==================== */
+
+.saved-plans {
+  background: var(--gray-1);
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  border: 1px solid var(--gray-2);
+}
+
+.saved-plan-item {
+  background: white;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-light);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.saved-plan-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.saved-plan-item button {
+  padding: 8px 16px;
+  background: var(--primary-blue);
+  color: white;
+  font-size: 13px;
+  margin-left: 8px;
+}
+
+.saved-plan-item button:hover {
+  background: #0062cc;
+}
+
+.saved-plan-item button:last-child {
+  background: var(--pink);
+}
+
+.saved-plan-item button:last-child:hover {
+  background: #e6194b;
+}
+
+/* ==================== DISH LIST ==================== */
+
+.dish-list {
+  display: grid;
+  gap: 16px;
+}
+
+.dish-item {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--gray-2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dish-item:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+.dish-item h4 {
+  color: var(--primary-blue);
+  margin-bottom: 10px;
+}
+
+.dish-item button {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: var(--pink);
+  color: white;
+  font-size: 13px;
+}
+
+.dish-item button:hover {
+  background: #e6194b;
+}
+
+/* ==================== ACTIVITY TAB ==================== */
+
+.result-box {
+  background: var(--gray-1);
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 15px;
+  border-left: 4px solid var(--green);
+}
+
+.result-box h4 {
+  margin: 0 0 10px 0;
+  color: var(--gray-6);
+}
+
+.result-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin: 10px 0;
+}
+
+.activity-item {
+  background: white;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border-left: 4px solid var(--orange);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Water progress bar */
+.water-progress-bar {
+  width: 100%;
+  height: 40px;
+  background: var(--gray-2);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 10px;
+}
+
+.water-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--secondary-blue), var(--primary-blue));
+  transition: width 0.5s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.weight-entry {
+  background: var(--gray-1);
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ==================== FRIDGE TAB ==================== */
+
+.fridge-item {
+  background: white;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--gray-3);
+}
+
+.fridge-item.expiring {
+  border-left: 4px solid var(--orange);
+  background: #fff3e0;
+}
+
+.fridge-item.expired {
+  border-left: 4px solid var(--pink);
+  background: #ffebee;
+}
+
+.price-item {
+  background: white;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border: 1px solid var(--gray-3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ==================== TRAINING TAB ==================== */
+
+.training-day {
+  background: var(--gray-1);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border-left: 4px solid var(--primary-blue);
+}
+
+.training-item {
+  background: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Garmin Connect Section */
+.garmin-info {
+  background: var(--gray-1);
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 15px;
+}
+
+.info-item {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--gray-3);
+}
+
+.info-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.info-item strong {
+  display: block;
+  color: var(--primary-blue);
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.info-item p {
+  color: var(--gray-6);
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.garmin-link {
+  color: var(--primary-blue);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.garmin-link:hover {
+  text-decoration: underline;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+    margin: 20px auto;
+  }
+  
+  .tabs {
+    flex-direction: column;
+  }
+  
+  .tab {
+    min-width: 100%;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .btn-action {
+    min-width: 100%;
+  }
+  
+  .export-buttons {
+    flex-direction: column;
+  }
+  
+  .day-checkboxes {
+    grid-template-columns: 1fr;
+  }
+  
+  .exercise-categories {
+    grid-template-columns: 1fr;
+  }
+  
+  table {
+    font-size: 12px;
+  }
+  
+  th, td {
+    padding: 8px 10px;
+  }
+}
+
+/* ==================== PRINT STYLES ==================== */
+
+@media print {
+  body {
+    background: white;
+  }
+  
+  body::before {
+    display: none;
+  }
+  
+  .container {
+    max-width: 100%;
+    margin: 0;
+  }
+  
+  .tabs,
+  .action-buttons,
+  .export-buttons,
+  .btn-filter,
+  #dropdowns,
+  #zakupy-section,
+  button {
+    display: none !important;
+  }
+  
+  #plan {
+    display: none;
+  }
+  
+  .result-section {
+    background: white;
+    box-shadow: none;
+  }
+  
+  table {
+    border: 1px solid #000;
+    color: #000;
+  }
+  
+  th {
+    background: #e0e0e0 !important;
+    color: #000 !important;
+  }
+}
