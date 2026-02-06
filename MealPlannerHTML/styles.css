@@ -155,10 +155,27 @@ small {
 }
 
 /* Semi-transparent cards for special sections */
-.tab-content > div[style*="background"] {
+.tab-content > div[style*="background"]:not(.firebase-sync-section) {
   background: var(--card-bg-semi) !important;
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Firebase sync section styling */
+.firebase-sync-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  padding: 24px !important;
+  border-radius: 20px !important;
+  margin-bottom: 24px !important;
+}
+
+.firebase-sync-section h3,
+.firebase-sync-section p,
+.firebase-sync-section li,
+.firebase-sync-section strong {
+  color: white !important;
+  opacity: 1 !important;
 }
 
 /* ==================== TABS NAVIGATION ==================== */

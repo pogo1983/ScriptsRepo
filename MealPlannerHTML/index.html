@@ -507,21 +507,21 @@
   <div id="manage-tab" class="tab-content">
     <h2>⚙️ Zarządzaj danymi</h2>
     
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white !important; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-      <h3 style="margin-top: 0; color: white !important;">☁️ Synchronizacja między urządzeniami</h3>
-      <p style="margin: 10px 0; opacity: 0.95; color: white !important;">Włącz synchronizację, aby automatycznie przenosić dane między Mac, iPhone i innymi urządzeniami.</p>
+    <div class="firebase-sync-section">
+      <h3 style="margin-top: 0;">☁️ Synchronizacja między urządzeniami</h3>
+      <p style="margin: 10px 0; opacity: 0.95;">Włącz synchronizację, aby automatycznie przenosić dane między Mac, iPhone i innymi urządzeniami.</p>
       <div id="syncSection">
         <div id="syncDisabled">
-          <p style="margin: 10px 0; font-size: 14px; opacity: 0.9; color: white !important;">✅ Jadłospis i lista zakupów - działa lokalnie (bez synchronizacji)<br>📊 Historia treningów, wagi, Garmin - można zsynchronizować</p>
+          <p style="margin: 10px 0; font-size: 14px; opacity: 0.9;">✅ Jadłospis i lista zakupów - działa lokalnie (bez synchronizacji)<br>📊 Historia treningów, wagi, Garmin - można zsynchronizować</p>
           <button onclick="showFirebaseLogin()" style="background: white; color: #667eea; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; margin-top: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">🔗 Włącz synchronizację (opcjonalnie)</button>
         </div>
         <div id="syncEnabled" style="display: none;">
-          <p style="margin: 10px 0; color: white !important;">✅ Synchronizacja włączona</p>
+          <p style="margin: 10px 0;">✅ Synchronizacja włączona</p>
           <div style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">
             <img id="syncUserPhoto" src="" alt="" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white;">
             <div style="flex: 1;">
-              <div id="syncUserName" style="font-weight: bold; color: white !important;">Użytkownik</div>
-              <div id="syncUserEmail" style="font-size: 12px; opacity: 0.8; color: white !important;">email@example.com</div>
+              <div id="syncUserName" style="font-weight: bold;">Użytkownik</div>
+              <div id="syncUserEmail" style="font-size: 12px; opacity: 0.8;">email@example.com</div>
             </div>
             <button id="disableSyncBtn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white !important; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Wyloguj</button>
           </div>
