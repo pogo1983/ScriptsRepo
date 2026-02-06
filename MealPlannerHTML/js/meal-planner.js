@@ -410,6 +410,10 @@ function toggleAllDays(expand) {
   });
 }
 
+// Make functions globally available for onclick handlers
+window.toggleDay = toggleDay;
+window.toggleAllDays = toggleAllDays;
+
 // ---------- FLOATING ACTION BUTTONS ----------
 
 function addFloatingButtons() {
@@ -454,3 +458,6 @@ function scrollToShoppingList() {
     zakupySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
+
+// Make globally available for onclick handlers
+window.scrollToShoppingList = scrollToShoppingList;
