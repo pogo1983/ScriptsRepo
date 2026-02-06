@@ -1,5 +1,5 @@
 // ---------- ZMIENNE GLOBALNE ----------
-let currentMealCount = 3;
+let currentMealCount = 4;
 
 // Bazowe wartości kalorii (odpowiadają domyślnym celom kalorycznym)
 // Kalorie w bazie dań są podane dla jednej porcji (Michaliny)
@@ -84,7 +84,7 @@ function createDropdowns() {
   html += "</tr>";
   
   for(let i=0;i<dni.length;i++){
-    html += "<tr><td class='day-label'>"+dni[i]+"</td>";
+    html += "<tr><td class='day-label'><strong>"+dni[i]+"</strong></td>";
     posilki.forEach(posilek=>{
       html += "<td><select id='"+posilek+i+"'>";
       if(dania[posilek]) {
