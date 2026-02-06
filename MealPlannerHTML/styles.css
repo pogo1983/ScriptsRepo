@@ -1,0 +1,409 @@
+* {
+  box-sizing: border-box;
+}
+
+body { 
+  font-family: Arial, sans-serif; 
+  margin: 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+h1 { 
+  color: #236be8; 
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 2em;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #236be8;
+  margin-bottom: 20px;
+  gap: 5px;
+}
+
+.tab {
+  padding: 12px 24px;
+  background: #f0f0f0;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.3s;
+}
+
+.tab:hover {
+  background: #e0e0e0;
+}
+
+.tab.active {
+  background: #236be8;
+  color: white;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+h2 { 
+  color: #236be8; 
+  border-bottom: 3px solid #236be8;
+  padding-bottom: 10px;
+  margin-top: 40px;
+}
+
+.intro {
+  text-align: center;
+  color: #555;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+table { 
+  width: 100%;
+  margin-bottom: 30px; 
+  border-collapse: collapse;
+  overflow-x: auto;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  table {
+    display: table;
+  }
+}
+
+th, td { 
+  border: 1px solid #ddd; 
+  padding: 12px 10px;
+  text-align: left;
+}
+
+th {
+  background: #236be8;
+  color: white;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+}
+
+tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+tr:hover {
+  background: #e8f4ff;
+}
+
+select {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+select:focus {
+  outline: none;
+  border-color: #236be8;
+}
+
+button { 
+  width: 100%;
+  max-width: 400px;
+  margin: 20px auto;
+  display: block;
+  padding: 15px;
+  background: #236be8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(35, 107, 232, 0.3);
+}
+
+button:hover {
+  background: #1a57c4;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(35, 107, 232, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+#plan, #zakupy {
+  margin-top: 40px;
+}
+
+.result-section {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsywność dla małych ekranów */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+    border-radius: 0;
+  }
+  
+  h1 {
+    font-size: 1.5em;
+  }
+  
+  h2 {
+    font-size: 1.3em;
+  }
+  
+  body {
+    padding: 0;
+  }
+  
+  table {
+    font-size: 12px;
+  }
+  
+  th, td {
+    padding: 8px 5px;
+  }
+  
+  select {
+    font-size: 12px;
+    padding: 6px;
+  }
+  
+  button {
+    font-size: 16px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  table {
+    font-size: 11px;
+  }
+  
+  th, td {
+    padding: 6px 3px;
+  }
+  
+  h1 {
+    font-size: 1.3em;
+  }
+}
+
+.person-michalina {
+  color: #e91e63;
+  font-weight: 600;
+}
+
+.person-marcin {
+  color: #2196f3;
+  font-weight: 600;
+}
+
+.day-label {
+  font-weight: bold;
+  color: #333;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.meal-count-selector {
+  background: #fff3cd;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid #ffc107;
+}
+
+.meal-count-selector label {
+  margin-right: 15px;
+  font-weight: bold;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.form-group input, .form-group textarea {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  font-family: Arial, sans-serif;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+}
+
+.dish-list {
+  margin-top: 20px;
+}
+
+.dish-item {
+  background: #f9f9f9;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border-left: 4px solid #236be8;
+}
+
+.dish-item h4 {
+  margin-top: 0;
+  color: #236be8;
+}
+
+.info-box {
+  background: #e8f4ff;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid #2196f3;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.btn-action {
+  flex: 1;
+  min-width: 150px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.btn-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.btn-randomize {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-reset {
+  background: #ff9800;
+  color: white;
+}
+
+.btn-save {
+  background: #4caf50;
+  color: white;
+}
+
+.btn-load {
+  background: #2196f3;
+  color: white;
+}
+
+.saved-plans {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  border: 2px solid #ddd;
+}
+
+.saved-plan-item {
+  background: white;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 4px solid #236be8;
+}
+
+.saved-plan-item:hover {
+  background: #f0f7ff;
+}
+
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .btn-action {
+    width: 100%;
+  }
+}
