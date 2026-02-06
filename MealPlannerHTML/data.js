@@ -155,7 +155,7 @@ const dania = {
     {
       nazwa: "Kanapka z awokado i jajkiem",
       kalorie: 260,
-      skladniki: {'Pieczywo pełnoziarniste':[40,60],'Awokado':[40,60],'Jajko':[1,1]}
+      skladniki: {'Pieczywo pełnoziarniste':[40,60],'Awokado':[40,60],'Jajka':[1,1]}
     },
     {
       nazwa: "Cottage cheese z pomidorkami koktajlowymi",
@@ -170,7 +170,7 @@ const dania = {
     {
       nazwa: "Jogurt skyr z granolą",
       kalorie: 230,
-      skladniki: {'Jogurt Skyr': [150,200],'Granola':[20,30],'Jagody':[30,50]}
+      skladniki: {'Jogurt Skyr': [150,200],'Granola':[20,30],'Jagody mrożone':[30,50]}
     },
     {
       nazwa: "Kanapka z serem białym i pomidorem",
