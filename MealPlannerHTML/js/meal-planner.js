@@ -63,7 +63,13 @@ function generujPlan(){
     
   let plan = "<div class='result-section'><h2>📅 Jadłospis na tydzień</h2>";
   
-  // Karty dla każdego dnia
+  // Przycisk rozwiń/zwiń wszystkie dni
+  plan += "<div class='accordion-controls'>";
+  plan += "<button class='btn-secondary' onclick='toggleAllDays(true)'>📂 Rozwiń wszystkie</button>";
+  plan += "<button class='btn-secondary' onclick='toggleAllDays(false)'>📁 Zwiń wszystkie</button>";
+  plan += "</div>";
+  
+  // Karty dla każdego dnia (accordion)
   plan += "<div class='week-plan-cards'>";
   
   let zakupy = {}; // sumowanie składników
@@ -76,10 +82,13 @@ function generujPlan(){
   for(let i=0;i<dni.length;i++){
     let dayMeals = [];
     
-    // Rozpocznij kartę dnia
-    plan += `<div class='day-plan-card'>
-      <h3 class='day-plan-title'>${dni[i]}</h3>
-      <div class='day-plan-meals'>`;
+    // Rozpocznij kartę dnia z accordion
+    plan += `<div class='day-plan-card accordion-item'>
+      <h3 class='day-plan-title accordion-header' onclick='toggleDay(${i})'>
+        <span><span class='accordion-icon'>▼</span> ${dni[i]}</span>
+        <span class='day-calories-preview'>... kcal</span>
+      </h3>
+      <div class='day-plan-meals accordion-content active' id='day-content-${i}'>`;
     
     posilki.forEach(posilek=>{
       const element = document.getElementById(posilek+i);
@@ -201,6 +210,18 @@ function generujPlan(){
   generateShoppingList(zakupy, sortedProducts);
 
   document.getElementById("plan").innerHTML = plan;
+  
+  // Aktualizuj kalorie w nagłówkach dni
+  for(let i=0; i<dni.length; i++) {
+    const header = document.querySelector(`#day-content-${i}`).previousElementSibling;
+    const preview = header.querySelector('.day-calories-preview');
+    if(preview) {
+      preview.innerHTML = `${totalCalories1[i]} / ${totalCalories2[i]} kcal`;
+    }
+  }
+  
+  // Dodaj/zaktualizuj floating action button
+  addFloatingButtons();
   
   // Pokaż sekcję wyboru dni
   document.getElementById("zakupy-section").style.display = 'block';
@@ -353,5 +374,83 @@ function wczytajWybor() {
         });
       }
     }
+  }
+}
+
+// ---------- ACCORDION FUNCTIONS ----------
+
+function toggleDay(dayIndex) {
+  const content = document.getElementById(`day-content-${dayIndex}`);
+  const header = content.previousElementSibling;
+  const icon = header.querySelector('.accordion-icon');
+  
+  if(content.classList.contains('active')) {
+    content.classList.remove('active');
+    icon.textContent = '▶';
+  } else {
+    content.classList.add('active');
+    icon.textContent = '▼';
+  }
+}
+
+function toggleAllDays(expand) {
+  const contents = document.querySelectorAll('.accordion-content');
+  const icons = document.querySelectorAll('.accordion-icon');
+  
+  contents.forEach(content => {
+    if(expand) {
+      content.classList.add('active');
+    } else {
+      content.classList.remove('active');
+    }
+  });
+  
+  icons.forEach(icon => {
+    icon.textContent = expand ? '▼' : '▶';
+  });
+}
+
+// ---------- FLOATING ACTION BUTTONS ----------
+
+function addFloatingButtons() {
+  // Usuń stare buttony jeśli istnieją
+  const oldFab = document.querySelector('.floating-action-buttons');
+  if(oldFab) oldFab.remove();
+  
+  // Stwórz nowy floating action button container
+  const fab = document.createElement('div');
+  fab.className = 'floating-action-buttons';
+  fab.innerHTML = `
+    <button class='fab-button' onclick='scrollToShoppingList()' title='Przejdź do listy zakupów'>
+      🛒
+    </button>
+    <button class='fab-button' onclick='exportToiOSReminders()' title='Eksportuj do iOS Reminders'>
+      📱
+    </button>
+  `;
+  
+  document.body.appendChild(fab);
+  
+  // Pokaż FAB tylko gdy plan jest widoczny
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) {
+        fab.style.display = 'flex';
+      } else {
+        fab.style.display = 'none';
+      }
+    });
+  }, { threshold: 0.1 });
+  
+  const planSection = document.getElementById('plan');
+  if(planSection) {
+    observer.observe(planSection);
+  }
+}
+
+function scrollToShoppingList() {
+  const zakupySection = document.getElementById('zakupy');
+  if(zakupySection) {
+    zakupySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }

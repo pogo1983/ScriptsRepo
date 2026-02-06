@@ -1092,6 +1092,18 @@ tr:hover {
   margin-top: 20px;
 }
 
+.accordion-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.accordion-item {
+  overflow: hidden;
+}
+
 .day-plan-card {
   background: white;
   border-radius: 16px;
@@ -1106,6 +1118,48 @@ tr:hover {
   margin: 0 0 20px 0;
   padding-bottom: 12px;
   border-bottom: 3px solid var(--primary-blue);
+}
+
+/* Accordion header styles */
+.accordion-header {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+  margin-bottom: 0;
+  padding-bottom: 16px;
+  border-bottom: 3px solid var(--primary-blue);
+}
+
+.accordion-header:hover {
+  color: var(--primary-blue);
+}
+
+.accordion-icon {
+  display: inline-block;
+  margin-right: 8px;
+  transition: transform 0.3s ease;
+  font-size: 18px;
+}
+
+.day-calories-preview {
+  font-size: 16px;
+  font-weight: 600;
+  color: #666;
+  white-space: nowrap;
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.accordion-content.active {
+  max-height: 5000px;
+  margin-top: 20px;
 }
 
 .day-plan-meals {
@@ -1474,6 +1528,56 @@ tr:hover {
   }
 }
 
+/* ==================== FLOATING ACTION BUTTONS ==================== */
+
+.floating-action-buttons {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 900;
+}
+
+.fab-button {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+  color: white;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fab-button:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 122, 255, 0.5);
+}
+
+.fab-button:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+  .floating-action-buttons {
+    bottom: 16px;
+    right: 16px;
+  }
+  
+  .fab-button {
+    width: 52px;
+    height: 52px;
+    font-size: 22px;
+  }
+}
+
 /* ==================== PRINT STYLES ==================== */
 
 @media print {
@@ -1494,6 +1598,8 @@ tr:hover {
   .action-buttons,
   .export-buttons,
   .btn-filter,
+  .floating-action-buttons,
+  .accordion-controls,
   #dropdowns,
   #zakupy-section,
   button {
