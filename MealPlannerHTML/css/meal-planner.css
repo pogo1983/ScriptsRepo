@@ -1,0 +1,401 @@
+/* ========================================
+   MEAL PLANNER SPECIFIC STYLES
+   Dropdowns, Week Plan Cards, Accordions
+   ======================================== */
+
+/* ==================== MEAL COUNT SELECTOR ==================== */
+
+.meal-count-selector {
+  background: var(--gray-1);
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  border: 1px solid var(--gray-2);
+}
+
+.meal-count-selector label:first-child {
+  display: block;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.meal-count-selector label:not(:first-child) {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 24px;
+  margin-top: 8px;
+  cursor: pointer;
+  color: #1d1d1f;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.meal-count-selector input[type="radio"] {
+  margin-right: 8px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--primary-blue);
+}
+
+/* ==================== DROPDOWNS & SELECTS ==================== */
+
+.day-row {
+  margin-bottom: 32px;
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-light);
+  border: 1px solid var(--gray-2);
+}
+
+.day-label {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--primary-blue);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.meal-selector {
+  margin-bottom: 16px;
+}
+
+.meal-selector label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-6);
+  margin-bottom: 8px;
+}
+
+.meal-selector select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--gray-3);
+  border-radius: 10px;
+  font-size: 14px;
+  background: white;
+}
+
+.meal-selector select:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+}
+
+/* Meal selection table specific styles */
+#dropdowns table {
+  margin-top: 10px;
+}
+
+#dropdowns table th {
+  background: var(--primary-blue);
+  color: white;
+  padding: 12px 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 13px;
+  border: none;
+}
+
+#dropdowns table tr {
+  height: 1px; /* Force cells to expand to content */
+}
+
+#dropdowns table td {
+  padding: 0;
+  border: 1px solid var(--gray-2);
+  vertical-align: middle;
+  text-align: center;
+  height: inherit;
+}
+
+#dropdowns table .day-label {
+  font-weight: 700;
+  background: var(--gray-1);
+  text-align: left;
+  padding: 0;
+  position: relative;
+}
+
+#dropdowns table .day-label strong {
+  display: table-cell;
+  vertical-align: middle;
+  padding: 10px 15px;
+  height: 100%;
+  width: 100%;
+}
+
+#dropdowns table select {
+  width: calc(100% - 12px);
+  padding: 10px 8px;
+  border: 2px solid var(--gray-3);
+  border-radius: 6px;
+  font-size: 13px;
+  background: white;
+  cursor: pointer;
+  margin: 6px;
+  box-sizing: border-box;
+  display: block;
+}
+
+#dropdowns table select:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+}
+
+#dropdowns table tr:hover {
+  background: var(--gray-1);
+}
+
+/* ==================== DAY SELECTOR (Shopping List) ==================== */
+
+.day-selector {
+  background: var(--gray-1);
+  padding: 24px;
+  border-radius: 16px;
+  margin: 20px 0;
+  border: 2px solid var(--primary-blue);
+}
+
+.day-selector p {
+  margin: 0 0 16px 0;
+  font-weight: 600;
+  color: var(--gray-6);
+  font-size: 15px;
+}
+
+.day-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.day-checkbox-label {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  background: white;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid var(--gray-3);
+  font-weight: 500;
+  color: var(--gray-6);
+}
+
+.day-checkbox-label:hover {
+  background: var(--gray-1);
+  border-color: var(--primary-blue);
+  transform: translateY(-1px);
+}
+
+.day-checkbox-label input[type="checkbox"] {
+  margin-right: 10px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--primary-blue);
+}
+
+.day-checkbox-label:has(input[type="checkbox"]:checked) {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+}
+
+/* ==================== MEAL PLAN CARDS ==================== */
+
+.week-plan-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.accordion-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.accordion-item {
+  overflow: hidden;
+}
+
+.day-plan-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-light);
+}
+
+.day-plan-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 3px solid var(--primary-blue);
+}
+
+/* Accordion header styles */
+.accordion-header {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+  margin-bottom: 0;
+  padding-bottom: 16px;
+  border-bottom: 3px solid var(--primary-blue);
+}
+
+.accordion-header:hover {
+  color: var(--primary-blue);
+}
+
+.accordion-icon {
+  display: inline-block;
+  margin-right: 8px;
+  transition: transform 0.3s ease;
+  font-size: 18px;
+}
+
+.day-calories-preview {
+  font-size: 16px;
+  font-weight: 600;
+  color: #666;
+  white-space: nowrap;
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out;
+}
+
+.accordion-item .accordion-content.active {
+  max-height: 10000px;
+  margin-top: 20px;
+  overflow: visible;
+  transition: max-height 0.6s ease-in;
+}
+
+.day-plan-meals {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.meal-plan-card {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 16px;
+  border-left: 4px solid var(--primary-blue);
+}
+
+.meal-plan-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.meal-plan-icon {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.meal-plan-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-blue);
+}
+
+.meal-plan-people {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.meal-plan-person {
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+}
+
+.meal-plan-person strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+.meal-plan-calories {
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.day-plan-summary {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 2px solid #e0e0e0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.day-plan-summary strong {
+  font-weight: 700;
+}
+
+/* ==================== FLOATING ACTION BUTTONS ==================== */
+
+.floating-action-buttons {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 900;
+}
+
+.fab-button {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+  color: white;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fab-button:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 122, 255, 0.5);
+}
+
+.fab-button:active {
+  transform: scale(0.95);
+}

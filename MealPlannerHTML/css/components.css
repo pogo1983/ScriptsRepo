@@ -1,0 +1,401 @@
+/* ========================================
+   COMPONENT STYLES
+   Buttons, Forms, Tables, Cards
+   ======================================== */
+
+/* ==================== CARDS & CONTAINERS ==================== */
+
+.card,
+.result-section {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-medium);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-heavy);
+}
+
+/* Semi-transparent cards for special sections */
+.tab-content > div[style*="background"]:not(.firebase-sync-section) {
+  background: var(--card-bg-semi) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Firebase sync section styling */
+.firebase-sync-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  padding: 24px !important;
+  border-radius: 20px !important;
+  margin-bottom: 24px !important;
+}
+
+.firebase-sync-section h3,
+.firebase-sync-section p,
+.firebase-sync-section li,
+.firebase-sync-section strong {
+  color: white !important;
+  opacity: 1 !important;
+}
+
+/* ==================== FORM ELEMENTS ==================== */
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--gray-3);
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+  color: #1d1d1f;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* ==================== BUTTONS ==================== */
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--primary-blue);
+  color: white;
+  font-size: 15px;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-primary:hover {
+  background: #0062cc;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-success {
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--green);
+  color: white;
+  font-size: 15px;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-success:hover {
+  background: #2db24f;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin: 24px 0;
+  flex-wrap: wrap;
+}
+
+.btn-action {
+  flex: 1;
+  min-width: 200px;
+  padding: 14px 20px;
+  font-size: 15px;
+  background: white;
+  color: var(--primary-blue);
+  border: 2px solid var(--primary-blue);
+}
+
+.btn-action:hover {
+  background: var(--primary-blue);
+  color: white;
+}
+
+.btn-randomize {
+  background: var(--purple);
+  color: white;
+  border-color: var(--purple);
+}
+
+.btn-randomize:hover {
+  background: #9742cc;
+  border-color: #9742cc;
+}
+
+.btn-reset {
+  background: var(--orange);
+  color: white;
+  border-color: var(--orange);
+}
+
+.btn-reset:hover {
+  background: #e68600;
+  border-color: #e68600;
+}
+
+.btn-save {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+}
+
+.btn-save:hover {
+  background: #2db24f;
+  border-color: #2db24f;
+}
+
+.btn-load {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+}
+
+.btn-load:hover {
+  background: #0062cc;
+  border-color: #0062cc;
+}
+
+/* Export Buttons */
+.export-buttons {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-export {
+  padding: 12px 24px;
+  font-size: 15px;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-export:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-excel {
+  background: #217346;
+  color: white;
+}
+
+.btn-excel:hover {
+  background: #1a5c37;
+}
+
+.btn-print {
+  background: var(--gray-6);
+  color: white;
+}
+
+.btn-print:hover {
+  background: var(--gray-5);
+}
+
+.btn-ios {
+  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+  color: white;
+}
+
+.btn-ios:hover {
+  background: linear-gradient(135deg, #0051D5 0%, #003DA5 100%);
+}
+
+.btn-filter {
+  padding: 12px 20px;
+  font-size: 14px;
+  margin-right: 8px;
+  background: var(--primary-blue);
+  color: white;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-filter:hover {
+  background: #0062cc;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Water buttons */
+.water-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-water {
+  flex: 1;
+  min-width: 100px;
+  padding: 12px 16px;
+  background: var(--secondary-blue);
+  color: white;
+  font-size: 14px;
+}
+
+.btn-water:hover {
+  background: #48B0E6;
+  transform: translateY(-1px);
+}
+
+.btn-reset-small {
+  padding: 12px 16px;
+  background: var(--orange);
+  color: white;
+  font-size: 14px;
+}
+
+.btn-reset-small:hover {
+  background: #e68600;
+}
+
+/* Exercise category buttons */
+.exercise-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.btn-exercise {
+  padding: 14px 18px;
+  background: white;
+  color: var(--gray-6);
+  border: 2px solid var(--gray-3);
+  font-size: 14px;
+}
+
+.btn-exercise:hover {
+  background: var(--purple);
+  color: white;
+  border-color: var(--purple);
+  transform: translateY(-2px);
+}
+
+/* Delete buttons */
+.training-delete,
+.activity-delete,
+.fridge-delete,
+.weight-delete,
+.price-delete {
+  background: var(--pink);
+  color: white;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.training-delete:hover,
+.activity-delete:hover,
+.fridge-delete:hover,
+.weight-delete:hover,
+.price-delete:hover {
+  background: #e6194b;
+}
+
+.weight-delete {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+/* ==================== TABLES ==================== */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+}
+
+th {
+  background: var(--primary-blue);
+  color: white;
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--gray-2);
+  color: #1d1d1f;
+  font-size: 14px;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover {
+  background: var(--gray-1);
+}
+
+.person-michalina {
+  color: #D70040;
+  font-weight: 600;
+}
+
+.person-marcin {
+  color: #0051D5;
+  font-weight: 600;
+}
+
+/* ==================== RESULT SECTIONS ==================== */
+
+.result-box {
+  background: var(--gray-1);
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 15px;
+  border-left: 4px solid var(--green);
+}
+
+.result-box h4 {
+  margin: 0 0 10px 0;
+  color: var(--gray-6);
+}
+
+.result-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin: 10px 0;
+}

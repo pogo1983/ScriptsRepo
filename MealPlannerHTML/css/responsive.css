@@ -1,0 +1,343 @@
+/* ========================================
+   RESPONSIVE STYLES
+   Media Queries, Mobile Overrides, Print
+   ======================================== */
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* Table wrapper for horizontal scroll */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Mobile plan cards - hidden on desktop */
+.plan-cards-mobile {
+  display: none;
+}
+
+.plan-table-desktop {
+  display: table;
+  width: 100%;
+  min-width: 800px;
+  font-size: 14px;
+}
+
+.plan-table-desktop th {
+  white-space: nowrap;
+  font-size: 13px;
+  padding: 10px 8px;
+}
+
+.plan-table-desktop td {
+  padding: 10px 8px;
+  font-size: 13px;
+}
+
+.plan-table-desktop .day-label {
+  font-weight: 700;
+  background: #f0f7ff;
+  vertical-align: middle;
+  text-align: center;
+  padding: 12px 15px;
+}
+
+.plan-table-desktop .day-label strong {
+  display: inline;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  /* Show hamburger menu on mobile */
+  .hamburger-menu {
+    display: flex;
+  }
+  
+  /* Mobile navigation - sidebar */
+  .tabs {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+    padding: 80px 0 20px 0;
+    border-radius: 0;
+    box-shadow: var(--shadow-heavy);
+    z-index: 1000;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+  }
+  
+  .tabs.active {
+    left: 0;
+  }
+  
+  .tab {
+    flex: none;
+    min-width: auto;
+    padding: 16px 24px;
+    border-radius: 0;
+    text-align: left;
+    font-size: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #1d1d1f;
+    background: transparent;
+  }
+  
+  .tab:hover {
+    background: #f5f5f5;
+  }
+  
+  .tab.active {
+    background: #f0f7ff;
+    color: var(--primary-blue);
+    border-left: 4px solid var(--primary-blue);
+    padding-left: 20px;
+  }
+  
+  .meal-plan-people {
+    grid-template-columns: 1fr;
+  }
+  
+  .day-plan-summary {
+    grid-template-columns: 1fr;
+  }
+  
+  .day-plan-card {
+    padding: 16px;
+  }
+  
+  .day-plan-title {
+    font-size: 22px;
+  }
+  
+  /* Hide desktop table on mobile */
+  .plan-table-desktop {
+    display: none;
+  }
+  
+  /* Show mobile cards */
+  .plan-cards-mobile {
+    display: block;
+  }
+  
+  /* Day card styling */
+  .day-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+  
+  .day-card-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1d1d1f;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+  
+  .day-card-meals {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .meal-card {
+    background: #f9f9f9;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  
+  .meal-card-header {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 8px;
+  }
+  
+  .meal-card-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #007AFF;
+    margin-bottom: 12px;
+  }
+  
+  .meal-card-people {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .meal-card-person {
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 8px;
+    background: white;
+    border-radius: 8px;
+  }
+  
+  .meal-card-person strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+  
+  .meal-card-calories {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    padding-top: 8px;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .day-card-summary {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 2px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .day-card-summary strong {
+    font-weight: 700;
+  }
+  
+  .container {
+    padding: 15px;
+    margin: 20px auto;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .btn-action {
+    min-width: 100%;
+  }
+  
+  .export-buttons {
+    flex-direction: column;
+  }
+  
+  .day-checkboxes {
+    grid-template-columns: 1fr;
+  }
+  
+  .exercise-categories {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Fix meal selection table on mobile */
+  #dropdowns table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  #dropdowns table th,
+  #dropdowns table td {
+    font-size: 11px;
+    padding: 6px 4px;
+    min-width: 80px;
+  }
+  
+  #dropdowns table .day-label {
+    padding: 10px 8px;
+    min-width: 90px;
+    font-weight: 700;
+  }
+  
+  #dropdowns table select {
+    font-size: 12px;
+    padding: 6px 4px;
+    width: 100%;
+    min-width: 100px;
+  }
+  
+  #dropdowns table .day-label {
+    position: sticky;
+    left: 0;
+    background: var(--gray-1);
+    z-index: 1;
+  }
+  
+  table {
+    font-size: 12px;
+  }
+  
+  th, td {
+    padding: 8px 10px;
+  }
+  
+  .floating-action-buttons {
+    bottom: 16px;
+    right: 16px;
+  }
+  
+  .fab-button {
+    width: 52px;
+    height: 52px;
+    font-size: 22px;
+  }
+}
+
+/* ==================== PRINT STYLES ==================== */
+
+@media print {
+  body {
+    background: white;
+  }
+  
+  body::before {
+    display: none;
+  }
+  
+  .container {
+    max-width: 100%;
+    margin: 0;
+  }
+  
+  .tabs,
+  .action-buttons,
+  .export-buttons,
+  .btn-filter,
+  .floating-action-buttons,
+  .accordion-controls,
+  #dropdowns,
+  #zakupy-section,
+  button {
+    display: none !important;
+  }
+  
+  #plan {
+    display: none;
+  }
+  
+  .result-section {
+    background: white;
+    box-shadow: none;
+  }
+  
+  table {
+    border: 1px solid #000;
+    color: #000;
+  }
+  
+  th {
+    background: #e0e0e0 !important;
+    color: #000 !important;
+  }
+}
