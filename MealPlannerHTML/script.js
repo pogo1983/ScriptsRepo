@@ -503,6 +503,11 @@ function switchTab(tabName) {
     }
   });
   
+  // Zamknij mobile menu po wyborze (jeśli otwarty)
+  if (window.innerWidth <= 768) {
+    closeMobileMenu();
+  }
+  
   // Inicjalizuj widoki przy przełączaniu
   if(tabName === 'manage') {
     displayDishList();
@@ -2040,3 +2045,33 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 document.getElementById('waterPerson').addEventListener('change', displayWaterProgress);
 document.getElementById('waterGoal').addEventListener('change', displayWaterProgress);
+
+// ---------- HAMBURGER MENU (Mobile) ----------
+
+function toggleMobileMenu() {
+  const hamburger = document.querySelector('.hamburger-menu');
+  const tabs = document.querySelector('.tabs');
+  const overlay = document.querySelector('.mobile-menu-overlay');
+  
+  hamburger.classList.toggle('active');
+  tabs.classList.toggle('active');
+  overlay.classList.toggle('active');
+  
+  // Prevent body scroll when menu is open
+  if (tabs.classList.contains('active')) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+function closeMobileMenu() {
+  const hamburger = document.querySelector('.hamburger-menu');
+  const tabs = document.querySelector('.tabs');
+  const overlay = document.querySelector('.mobile-menu-overlay');
+  
+  hamburger.classList.remove('active');
+  tabs.classList.remove('active');
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}

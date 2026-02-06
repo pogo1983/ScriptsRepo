@@ -9,6 +9,16 @@
 <body>
 
 <div class="container">
+  <!-- Hamburger Menu Button (Mobile Only) -->
+  <button class="hamburger-menu" onclick="toggleMobileMenu()" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu-overlay" onclick="toggleMobileMenu()"></div>
+  
   <h1>🍽️ Planner Dietetyczny</h1>
   <p class="intro">Wybierz dania na każdy dzień tygodnia dla <span class="person-michalina"><span class="person-michalina-name">Michalina</span></span> i <span class="person-marcin"><span class="person-marcin-name">Marcin</span></span>.<br>
   Po wyborze wszystkich posiłków, wygeneruj jadłospis i automatyczną listę zakupów!</p>
@@ -47,14 +57,14 @@
     <small style="color: #666;">* Suplementacja po konsultacji z lekarzem</small>
   </div>
 
-  <div class="tabs">
+  <nav class="tabs">
     <button class="tab active" onclick="switchTab('planner')">📅 Planner</button>
     <button class="tab" onclick="switchTab('activity')">🏃‍♂️ Aktywność</button>
     <button class="tab" onclick="switchTab('fridge')">🧊 Lodówka</button>
     <button class="tab" onclick="switchTab('training')">💪 Trening</button>
     <button class="tab" onclick="switchTab('stats')">📊 Statystyki & Garmin</button>
     <button class="tab" onclick="switchTab('manage')">⚙️ Zarządzaj danymi</button>
-  </div>
+  </nav>
 
   <div id="planner-tab" class="tab-content active">
     <div class="meal-count-selector">
