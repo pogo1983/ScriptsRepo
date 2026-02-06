@@ -8,21 +8,6 @@
 </head>
 <body>
 
-<!-- Firebase Login UI (hidden by default) -->
-<div id="loginScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); z-index: 10000; align-items: center; justify-content: center;">
-  <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center; max-width: 400px;">
-    <h1 style="margin: 0 0 10px 0; color: #1d1d1f;">🔗 Synchronizacja danych</h1>
-    <p style="color: #666; margin-bottom: 30px;">Zaloguj się, aby zsynchronizować dane między urządzeniami (Mac, iPhone, etc.)</p>
-    <button id="googleSignInBtn" style="width: 100%; padding: 15px; background: white; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='none'">
-      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-      Zaloguj przez Google
-    </button>
-    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
-      <button id="cancelLoginBtn" style="background: none; border: none; color: #666; cursor: pointer; font-size: 14px;">✕ Anuluj</button>
-    </div>
-  </div>
-</div>
-
 <div class="container">
   <h1>🍽️ Planner Dietetyczny</h1>
   <p class="intro">Wybierz dania na każdy dzień tygodnia dla <span class="person-michalina"><span class="person-michalina-name">Michalina</span></span> i <span class="person-marcin"><span class="person-marcin-name">Marcin</span></span>.<br>
@@ -507,26 +492,13 @@
   <div id="manage-tab" class="tab-content">
     <h2>⚙️ Zarządzaj danymi</h2>
     
-    <div class="firebase-sync-section">
-      <h3 style="margin-top: 0;">☁️ Synchronizacja między urządzeniami</h3>
-      <p style="margin: 10px 0; opacity: 0.95;">Włącz synchronizację, aby automatycznie przenosić dane między Mac, iPhone i innymi urządzeniami.</p>
-      <div id="syncSection">
-        <div id="syncDisabled">
-          <p style="margin: 10px 0; font-size: 14px; opacity: 0.9;">✅ Jadłospis i lista zakupów - działa lokalnie (bez synchronizacji)<br>📊 Historia treningów, wagi, Garmin - można zsynchronizować</p>
-          <button onclick="showFirebaseLogin()" style="background: white; color: #667eea; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; margin-top: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">🔗 Włącz synchronizację (opcjonalnie)</button>
-        </div>
-        <div id="syncEnabled" style="display: none;">
-          <p style="margin: 10px 0;">✅ Synchronizacja włączona</p>
-          <div style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">
-            <img id="syncUserPhoto" src="" alt="" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white;">
-            <div style="flex: 1;">
-              <div id="syncUserName" style="font-weight: bold;">Użytkownik</div>
-              <div id="syncUserEmail" style="font-size: 12px; opacity: 0.8;">email@example.com</div>
-            </div>
-            <button id="disableSyncBtn" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white !important; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Wyloguj</button>
-          </div>
-        </div>
-      </div>
+    <!-- TODO: Dodać Supabase do synchronizacji między urządzeniami -->
+    <!-- Supabase = PostgreSQL + admin panel + auto sync -->
+    <!-- Setup: supabase.com → create project → add tables → get API key -->
+    <!-- Korzyści: prawdziwy SQL, pełna kontrola, darmowy tier 500MB -->
+    <div style="background: #fff3cd; padding: 16px; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 20px;">
+      <h3 style="margin-top: 0; color: #856404;">💡 TODO: Synchronizacja (Supabase)</h3>
+      <p style="color: #856404; margin: 8px 0; font-size: 14px;">W przyszłości dodamy Supabase do syncowania danych między Mac i iPhone.<br>Na razie wszystko działa lokalnie w przeglądarce (localStorage).</p>
     </div>
     
     <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; border: 2px solid #2196f3; margin-bottom: 20px;">
@@ -582,64 +554,6 @@
     <div id="dishList" class="dish-list"></div>
   </div>
 </div>
-
-<!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-  import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, getDocs, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-  
-  // Firebase configuration - ZASTĄP SWOIMI DANYMI po utworzeniu projektu Firebase
-  // Jeśli nie chcesz używać Firebase, zostaw puste - aplikacja będzie działać lokalnie
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
-  
-  // Initialize Firebase only if config is valid
-  if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
-    try {
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
-      
-      // Enable offline persistence
-      enableIndexedDbPersistence(db).catch((err) => {
-        if (err.code == 'failed-precondition') {
-          console.warn('Offline persistence: Multiple tabs open');
-        } else if (err.code == 'unimplemented') {
-          console.warn('Offline persistence: Browser not supported');
-        }
-      });
-      
-      // Export to window for use in other scripts
-      window.firebaseAuth = auth;
-      window.firebaseDb = db;
-      window.firebaseSignIn = signInWithPopup;
-      window.firebaseSignOut = signOut;
-      window.firebaseAuthChanged = onAuthStateChanged;
-      window.GoogleAuthProvider = GoogleAuthProvider;
-      window.firestoreDoc = doc;
-      window.firestoreSetDoc = setDoc;
-      window.firestoreGetDoc = getDoc;
-      window.firestoreUpdateDoc = updateDoc;
-      window.firestoreDeleteDoc = deleteDoc;
-      window.firestoreCollection = collection;
-      window.firestoreQuery = query;
-      window.firestoreGetDocs = getDocs;
-      
-      console.log('✅ Firebase initialized');
-    } catch (error) {
-      console.warn('⚠️ Firebase nie zainicjalizowany (działamy lokalnie):', error.message);
-    }
-  } else {
-    console.log('ℹ️ Firebase config not set - running in local mode');
-  }
-</script>
 
 <script src="data.js"></script>
 <script src="script.js"></script>
