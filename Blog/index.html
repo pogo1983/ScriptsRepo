@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mój Blog</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">Mój Blog</h1>
+                <nav class="nav">
+                    <a href="#" class="nav-link active">Strona główna</a>
+                    <a href="#" class="nav-link">O mnie</a>
+                    <a href="#" class="nav-link">Kontakt</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2 class="hero-title">Witaj na moim blogu</h2>
+            <p class="hero-subtitle">Dzielę się swoimi myślami, doświadczeniami i pomysłami</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="content-wrapper">
+                <!-- Blog Posts -->
+                <div class="posts">
+                    <!-- Post 1 -->
+                    <article class="post">
+                        <div class="post-image">
+                            <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&h=400&fit=crop" alt="Post 1">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-date">7 lutego 2026</span>
+                                <span class="post-category">Technologia</span>
+                            </div>
+                            <h2 class="post-title">
+                                <a href="#">Jak stworzyć nowoczesny blog w 2026 roku</a>
+                            </h2>
+                            <p class="post-excerpt">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam...
+                            </p>
+                            <a href="#" class="btn btn-primary">Czytaj więcej</a>
+                        </div>
+                    </article>
+
+                    <!-- Post 2 -->
+                    <article class="post">
+                        <div class="post-image">
+                            <img src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=400&fit=crop" alt="Post 2">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-date">5 lutego 2026</span>
+                                <span class="post-category">Programowanie</span>
+                            </div>
+                            <h2 class="post-title">
+                                <a href="#">10 wskazówek dla początkujących programistów</a>
+                            </h2>
+                            <p class="post-excerpt">
+                                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident...
+                            </p>
+                            <a href="#" class="btn btn-primary">Czytaj więcej</a>
+                        </div>
+                    </article>
+
+                    <!-- Post 3 -->
+                    <article class="post">
+                        <div class="post-image">
+                            <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&h=400&fit=crop" alt="Post 3">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-date">1 lutego 2026</span>
+                                <span class="post-category">Lifestyle</span>
+                            </div>
+                            <h2 class="post-title">
+                                <a href="#">Równowaga między pracą a życiem prywatnym</a>
+                            </h2>
+                            <p class="post-excerpt">
+                                Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore...
+                            </p>
+                            <a href="#" class="btn btn-primary">Czytaj więcej</a>
+                        </div>
+                    </article>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <a href="#" class="pagination-link disabled">« Poprzednia</a>
+                        <a href="#" class="pagination-link active">1</a>
+                        <a href="#" class="pagination-link">2</a>
+                        <a href="#" class="pagination-link">3</a>
+                        <a href="#" class="pagination-link">Następna »</a>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <!-- About Widget -->
+                    <div class="widget">
+                        <h3 class="widget-title">O mnie</h3>
+                        <div class="widget-content">
+                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop" alt="Author" class="author-image">
+                            <p>Cześć! Jestem pasjonatem technologii i programowania. Dzielę się swoją wiedzą i doświadczeniem.</p>
+                        </div>
+                    </div>
+
+                    <!-- Categories Widget -->
+                    <div class="widget">
+                        <h3 class="widget-title">Kategorie</h3>
+                        <div class="widget-content">
+                            <ul class="categories-list">
+                                <li><a href="#">Technologia <span>(12)</span></a></li>
+                                <li><a href="#">Programowanie <span>(8)</span></a></li>
+                                <li><a href="#">Lifestyle <span>(5)</span></a></li>
+                                <li><a href="#">Podróże <span>(3)</span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Recent Posts Widget -->
+                    <div class="widget">
+                        <h3 class="widget-title">Ostatnie wpisy</h3>
+                        <div class="widget-content">
+                            <ul class="recent-posts">
+                                <li>
+                                    <a href="#">Jak stworzyć nowoczesny blog</a>
+                                    <span class="recent-date">7 lutego 2026</span>
+                                </li>
+                                <li>
+                                    <a href="#">10 wskazówek dla programistów</a>
+                                    <span class="recent-date">5 lutego 2026</span>
+                                </li>
+                                <li>
+                                    <a href="#">Równowaga między pracą a życiem</a>
+                                    <span class="recent-date">1 lutego 2026</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Tags Widget -->
+                    <div class="widget">
+                        <h3 class="widget-title">Tagi</h3>
+                        <div class="widget-content">
+                            <div class="tags">
+                                <a href="#" class="tag">HTML</a>
+                                <a href="#" class="tag">CSS</a>
+                                <a href="#" class="tag">JavaScript</a>
+                                <a href="#" class="tag">Web Design</a>
+                                <a href="#" class="tag">Tutorial</a>
+                                <a href="#" class="tag">Tips</a>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2026 Mój Blog. Wszystkie prawa zastrzeżone.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">Facebook</a>
+                    <a href="#" class="social-link">Twitter</a>
+                    <a href="#" class="social-link">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
