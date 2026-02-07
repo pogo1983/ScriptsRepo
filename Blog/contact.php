@@ -1,9 +1,10 @@
+<?php require_once 'includes/functions.php'; ?>
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="<?php echo $lang; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kontakt - Mój Blog</title>
+    <title><?php echo t('contact'); ?> - <?php echo SITE_TITLE; ?></title>
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -11,13 +12,13 @@
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <h1 class="logo"><a href="index.html">Mój Blog</a></h1>
+                <h1 class="logo"><a href="index.php"><?php echo SITE_TITLE; ?></a></h1>
                 <nav class="nav">
-                    <a href="index.php" class="nav-link">Strona główna</a>
-                    <a href="about.html" class="nav-link">O mnie</a>
-                    <a href="contact.html" class="nav-link active">Kontakt</a>
-                    <a href="admin/admin.php" class="nav-link" style="color: #ef4444;">⚙️ Admin</a>
-                    <a href="?lang=en" class="lang-switcher">🇬🇧 EN</a>
+                    <a href="index.php" class="nav-link"><?php echo t('home'); ?></a>
+                    <a href="about.php" class="nav-link"><?php echo t('about'); ?></a>
+                    <a href="contact.php" class="nav-link active"><?php echo t('contact'); ?></a>
+                    <a href="admin/admin.php" class="nav-link" style="color: #ef4444;">⚙️ <?php echo t('admin'); ?></a>
+                    <?php langSwitcher(); ?>
                 </nav>
             </div>
         </div>
@@ -26,8 +27,8 @@
     <!-- Page Header -->
     <section class="page-header">
         <div class="container">
-            <h1 class="page-title">Kontakt</h1>
-            <p class="page-subtitle">Skontaktuj się ze mną</p>
+            <h1 class="page-title"><?php echo t('contact'); ?></h1>
+            <p class="page-subtitle"><?php echo t('get_in_touch'); ?></p>
         </div>
     </section>
 
@@ -81,22 +82,22 @@
                 <div class="contact-form-wrapper">
                     <form class="contact-form">
                         <div class="form-group">
-                            <label for="name" class="form-label">Imię i nazwisko</label>
+                            <label for="name" class="form-label"><?php echo t('your_name'); ?></label>
                             <input type="text" id="name" name="name" class="form-input" placeholder="Jan Kowalski" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="email" class="form-label">Email</label>
+                            <label for="email" class="form-label"><?php echo t('your_email'); ?></label>
                             <input type="email" id="email" name="email" class="form-input" placeholder="jan@example.com" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="subject" class="form-label">Temat</label>
+                            <label for="subject" class="form-label"><?php echo t('subject'); ?></label>
                             <input type="text" id="subject" name="subject" class="form-input" placeholder="W czym mogę pomóc?" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="message" class="form-label">Wiadomość</label>
+                            <label for="message" class="form-label"><?php echo t('your_message'); ?></label>
                             <textarea id="message" name="message" class="form-textarea" rows="6" placeholder="Twoja wiadomość..." required></textarea>
                         </div>
 
@@ -107,7 +108,7 @@
                             </label>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-large">Wyślij wiadomość</button>
+                        <button type="submit" class="btn btn-primary btn-large"><?php echo t('send_message'); ?></button>
                     </form>
                 </div>
             </div>
@@ -144,7 +145,7 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <p>&copy; 2026 Mój Blog. Wszystkie prawa zastrzeżone.</p>
+                <p>&copy; 2026 <?php echo SITE_TITLE; ?>. Wszystkie prawa zastrzeżone.</p>
                 <div class="social-links">
                     <a href="#" class="social-link">Facebook</a>
                     <a href="#" class="social-link">Twitter</a>

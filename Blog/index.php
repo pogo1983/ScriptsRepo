@@ -45,8 +45,8 @@ $popularTags = getPopularTags(6);
                 <h1 class="logo"><a href="index.php"><?php echo SITE_TITLE; ?></a></h1>
                 <nav class="nav">
                     <a href="index.php" class="nav-link active"><?php echo t('home'); ?></a>
-                    <a href="about.html" class="nav-link"><?php echo t('about'); ?></a>
-                    <a href="contact.html" class="nav-link"><?php echo t('contact'); ?></a>
+                    <a href="about.php" class="nav-link"><?php echo t('about'); ?></a>
+                    <a href="contact.php" class="nav-link"><?php echo t('contact'); ?></a>
                     <a href="admin/admin.php" class="nav-link" style="color: #ef4444;">⚙️ <?php echo t('admin'); ?></a>
                     <?php langSwitcher(); ?>
                 </nav>

@@ -1,9 +1,10 @@
+<?php require_once 'includes/functions.php'; ?>
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="<?php echo $lang; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O mnie - Mój Blog</title>
+    <title><?php echo t('about'); ?> - <?php echo SITE_TITLE; ?></title>
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -11,13 +12,13 @@
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <h1 class="logo"><a href="index.html">Mój Blog</a></h1>
+                <h1 class="logo"><a href="index.php"><?php echo SITE_TITLE; ?></a></h1>
                 <nav class="nav">
-                    <a href="index.php" class="nav-link">Strona główna</a>
-                    <a href="about.html" class="nav-link active">O mnie</a>
-                    <a href="contact.html" class="nav-link">Kontakt</a>
-                    <a href="admin/admin.php" class="nav-link" style="color: #ef4444;">⚙️ Admin</a>
-                    <a href="?lang=en" class="lang-switcher">🇬🇧 EN</a>
+                    <a href="index.php" class="nav-link"><?php echo t('home'); ?></a>
+                    <a href="about.php" class="nav-link active"><?php echo t('about'); ?></a>
+                    <a href="contact.php" class="nav-link"><?php echo t('contact'); ?></a>
+                    <a href="admin/admin.php" class="nav-link" style="color: #ef4444;">⚙️ <?php echo t('admin'); ?></a>
+                    <?php langSwitcher(); ?>
                 </nav>
             </div>
         </div>
@@ -26,7 +27,7 @@
     <!-- Page Header -->
     <section class="page-header">
         <div class="container">
-            <h1 class="page-title">O mnie</h1>
+            <h1 class="page-title"><?php echo t('about'); ?></h1>
             <p class="page-subtitle">Poznaj moją historię i pasje</p>
         </div>
     </section>
@@ -103,7 +104,7 @@
                 <div class="about-cta">
                     <h2>Współpracujmy!</h2>
                     <p>Jeśli masz pytanie, pomysł na projekt lub po prostu chcesz pogadać o technologii - zapraszam do kontaktu!</p>
-                    <a href="contact.html" class="btn btn-primary">Skontaktuj się ze mną</a>
+                    <a href="contact.php" class="btn btn-primary">Skontaktuj się ze mną</a>
                 </div>
             </div>
         </div>
@@ -113,7 +114,7 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <p>&copy; 2026 Mój Blog. Wszystkie prawa zastrzeżone.</p>
+                <p>&copy; 2026 <?php echo SITE_TITLE; ?>. Wszystkie prawa zastrzeżone.</p>
                 <div class="social-links">
                     <a href="#" class="social-link">Facebook</a>
                     <a href="#" class="social-link">Twitter</a>
