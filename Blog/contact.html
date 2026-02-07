@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kontakt - Mój Blog</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
     <!-- Header -->
@@ -13,9 +13,11 @@
             <div class="header-content">
                 <h1 class="logo"><a href="index.html">Mój Blog</a></h1>
                 <nav class="nav">
-                    <a href="index.html" class="nav-link">Strona główna</a>
+                    <a href="index.php" class="nav-link">Strona główna</a>
                     <a href="about.html" class="nav-link">O mnie</a>
                     <a href="contact.html" class="nav-link active">Kontakt</a>
+                    <a href="admin/admin.php" class="nav-link" style="color: #ef4444;">⚙️ Admin</a>
+                    <a href="?lang=en" class="lang-switcher">🇬🇧 EN</a>
                 </nav>
             </div>
         </div>
@@ -80,22 +82,22 @@
                     <form class="contact-form">
                         <div class="form-group">
                             <label for="name" class="form-label">Imię i nazwisko</label>
-                            <input type="text" id="name" class="form-input" placeholder="Jan Kowalski" required>
+                            <input type="text" id="name" name="name" class="form-input" placeholder="Jan Kowalski" required>
                         </div>
 
                         <div class="form-group">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" id="email" class="form-input" placeholder="jan@example.com" required>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="jan@example.com" required>
                         </div>
 
                         <div class="form-group">
                             <label for="subject" class="form-label">Temat</label>
-                            <input type="text" id="subject" class="form-input" placeholder="W czym mogę pomóc?" required>
+                            <input type="text" id="subject" name="subject" class="form-input" placeholder="W czym mogę pomóc?" required>
                         </div>
 
                         <div class="form-group">
                             <label for="message" class="form-label">Wiadomość</label>
-                            <textarea id="message" class="form-textarea" rows="6" placeholder="Twoja wiadomość..." required></textarea>
+                            <textarea id="message" name="message" class="form-textarea" rows="6" placeholder="Twoja wiadomość..." required></textarea>
                         </div>
 
                         <div class="form-group">
@@ -151,5 +153,7 @@
             </div>
         </div>
     </footer>
+
+    <script src="assets/js/blog.js"></script>
 </body>
 </html>
