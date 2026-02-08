@@ -31,7 +31,9 @@ Nowoczesny, responsywny blog z pełnym backendem PHP + MySQL oraz wsparciem wiel
 - ✅ **Kategorie i tagi** - organizacja treści
 - ✅ **Panel admina** - dodawanie/usuwanie postów przez przeglądarkę
 - ✅ **Autentykacja** - bezpieczny login do panelu
-- ✅ **Wielojęzyczność** - przełączanie PL/EN z flagami 🇵🇱 🇬🇧
+- ✅ **Wielojęzyczność interfejsu** - przełączanie PL/EN z flagami 🇵🇱 🇬🇧
+- ✅ **Wielojęzyczność postów** - opcjonalne tłumaczenia treści PL/EN
+- ✅ **Featured images** - obrazki wyróżniające (linki URL)
 - ✅ **Paginacja** - dynamiczne stronicowanie
 - ✅ **Responsywny design** - działa na wszystkich urządzeniach
 - ✅ **REST API** - endpoints dla wszystkich formularzy
@@ -39,9 +41,10 @@ Nowoczesny, responsywny blog z pełnym backendem PHP + MySQL oraz wsparciem wiel
 ### Do zrobienia (opcjonalnie):
 - ⏳ Edycja postów w panelu admina
 - ⏳ Wyszukiwarka
-- ⏳ Upload obrazków
+- ⏳ Upload obrazków (obecnie: linki URL)
 - ⏳ RSS feed
 - ⏳ Panel moderacji komentarzy
+- ⏳ Automatyczne tłumaczenia AI (DeepL/OpenAI API)
 
 ---
 
@@ -314,6 +317,7 @@ brew services start mysql && cd Blog && php -S localhost:8000
 
 **Funkcje**:
 - ✅ Dodawanie nowych postów (tytuł, slug, excerpt, treść, kategoria)
+- ✅ Upload obrazków z dysku lub linki URL
 - ✅ Podgląd wszystkich postów z licznikami wyświetleń
 - ✅ Usuwanie postów z potwierdzeniem
 - ✅ Automatyczne generowanie slug z tytułu
@@ -321,35 +325,41 @@ brew services start mysql && cd Blog && php -S localhost:8000
 
 **Do zrobienia**:
 - ⏳ Edycja istniejących postów
-- ⏳ Upload obrazków
 - ⏳ Moderacja komentarzy
+- ⏳ Galeria/menadżer uploadowanych plików
 
 ---
 
 ## 🌍 Wielojęzyczność
 
-### System tłumaczeń
+System bloga obsługuje **dwa poziomy wielojęzyczności**:
+
+### 1. Wielojęzyczność interfejsu (UI)
 
 **Plik**: `includes/lang.php`
 
-**Wspierane języki**: Polski (PL), English (EN)
+**Co jest tłumaczone**:
+- Menu nawigacji (Strona główna, O mnie, Kontakt)
+- Przyciski (Czytaj więcej, Wyślij, Dodaj komentarz)
+- Etykiety formularzy
+- Daty i komunikaty
 
 **Przełączanie**:
 - Kliknij flagę 🇵🇱 lub 🇬🇧 w nawigacji
-- Język zapisuje się w sesji
+- Język zapisuje się w sesji PHP
 - Działa na wszystkich stronach
 
-### Dodawanie tłumaczeń
+**Dodawanie nowych tłumaczeń UI**:
 
 Edytuj `includes/lang.php`:
 
 ```php
 $translations = [
     'pl' => [
-        'key' => 'Wartość po polsku',
+        'new_key' => 'Wartość po polsku',
     ],
     'en' => [
-        'key' => 'English value',
+        'new_key' => 'English value',
     ]
 ];
 ```
@@ -357,12 +367,205 @@ $translations = [
 Użycie w kodzie:
 
 ```php
-<?php echo t('key'); ?>
+<?php echo t('new_key'); ?>
 ```
+
+### 2. Wielojęzyczność treści postów
+
+**Struktura bazy**:
+- `title` / `title_en` - tytuł posta
+- `excerpt` / `excerpt_en` - krótki opis
+- `content` / `content_en` - pełna treść
+
+**Jak działa**:
+1. **Post tylko po polsku**: Wypełnij tylko pola PL, zostaw EN puste
+   - Post będzie widoczny po polsku niezależnie od wybranego języka
+
+2. **Post dwujęzyczny**: Wypełnij pola PL i EN
+   - Język PL → pokazuje wersję PL
+   - Język EN → pokazuje wersję EN
+
+**Panel admina**:
+
+Formularz dodawania posta ma pola dla obu języków:
+
+```
+🇵🇱 Tytuł (PL) *        🇬🇧 Title (EN)
+🇵🇱 Opis (PL)           🇬🇧 Description (EN)
+🇵🇱 Treść (PL) *        🇬🇧 Content (EN)
+```
+
+*Pola oznaczone * są wymagane (wersja PL)*
+
+**Funkcja pomocnicza**:
+
+```php
+// Automatycznie zwraca odpowiednią wersję językową
+getLocalizedField($post, 'title');    // Zwraca title lub title_en
+getLocalizedField($post, 'excerpt');  // Zwraca excerpt lub excerpt_en
+getLocalizedField($post, 'content');  // Zwraca content lub content_en
+```
+
+**Przykładowy workflow**:
+
+1. Napisz post po polsku w panelu admina
+2. Skopiuj tekst do ChatGPT/Claude
+3. Zapytaj: "Przetłumacz ten post na angielski"
+4. Wklej tłumaczenie do pól EN
+5. Zapisz - post automatycznie dwujęzyczny!
+
+**Przyszłość - automatyczne tłumaczenia**:
+- Integracja z DeepL API
+- Integracja z OpenAI API
+- Przycisk "Auto-translate" w panelu admina
 
 ---
 
-## 🔐 Bezpieczeństwo
+## 📷 Obrazki w postach
+
+System obsługuje **dwa sposoby dodawania obrazków**:
+
+### 1. Featured Image (obrazek wyróżniający)
+
+W formularzu dodawania posta masz **dwie opcje**:
+
+#### Opcja A: Upload z dysku (NOWE! ✨)
+
+**Formularz**: Sekcja "📸 Obrazek wyróżniający"
+
+```
+🖼️ Upload z dysku: [Wybierz plik...]
+```
+
+**Wspierane formaty**:
+- JPG / JPEG
+- PNG
+- GIF
+- WebP
+
+**Limity**:
+- Maksymalny rozmiar: **5 MB**
+- Automatyczna walidacja typu MIME
+- Unikalne nazwy plików: `abc123_1234567890.jpg`
+
+**Gdzie są zapisywane**:
+- Folder: `/uploads/`
+- Ścieżka w bazie: `uploads/filename.jpg`
+- Automatyczne uprawnienia: 755
+
+**Zabezpieczenia**:
+- ❌ PHP nie może być wykonany w `/uploads/`
+- ✅ Tylko pliki graficzne dozwolone (`.htaccess`)
+- ✅ Walidacja typu MIME i rozszerzenia
+- ✅ Limit rozmiaru: 5 MB
+- ✅ Index.php blokuje przeglądanie folderu
+
+#### Opcja B: Link URL (jak poprzednio)
+
+```
+🔗 Lub URL obrazka: https://images.unsplash.com/...
+```
+
+**Zalecane źródła darmowych obrazków**:
+- [Unsplash](https://unsplash.com) - Wysokiej jakości zdjęcia
+- [Pexels](https://www.pexels.com) - Darmowe zdjęcia stockowe
+- [Pixabay](https://www.pixabay.com) - Darmowa biblioteka
+- Własny serwer/CDN
+
+**Jak znaleźć URL**:
+1. Wejdź na Unsplash.com
+2. Znajdź obrazek
+3. Prawy klik → "Copy Image Address"
+4. Wklej do pola URL
+
+### 2. Obrazki w treści posta
+
+W polu **"Treść posta"** używaj HTML:
+
+```html
+<h2>Nagłówek</h2>
+<p>Treść akapitu...</p>
+
+<img src="https://images.unsplash.com/photo-123456" alt="Opis obrazka">
+<!-- lub -->
+<img src="uploads/abc123_1234567890.jpg" alt="Uploadowany obrazek">
+
+<p>Kolejny akapit...</p>
+```
+
+**Style dla obrazków** (automatyczne):
+- Responsywne: `max-width: 100%`
+- Zaokrąglone rogi: `border-radius: 8px`
+- Marginesy góra/dół: `margin: 20px 0`
+
+### Funkcja `uploadImage()` - Implementacja
+
+**Plik**: `includes/functions.php`
+
+**Proces upload'u**:
+1. Sprawdzenie czy plik został przesłany
+2. Walidacja typu MIME (tylko obrazki)
+3. Sprawdzenie rozszerzenia pliku
+4. Walidacja rozmiaru (max 5 MB)
+5. Generowanie unikalnej nazwy: `uniqid() . '_' . time() . '.ext'`
+6. Zapis do folderu `/uploads/`
+7. Zwrócenie ścieżki: `uploads/filename.jpg`
+
+**Przykład użycia**:
+```php
+if (isset($_FILES['featured_image_file']) && $_FILES['featured_image_file']['error'] === UPLOAD_ERR_OK) {
+    $result = uploadImage($_FILES['featured_image_file']);
+    if ($result['success']) {
+        $imagePath = $result['path']; // uploads/abc123.jpg
+    } else {
+        $error = $result['message']; // Komunikat błędu
+    }
+}
+```
+
+**Kody błędów**:
+- "Błąd podczas przesyłania pliku" - problem z upload'em
+- "Nieprawidłowy typ pliku" - nie jest obrazkiem
+- "Nieprawidłowe rozszerzenie pliku" - zakazane rozszerzenie
+- "Plik jest za duży. Maksymalny rozmiar: 5 MB"
+- "Nie udało się zapisać pliku" - problem z dyskiem/uprawnieniami
+
+### Backup plików
+
+**Ważne**: Folder `/uploads/` należy dołączyć do backupów!
+
+```bash
+# Backup plików + baza danych
+tar -czf backup_$(date +%Y%m%d).tar.gz uploads/ database/
+mysqldump -u blog_user -p blog_db > backup_db.sql
+```
+
+### Zarządzanie miejscem na dysku
+
+**Sprawdź rozmiar folderu uploads**:
+```bash
+du -sh uploads/
+```
+
+**Usuń stare/nieużywane obrazki**:
+```sql
+-- Znajdź obrazki które są używane w postach
+SELECT featured_image FROM posts WHERE featured_image LIKE 'uploads/%';
+```
+
+### Przyszłe rozszerzenia
+
+**Co można dodać**:
+- ⏳ Automatyczne tworzenie miniaturek (thumbnails)
+- ⏳ Kompresja obrazków (zmniejszenie rozmiaru)
+- ⏳ Galeria/menadżer uploadowanych plików
+- ⏳ Edycja/obcinanie obrazków w przeglądarce
+- ⏳ Lazy loading dla obrazków
+- ⏳ CDN integration (CloudFlare, AWS S3)
+
+---
+
+## �🔐 Bezpieczeństwo
 
 ### CHECKLIST przed produkcją:
 

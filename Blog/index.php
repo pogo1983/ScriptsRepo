@@ -87,10 +87,10 @@ $popularTags = getPopularTags(6);
                                         <?php endif; ?>
                                     </div>
                                     <h2 class="post-title">
-                                        <a href="post.php?slug=<?php echo e($post['slug']); ?>"><?php echo e($post['title']); ?></a>
+                                        <a href="post.php?slug=<?php echo e($post['slug']); ?>"><?php echo e(getLocalizedField($post, 'title')); ?></a>
                                     </h2>
                                     <p class="post-excerpt">
-                                        <?php echo e($post['excerpt']); ?>
+                                        <?php echo e(getLocalizedField($post, 'excerpt')); ?>
                                     </p>
                                     <a href="post.php?slug=<?php echo e($post['slug']); ?>" class="btn"><?php echo t('read_more'); ?> →</a>
                                 </div>

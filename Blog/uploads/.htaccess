@@ -1,0 +1,17 @@
+# Zabezpieczenie folderu uploads
+# Zezwalaj tylko na pliki graficzne
+
+# Wyłącz wykonywanie skryptów PHP
+php_flag engine off
+
+# Zezwalaj tylko na obrazki
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Blokuj wszystko inne
+<FilesMatch "\.(php|phtml|php3|php4|php5|pl|py|jsp|asp|sh|cgi)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

@@ -33,7 +33,7 @@ $recentPosts = getRecentPosts(3);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo e($post['title']); ?> - <?php echo SITE_TITLE; ?></title>
+    <title><?php echo e(getLocalizedField($post, 'title')); ?> - <?php echo SITE_TITLE; ?></title>
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -66,17 +66,17 @@ $recentPosts = getRecentPosts(3);
                                 <span class="post-category"><?php echo e($post['category_name']); ?></span>
                             <?php endif; ?>
                         </div>
-                        <h1 class="single-post-title"><?php echo e($post['title']); ?></h1>
+                        <h1 class="single-post-title"><?php echo e(getLocalizedField($post, 'title')); ?></h1>
                     </div>
 
                     <?php if ($post['featured_image']): ?>
                         <div class="post-featured-image">
-                            <img src="<?php echo e($post['featured_image']); ?>" alt="<?php echo e($post['title']); ?>">
+                            <img src="<?php echo e($post['featured_image']); ?>" alt="<?php echo e(getLocalizedField($post, 'title')); ?>">
                         </div>
                     <?php endif; ?>
 
                     <div class="post-body">
-                        <?php echo $post['content']; // Content already sanitized in DB ?>
+                        <?php echo getLocalizedField($post, 'content'); // Content already sanitized in DB ?>
                     </div>
 
                     <!-- Post Footer -->

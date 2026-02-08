@@ -7,6 +7,23 @@ require_once 'config.php';
 require_once 'lang.php';
 
 /**
+ * Zwraca treść w odpowiednim języku
+ */
+function getLocalizedField($row, $field) {
+    global $lang;
+    
+    $fieldLang = $field . '_' . $lang;
+    
+    // Jeśli istnieje wersja w wybranym języku i nie jest pusta, zwróć ją
+    if ($lang !== 'pl' && isset($row[$fieldLang]) && !empty($row[$fieldLang])) {
+        return $row[$fieldLang];
+    }
+    
+    // W przeciwnym razie zwróć wersję domyślną (PL)
+    return $row[$field];
+}
+
+/**
  * Pobierz wszystkie posty (opublikowane)
  */
 function getPosts($limit = null, $offset = 0, $category_id = null) {
@@ -303,5 +320,58 @@ function formatDate($date) {
  */
 function e($string) {
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * Upload obrazka
+ */
+function uploadImage($file) {
+    // Sprawdź czy plik został przesłany
+    if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
+        return ['success' => false, 'message' => 'Błąd podczas przesyłania pliku.'];
+    }
+    
+    // Dozwolone typy plików
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    
+    // Sprawdź typ MIME
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $file['tmp_name']);
+    finfo_close($finfo);
+    
+    if (!in_array($mimeType, $allowedTypes)) {
+        return ['success' => false, 'message' => 'Nieprawidłowy typ pliku. Dozwolone: JPG, PNG, GIF, WebP.'];
+    }
+    
+    // Sprawdź rozszerzenie
+    $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($extension, $allowedExtensions)) {
+        return ['success' => false, 'message' => 'Nieprawidłowe rozszerzenie pliku.'];
+    }
+    
+    // Sprawdź rozmiar (max 5 MB)
+    $maxSize = 5 * 1024 * 1024; // 5 MB
+    if ($file['size'] > $maxSize) {
+        return ['success' => false, 'message' => 'Plik jest za duży. Maksymalny rozmiar: 5 MB.'];
+    }
+    
+    // Wygeneruj unikalną nazwę
+    $fileName = uniqid() . '_' . time() . '.' . $extension;
+    $uploadDir = __DIR__ . '/../uploads/';
+    $uploadPath = $uploadDir . $fileName;
+    
+    // Sprawdź czy folder uploads istnieje
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+    
+    // Przenieś plik
+    if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
+        // Zwróć relatywną ścieżkę
+        return ['success' => true, 'path' => 'uploads/' . $fileName];
+    } else {
+        return ['success' => false, 'message' => 'Nie udało się zapisać pliku.'];
+    }
 }
 ?>
