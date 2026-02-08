@@ -106,6 +106,7 @@ function switchTab(tabName) {
 function getTabIcon(tabName) {
   const icons = {
     'planner': '📅',
+    'random': '🎲',
     'activity': '🏃',
     'fridge': '🧊',
     'training': '💪',

@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/components.css">
 <link rel="stylesheet" href="css/meal-planner.css">
+<link rel="stylesheet" href="css/random-meal.css">
 <link rel="stylesheet" href="css/modules.css">
 <link rel="stylesheet" href="css/responsive.css">
 </head>
@@ -65,6 +66,7 @@
 
   <nav class="tabs">
     <button class="tab active" onclick="switchTab('planner')">📅 Planner</button>
+    <button class="tab" onclick="switchTab('random')">🎲 Chybił trafił</button>
     <button class="tab" onclick="switchTab('activity')">🏃‍♂️ Aktywność</button>
     <button class="tab" onclick="switchTab('fridge')">🧊 Lodówka</button>
     <button class="tab" onclick="switchTab('training')">💪 Trening</button>
@@ -141,6 +143,45 @@
     </div>
     
     <div id="zakupy"></div>
+  </div>
+
+  <div id="random-tab" class="tab-content">
+    <h2>🎲 Chybił trafił - Losuj posiłek</h2>
+    <p class="intro">Nie wiesz co dziś zjeść? Wylosuj dowolny posiłek!</p>
+    
+    <div class="random-meal-grid">
+      <div class="random-meal-card">
+        <div class="random-meal-icon">🌅</div>
+        <h3>Śniadanie</h3>
+        <button class="btn-random" onclick="losujPosilek('śniadanie')">🎲 Losuj śniadanie</button>
+        <div id="random-śniadanie" class="random-meal-result"></div>
+      </div>
+      
+      <div class="random-meal-card">
+        <div class="random-meal-icon">🍽️</div>
+        <h3>Obiad</h3>
+        <button class="btn-random" onclick="losujPosilek('obiad')">🎲 Losuj obiad</button>
+        <div id="random-obiad" class="random-meal-result"></div>
+      </div>
+      
+      <div class="random-meal-card">
+        <div class="random-meal-icon">🍪</div>
+        <h3>Podwieczorek</h3>
+        <button class="btn-random" onclick="losujPosilek('podwieczorek')">🎲 Losuj podwieczorek</button>
+        <div id="random-podwieczorek" class="random-meal-result"></div>
+      </div>
+      
+      <div class="random-meal-card">
+        <div class="random-meal-icon">🌙</div>
+        <h3>Kolacja</h3>
+        <button class="btn-random" onclick="losujPosilek('kolacja')">🎲 Losuj kolację</button>
+        <div id="random-kolacja" class="random-meal-result"></div>
+      </div>
+    </div>
+    
+    <div class="random-all-section">
+      <button class="btn-random-all" onclick="losujWszystkie()">🎰 Losuj wszystkie posiłki na dziś!</button>
+    </div>
   </div>
 
   <div id="activity-tab" class="tab-content">
@@ -576,6 +617,7 @@
 <script src="js/utils.js"></script>
 <script src="js/app.js"></script>
 <script src="js/meal-planner.js"></script>
+<script src="js/random-meal.js"></script>
 <script src="js/meal-manager.js"></script>
 <script src="js/export.js"></script>
 <script src="js/activity.js"></script>

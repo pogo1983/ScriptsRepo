@@ -1,0 +1,207 @@
+/* ========================================
+   CHYBIŁ TRAFIŁ - Random Meal Styles
+   ======================================== */
+
+.random-meal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin: 30px 0;
+}
+
+.random-meal-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.random-meal-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.random-meal-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.random-meal-card h3 {
+  color: #1d1d1f;
+  margin: 12px 0 20px 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.btn-random {
+  width: 100%;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 16px;
+}
+
+.btn-random:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-random:active {
+  transform: scale(0.98);
+}
+
+.random-meal-result {
+  min-height: 100px;
+  margin-top: 16px;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.random-dish-info {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.random-dish-info h4 {
+  color: #1d1d1f;
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.random-calories {
+  display: inline-block;
+  background: #fff3cd;
+  color: #856404;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.random-details {
+  margin-top: 12px;
+  cursor: pointer;
+}
+
+.random-details summary {
+  font-weight: 600;
+  color: #667eea;
+  padding: 8px;
+  border-radius: 8px;
+  background: white;
+  list-style: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.random-details summary:hover {
+  background: #f0f0f0;
+}
+
+.random-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.random-details summary::before {
+  content: "▶ ";
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+.random-details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.random-ingredients {
+  list-style: none;
+  padding: 12px 0 0 0;
+  margin: 0;
+}
+
+.random-ingredients li {
+  padding: 6px 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.btn-reroll {
+  width: 100%;
+  padding: 10px 16px;
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.2s ease;
+}
+
+.btn-reroll:hover {
+  background: #667eea;
+  color: white;
+}
+
+.random-all-section {
+  text-align: center;
+  margin: 40px 0;
+  padding: 30px;
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border-radius: 16px;
+}
+
+.btn-random-all {
+  padding: 18px 40px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(245, 87, 108, 0.3);
+}
+
+.btn-random-all:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 30px rgba(245, 87, 108, 0.4);
+}
+
+.btn-random-all:active {
+  transform: scale(1.02);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .random-meal-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .random-meal-card {
+    padding: 20px;
+  }
+  
+  .random-meal-icon {
+    font-size: 40px;
+  }
+  
+  .btn-random-all {
+    padding: 16px 32px;
+    font-size: 16px;
+  }
+}
