@@ -12,6 +12,33 @@
   line-height: 1.6;
   font-size: 1.05rem;
   font-weight: 500;
+  /* iOS-style background */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 24px 32px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Style dla imion w intro - z białym tłem dla lepszej czytelności */
+.intro .person-michalina,
+.intro .person-marcin {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 4px 12px;
+  border-radius: 8px;
+  display: inline-block;
+  margin: 0 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.intro .person-michalina {
+  color: #D70040;
+}
+
+.intro .person-marcin {
+  color: #0051D5;
 }
 
 .info-box {
