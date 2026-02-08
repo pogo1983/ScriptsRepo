@@ -47,6 +47,39 @@ EXIT;
 mysql -u blog_user -p blog_db < database/schema.sql
 ```
 
+## 🔧 Zarządzanie serwerami (localhost)
+
+### MySQL
+```bash
+# Start MySQL
+brew services start mysql
+
+# Stop MySQL
+brew services stop mysql
+
+# Status MySQL
+brew services list | grep mysql
+
+# Połączenie z bazą
+mysql -u root
+use blog_db;
+```
+
+### PHP Development Server
+```bash
+# Start PHP (w folderze Blog/)
+php -S localhost:8000
+
+# Stop PHP
+Ctrl + C
+
+# Start w tle
+php -S localhost:8000 &
+
+# Sprawdź czy działa
+lsof -i :8000
+```
+
 ### Krok 3: Skonfiguruj config.php
 
 Edytuj `config.php` i zmień:

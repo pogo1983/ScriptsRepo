@@ -48,6 +48,60 @@ SZYBKI START - INSTALACJA NA SERWERZE
    Potem w MySQL:
    UPDATE users SET password_hash = 'WYGENEROWANY_HASH' WHERE username = 'admin';
 
+
+# ============================================
+# ZARZĄDZANIE SERWERAMI (LOCALHOST)
+# ============================================
+
+MYSQL
+-----
+# Start
+brew services start mysql
+
+# Stop
+brew services stop mysql
+
+# Restart
+brew services restart mysql
+
+# Status
+brew services list | grep mysql
+
+# Połączenie z bazą
+mysql -u root
+use blog_db;
+SHOW TABLES;
+
+# Sprawdź czy działa
+mysql -u root -e "SELECT 'OK' as status;"
+
+
+PHP DEVELOPMENT SERVER
+----------------------
+# Start (w folderze Blog/)
+cd Blog
+php -S localhost:8000
+
+# Stop
+Ctrl + C
+
+# Start w tle
+php -S localhost:8000 > /dev/null 2>&1 &
+
+# Sprawdź czy działa
+lsof -i :8000
+curl http://localhost:8000
+
+# Zabij proces PHP
+lsof -i :8000 | grep LISTEN | awk '{print $2}' | xargs kill
+
+
+SZYBKI START WSZYSTKIEGO
+-------------------------
+# Uruchom MySQL i PHP jedną komendą
+brew services start mysql && cd Blog && php -S localhost:8000
+
+
 6. TEST
    ----
    Otwórz: https://twoja-domena.pl/Blog/
