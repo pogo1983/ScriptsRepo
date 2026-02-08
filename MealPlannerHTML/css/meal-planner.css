@@ -3,6 +3,86 @@
    Dropdowns, Week Plan Cards, Accordions
    ======================================== */
 
+/* ==================== BATCH COOKING ==================== */
+
+.batch-cooking-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #f5f5f7;
+  border-radius: 8px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+
+.batch-label {
+  font-weight: 600;
+  color: #666;
+  font-size: 14px;
+}
+
+.batch-btn {
+  padding: 6px 12px;
+  border: 2px solid #ddd;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.batch-btn:hover {
+  border-color: #4CAF50;
+  color: #4CAF50;
+  transform: translateY(-1px);
+}
+
+.batch-btn.active {
+  background: #4CAF50;
+  color: white;
+  border-color: #4CAF50;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.batch-propagate-btn {
+  padding: 6px 12px;
+  border: 2px solid #2196F3;
+  background: #2196F3;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  margin-left: auto;
+}
+
+.batch-propagate-btn:hover {
+  background: #1976D2;
+  border-color: #1976D2;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+
+.batch-badge {
+  background: #4CAF50;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  margin-left: auto;
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+}
+
+.meal-plan-card.batch-cooking-active {
+  border-left: 4px solid #4CAF50;
+  background: linear-gradient(to right, #f1f8f4 0%, white 100%);
+}
+
 /* ==================== MEAL COUNT SELECTOR ==================== */
 
 .meal-count-selector {

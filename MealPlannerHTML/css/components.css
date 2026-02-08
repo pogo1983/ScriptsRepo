@@ -235,6 +235,15 @@ button {
   background: linear-gradient(135deg, #0051D5 0%, #003DA5 100%);
 }
 
+.btn-calendar {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.btn-calendar:hover {
+  background: linear-gradient(135deg, #f5576c 0%, #e91e63 100%);
+}
+
 .btn-filter {
   padding: 12px 20px;
   font-size: 14px;
@@ -412,4 +421,42 @@ tr:hover {
   font-weight: 700;
   color: var(--primary-blue);
   margin: 10px 0;
+}
+
+/* ==================== FAVORITE STARS ==================== */
+
+.dish-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.dish-header h4 {
+  margin: 0;
+  flex: 1;
+}
+
+.favorite-star {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: all 0.2s ease;
+  color: #ccc;
+  line-height: 1;
+}
+
+.favorite-star:hover {
+  transform: scale(1.2);
+}
+
+.favorite-star.active {
+  color: #ffc107;
+  text-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
+}
+
+.favorite-star.active:hover {
+  color: #ffb300;
 }
