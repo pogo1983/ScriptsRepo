@@ -240,6 +240,7 @@ function generateShoppingList(zakupy, sortedProducts) {
   
   let zakHTML = "<div class='result-section'><h2>🛒 Lista zakupów</h2>";
   zakHTML += "<div class='export-buttons'>";
+  zakHTML += "<button class='btn-export btn-print' onclick='printMealPlan()'>🖨️ Drukuj jadłospis</button>";
   zakHTML += "<button class='btn-export btn-excel' onclick='exportToExcel()'>📊 Eksportuj do Excel (CSV)</button>";
   zakHTML += "<button class='btn-export btn-print' onclick='printShoppingList()'>🖨️ Wydrukuj listę zakupów</button>";
   zakHTML += "<button class='btn-export btn-ios' onclick='exportToiOSReminders()'>📱 Eksportuj do iOS Reminders</button>";
@@ -459,5 +460,180 @@ function scrollToShoppingList() {
   }
 }
 
+// ---------- DRUKOWANIE JADŁOSPISU ----------
+
+function printMealPlan() {
+  if (!fullPlanData || !fullPlanData.dayMealsData) {
+    alert('Brak wygenerowanego planu do wydruku!');
+    return;
+  }
+
+  const printWindow = window.open('', '_blank');
+  
+  let html = `
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Jadłospis Tygodniowy</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    @page { 
+      size: A4 landscape;
+      margin: 8mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-size: 7pt;
+      line-height: 1.2;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 4px;
+      color: #1d1d1f;
+      font-size: 14pt;
+    }
+    .info {
+      text-align: center;
+      margin-bottom: 6px;
+      color: #666;
+      font-size: 7pt;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 6.5pt;
+    }
+    th {
+      background: #667eea;
+      color: white;
+      padding: 4px;
+      text-align: center;
+      font-weight: 600;
+      border: 1px solid #555;
+      font-size: 7pt;
+    }
+    td {
+      border: 1px solid #ddd;
+      padding: 4px;
+      vertical-align: top;
+      background: white;
+    }
+    .day-cell {
+      background: #2196f3;
+      color: white;
+      font-weight: 700;
+      text-align: center;
+      font-size: 7pt;
+      width: 80px;
+    }
+    .meal-name {
+      font-weight: 600;
+      color: #1d1d1f;
+      margin-bottom: 2px;
+      font-size: 7pt;
+    }
+    .ingredients {
+      color: #666;
+      font-size: 6pt;
+      line-height: 1.3;
+    }
+    .person-michalina { color: #D70040; }
+    .person-marcin { color: #0051D5; }
+    .summary-row {
+      background: #e3f2fd;
+      font-weight: 600;
+      font-size: 6.5pt;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍽️ Jadłospis Tygodniowy</h1>
+  <div class="info">
+    <strong>Cel kaloryczny:</strong> 
+    <span class="person-michalina">${namePerson1}: ${currentCaloriesMichalina} kcal</span> / 
+    <span class="person-marcin">${namePerson2}: ${currentCaloriesMarcin} kcal</span> | 
+    Wygenerowano: ${new Date().toLocaleDateString('pl-PL')}
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 80px;">Dzień</th>
+        <th>🌅 Śniadanie</th>
+        <th>🍴 Obiad</th>
+        <th>🍎 Podwieczorek</th>
+        <th>🌙 Kolacja</th>
+        <th style="width: 100px;">Suma kcal</th>
+      </tr>
+    </thead>
+    <tbody>
+`;
+
+  // Generuj wiersze dla każdego dnia
+  for (let i = 0; i < dni.length; i++) {
+    html += `<tr>`;
+    html += `<td class="day-cell">${dni[i]}</td>`;
+    
+    const dayMeals = fullPlanData.dayMealsData[i];
+    const mealsByType = {
+      'śniadanie': null,
+      'obiad': null,
+      'podwieczorek': null,
+      'kolacja': null
+    };
+    
+    // Pogrupuj posiłki według typu
+    dayMeals.forEach(meal => {
+      mealsByType[meal.posilek] = meal;
+    });
+    
+    // Dla każdego typu posiłku
+    ['śniadanie', 'obiad', 'podwieczorek', 'kolacja'].forEach(posilekType => {
+      const meal = mealsByType[posilekType];
+      
+      if (meal) {
+        html += `<td>`;
+        html += `<div class="meal-name">${meal.nazwa}</div>`;
+        html += `<div class="ingredients">`;
+        
+        // Lista składników (top 4-5 najważniejszych)
+        const skladnikiArray = Object.entries(meal.skladniki).slice(0, 4);
+        skladnikiArray.forEach(([skladnik, data]) => {
+          html += `${skladnik}: <span class="person-michalina">${data.michalina}${data.jednostka}</span>/<span class="person-marcin">${data.marcin}${data.jednostka}</span><br>`;
+        });
+        
+        html += `</div>`;
+        html += `</td>`;
+      } else {
+        html += `<td>-</td>`;
+      }
+    });
+    
+    // Suma kalorii
+    html += `<td class="summary-row">`;
+    html += `<span class="person-michalina">${fullPlanData.totalCalories1[i]}</span> / `;
+    html += `<span class="person-marcin">${fullPlanData.totalCalories2[i]}</span>`;
+    html += `</td>`;
+    html += `</tr>`;
+  }
+
+  html += `
+    </tbody>
+  </table>
+</body>
+</html>`;
+
+  printWindow.document.write(html);
+  printWindow.document.close();
+  
+  // Automatyczne uruchomienie drukowania po załadowaniu
+  printWindow.onload = function() {
+    printWindow.focus();
+    printWindow.print();
+  };
+}
+
 // Make globally available for onclick handlers
 window.scrollToShoppingList = scrollToShoppingList;
+window.printMealPlan = printMealPlan;
