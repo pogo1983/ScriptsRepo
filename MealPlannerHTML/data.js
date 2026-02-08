@@ -49,12 +49,12 @@ const dania = {
     {
       nazwa: "Jajka gotowane z warzywami",
       kalorie: 350,
-      skladniki: {'Jajka gotowane': [2,3],'Papryka':[40,80],'Pomidor':[40,80],'Ogórek':[40,80],'Pieczywo pełnoziarniste':[40,80]}
+      skladniki: {'Jajka': [2,3],'Papryka':[40,80],'Pomidor':[40,80],'Ogórek':[40,80],'Pieczywo pełnoziarniste':[40,80]}
     },
     {
       nazwa: "Kanapka z pastą jajeczną i warzywami",
       kalorie: 380,
-      skladniki: {'Pieczywo pełnoziarniste':[50,80],'Jajka gotowane':[2,2],'Sałata':[20,40],'Pomidor':[40,80],'Papryka':[30,50],'Jogurt naturalny':[20,30]}
+      skladniki: {'Pieczywo pełnoziarniste':[50,80],'Jajka':[2,2],'Sałata':[20,40],'Pomidor':[40,80],'Papryka':[30,50],'Jogurt naturalny':[20,30]}
     },
     {
       nazwa: "Wrap śniadaniowy z jajkiem i warzywami",
@@ -91,7 +91,7 @@ const dania = {
     {
       nazwa: "Indyk pieczony z warzywami",
       kalorie: 565,
-      skladniki: {'Indyk (pieczony filet)':[120,170],'Marchew':[40,80],'Cukinia/papryka':[40,80],'Ziemniaki':[80,150],'Oliwa':[5,10]}
+      skladniki: {'Filet z indyka':[120,170],'Marchew':[40,80],'Cukinia/papryka':[40,80],'Ziemniaki':[80,150],'Oliwa':[5,10]}
     },
     {
       nazwa: "Pulpeciki z indyka z ryżem i warzywami",
@@ -111,7 +111,7 @@ const dania = {
     {
       nazwa: "Makaron pełnoziarnisty z kurczakiem i brokułami",
       kalorie: 640,
-      skladniki: {'Makaron pełnoziarnisty (penne)': [50,80],'Pierś z kurczaka': [120,160],'Brokuły': [80,120],'Papryka':[50,80],'Pomidor':[50,80],'Oliwa':[5,10]}
+      skladniki: {'Makaron pełnoziarnisty (penne)': [50,80],'Pierś kurczaka': [120,160],'Brokuły': [80,120],'Papryka':[50,80],'Pomidor':[50,80],'Oliwa':[5,10]}
     },
     {
       nazwa: "Makaron z sosem pomidorowym i warzywami",
@@ -131,7 +131,7 @@ const dania = {
     {
       nazwa: "Tortilla z kurczakiem i warzywami",
       kalorie: 590,
-      skladniki: {'Tortilla pełnoziarnista':[70,100],'Pierś z kurczaka': [100,150],'Papryka':[60,100],'Pomidor':[50,80],'Sałata':[30,50],'Awokado':[30,50]}
+      skladniki: {'Tortilla pełnoziarnista':[70,100],'Pierś kurczaka': [100,150],'Papryka':[60,100],'Pomidor':[50,80],'Sałata':[30,50],'Awokado':[30,50]}
     },
     {
       nazwa: "Dorsz z kaszą kuskus i szpinakiem",
@@ -161,11 +161,6 @@ const dania = {
       skladniki: {'Sałata rzymska':[40,80],'Feta':[20,40],'Pomidor':[40,80],'Ogórek':[40,80],'Papryka':[30,60],'Pestki dyni':[5,10]}
     },
     {
-      nazwa: "Stir fry warzywny z tofu",
-      kalorie: 280,
-      skladniki: {'Stir fry warzywny (warzywa mrożone)':[120,200],'Tofu naturalne':[60,120],'Oliwa':[5,10]}
-    },
-    {
       nazwa: "Wrap z pastą jajeczną i warzywami",
       kalorie: 300,
       skladniki: {'Wrap pszenny pełnoziarnisty':[40,80],'Pasta jajeczna (jajka)':[2,2],'Sałata':[30,50],'Pomidor':[40,80],'Papryka':[30,50]}
@@ -188,7 +183,7 @@ const dania = {
     {
       nazwa: "Jajka gotowane z sałatką",
       kalorie: 300,
-      skladniki: {'Jajka gotowane': [2,3],'Sałata':[40,80],'Pomidor':[50,100],'Ogórek':[50,100],'Papryka':[40,80],'Pieczywo pełnoziarniste':[40,80]}
+      skladniki: {'Jajka': [2,3],'Sałata':[40,80],'Pomidor':[50,100],'Ogórek':[50,100],'Papryka':[40,80],'Pieczywo pełnoziarniste':[40,80]}
     },
     {
       nazwa: "Twarożek z rzodkiewką i papryką",
@@ -240,7 +235,7 @@ const dania = {
     {
       nazwa: "Shake proteinowy z owocami",
       kalorie: 190,
-      skladniki: {'Izolat białka':[20,30],'Mleko/woda':[200,300],'Banan/jagody':[50,80]}
+      skladniki: {'Izolat białka':[20,30],'Mleko 2%':[200,300],'Banan/jagody':[50,80]}
     },
     {
       nazwa: "Kanapka z awokado i jajkiem",
