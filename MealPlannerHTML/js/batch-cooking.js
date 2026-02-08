@@ -76,6 +76,11 @@ function clearAllBatchMultipliers() {
 
 // Generuj przyciski batch cooking dla dania
 function generateBatchButtons(day, mealType) {
+  // Sprawdź czy funkcja batch cooking jest włączona
+  if (typeof isBatchCookingEnabled === 'function' && !isBatchCookingEnabled()) {
+    return ''; // Funkcja wyłączona, nie generuj przycisków
+  }
+  
   const currentMultiplier = getBatchMultiplier(day, mealType);
   
   let html = '<div class="batch-cooking-controls">';

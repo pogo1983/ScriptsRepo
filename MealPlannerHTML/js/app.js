@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadStatsFeatureSetting();
   loadActivityFeatureSetting();
   loadFridgeFeatureSetting();
+  loadBatchCookingFeatureSetting();
   
   // Initialize meal planner dropdowns
   createDropdowns();

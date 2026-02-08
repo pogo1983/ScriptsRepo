@@ -347,6 +347,33 @@ function loadFridgeFeatureSetting() {
   }
 }
 
+// ---------- ZARZĄDZANIE FUNKCJĄ BATCH COOKING ----------
+
+function toggleBatchCookingFeature() {
+  const enabled = document.getElementById('enableBatchCookingFeature').checked;
+  
+  // Zapisz ustawienie
+  localStorage.setItem('batchCookingFeatureEnabled', enabled);
+  
+  // Regeneruj plan aby ukryć/pokazać batch cooking controls
+  const planElement = document.getElementById('plan');
+  if(planElement && planElement.innerHTML) {
+    generujPlan();
+  }
+}
+
+function loadBatchCookingFeatureSetting() {
+  const enabled = localStorage.getItem('batchCookingFeatureEnabled') === 'true'; // domyślnie wyłączone
+  const checkbox = document.getElementById('enableBatchCookingFeature');
+  if (checkbox) {
+    checkbox.checked = enabled;
+  }
+}
+
+function isBatchCookingEnabled() {
+  return localStorage.getItem('batchCookingFeatureEnabled') === 'true';
+}
+
 // Make functions globally available
 window.toggleFavoritesFeature = toggleFavoritesFeature;
 window.loadFavoritesFeatureSetting = loadFavoritesFeatureSetting;
@@ -358,3 +385,6 @@ window.toggleActivityFeature = toggleActivityFeature;
 window.loadActivityFeatureSetting = loadActivityFeatureSetting;
 window.toggleFridgeFeature = toggleFridgeFeature;
 window.loadFridgeFeatureSetting = loadFridgeFeatureSetting;
+window.toggleBatchCookingFeature = toggleBatchCookingFeature;
+window.loadBatchCookingFeatureSetting = loadBatchCookingFeatureSetting;
+window.isBatchCookingEnabled = isBatchCookingEnabled;

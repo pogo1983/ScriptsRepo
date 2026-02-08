@@ -149,8 +149,9 @@ function generujPlan(){
         skladniki: {}
       };
       
-      // Pobierz mnożnik batch cooking (jeśli funkcja istnieje)
-      const batchMultiplier = typeof getBatchMultiplier === 'function' ? getBatchMultiplier(i, posilek) : 1;
+      // Pobierz mnożnik batch cooking (jeśli funkcja istnieje i jest włączona)
+      const isBatchEnabled = typeof isBatchCookingEnabled === 'function' ? isBatchCookingEnabled() : false;
+      const batchMultiplier = (isBatchEnabled && typeof getBatchMultiplier === 'function') ? getBatchMultiplier(i, posilek) : 1;
       
       for (const [skladnik,[gramM,gramMA]] of Object.entries(d.skladniki)){
         let jednostka = skladnik === "Jajka" || skladnik.includes("Baton") ? "szt" : "g";
@@ -182,9 +183,9 @@ function generujPlan(){
         calorieDisplay = `<span class='person-michalina'>${caloriesScaled1}</span> / <span class='person-marcin'>${caloriesScaled2}</span> kcal`;
       }
       
-      // Generuj przyciski batch cooking (jeśli funkcja istnieje)
+      // Generuj przyciski batch cooking (jeśli funkcja istnieje i jest włączona)
       const batchButtons = typeof generateBatchButtons === 'function' ? generateBatchButtons(i, posilek) : '';
-      const batchClass = batchMultiplier > 1 ? 'batch-cooking-active' : '';
+      const batchClass = (isBatchEnabled && batchMultiplier > 1) ? 'batch-cooking-active' : '';
       
       // Karta posiłku
       plan += `
@@ -192,7 +193,7 @@ function generujPlan(){
           <div class='meal-plan-header'>
             <span class='meal-plan-icon'>${posilekDisplay}</span>
             <span class='meal-plan-name'>${d.nazwa}</span>
-            ${batchMultiplier > 1 ? `<span class='batch-badge'>×${batchMultiplier}</span>` : ''}
+            ${(isBatchEnabled && batchMultiplier > 1) ? `<span class='batch-badge'>×${batchMultiplier}</span>` : ''}
           </div>
           ${batchButtons}
           <div class='meal-plan-people'>
