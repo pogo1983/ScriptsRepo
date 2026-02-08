@@ -17,6 +17,11 @@ function createDropdowns() {
     "kolacja": "🌙 Kolacja"
   };
   
+  // Sprawdź czy filtr ulubionych jest aktywny
+  const showOnlyFavorites = document.getElementById('showOnlyFavorites');
+  const filterActive = showOnlyFavorites && showOnlyFavorites.checked;
+  const favorites = getFavorites();
+  
   let html = "<table><tr><th>Dzień</th>";
   posilki.forEach(p => {
     html += "<th>"+posilkiLabels[p]+"</th>";
@@ -29,7 +34,14 @@ function createDropdowns() {
       html += "<td><select id='"+posilek+i+"'>";
       if(dania[posilek]) {
         dania[posilek].forEach((d,j)=>{
-          html+="<option value='"+j+"'>"+d.nazwa+"</option>";
+          // Sprawdź czy danie jest ulubione
+          const isFavorite = favorites[posilek] && favorites[posilek].includes(j);
+          
+          // Jeśli filtr aktywny, pokaż tylko ulubione
+          if (!filterActive || isFavorite) {
+            const star = isFavorite ? "⭐ " : "";
+            html+="<option value='"+j+"'>"+star+d.nazwa+"</option>";
+          }
         });
       }
       html+="</select></td>";
@@ -137,10 +149,17 @@ function generujPlan(){
         skladniki: {}
       };
       
+      // Pobierz mnożnik batch cooking (jeśli funkcja istnieje)
+      const batchMultiplier = typeof getBatchMultiplier === 'function' ? getBatchMultiplier(i, posilek) : 1;
+      
       for (const [skladnik,[gramM,gramMA]] of Object.entries(d.skladniki)){
         let jednostka = skladnik === "Jajka" || skladnik.includes("Baton") ? "szt" : "g";
         let scaledM = jednostka === "szt" ? gramM : scaleAmount(gramM, false);
         let scaledMA = jednostka === "szt" ? gramMA : scaleAmount(gramMA, true);
+        
+        // Pomnóż przez batch multiplier
+        scaledM = Math.round(scaledM * batchMultiplier);
+        scaledMA = Math.round(scaledMA * batchMultiplier);
         
         skladM.push(skladnik+": "+scaledM+jednostka);
         skladMA.push(skladnik+": "+scaledMA+jednostka);
@@ -163,13 +182,19 @@ function generujPlan(){
         calorieDisplay = `<span class='person-michalina'>${caloriesScaled1}</span> / <span class='person-marcin'>${caloriesScaled2}</span> kcal`;
       }
       
+      // Generuj przyciski batch cooking (jeśli funkcja istnieje)
+      const batchButtons = typeof generateBatchButtons === 'function' ? generateBatchButtons(i, posilek) : '';
+      const batchClass = batchMultiplier > 1 ? 'batch-cooking-active' : '';
+      
       // Karta posiłku
       plan += `
-        <div class='meal-plan-card'>
+        <div class='meal-plan-card ${batchClass}'>
           <div class='meal-plan-header'>
             <span class='meal-plan-icon'>${posilekDisplay}</span>
             <span class='meal-plan-name'>${d.nazwa}</span>
+            ${batchMultiplier > 1 ? `<span class='batch-badge'>×${batchMultiplier}</span>` : ''}
           </div>
+          ${batchButtons}
           <div class='meal-plan-people'>
             <div class='meal-plan-person person-michalina'>
               <strong>${namePerson1}:</strong> ${skladM.join(", ")}
@@ -242,6 +267,7 @@ function generateShoppingList(zakupy, sortedProducts) {
   zakHTML += "<div class='export-buttons'>";
   zakHTML += "<button class='btn-export btn-print' onclick='printMealPlan()'>🖨️ Drukuj jadłospis</button>";
   zakHTML += "<button class='btn-export btn-excel' onclick='exportToExcel()'>📊 Eksportuj do Excel (CSV)</button>";
+  zakHTML += "<button class='btn-export btn-calendar' onclick='exportToCalendar()'>📅 Eksportuj do kalendarza (.ics)</button>";
   zakHTML += "<button class='btn-export btn-print' onclick='printShoppingList()'>🖨️ Wydrukuj listę zakupów</button>";
   zakHTML += "<button class='btn-export btn-ios' onclick='exportToiOSReminders()'>📱 Eksportuj do iOS Reminders</button>";
   zakHTML += "</div>";
@@ -634,6 +660,98 @@ function printMealPlan() {
   };
 }
 
+// ---------- KOPIOWANIE POPRZEDNIEGO TYGODNIA ----------
+
+function copyPreviousWeek() {
+  const history = JSON.parse(localStorage.getItem('mealPlanHistory') || '[]');
+  
+  if (history.length === 0) {
+    alert('Brak zapisanych planów! Najpierw zapisz plan do historii.');
+    return;
+  }
+  
+  // Weź ostatni plan
+  const lastPlan = history[0];
+  
+  // Ustaw liczbę posiłków
+  if (lastPlan.mealCount !== currentMealCount) {
+    currentMealCount = lastPlan.mealCount;
+    document.querySelector(`input[name="mealCount"][value="${currentMealCount}"]`).checked = true;
+    updateMealCount();
+  }
+  
+  // Ustaw kalorie
+  currentCaloriesMichalina = lastPlan.calories.person1;
+  currentCaloriesMarcin = lastPlan.calories.person2;
+  document.getElementById('caloriesMichalina').value = currentCaloriesMichalina;
+  document.getElementById('caloriesMarcin').value = currentCaloriesMarcin;
+  
+  // Poczekaj na przeładowanie dropdownów jeśli było trzeba
+  setTimeout(() => {
+    let posilki = currentMealCount === 3 ? 
+      ["śniadanie","obiad","kolacja"] : 
+      ["śniadanie","obiad","podwieczorek","kolacja"];
+    
+    for(let i=0; i<dni.length; i++){
+      if(lastPlan.selection[i]) {
+        posilki.forEach(posilek => {
+          const el = document.getElementById(posilek+i);
+          if(el && lastPlan.selection[i][posilek] !== undefined) {
+            el.value = lastPlan.selection[i][posilek];
+          }
+        });
+      }
+    }
+    
+    zapiszWybor();
+    alert('✅ Skopiowano ostatni plan!');
+  }, 200);
+}
+
+// ---------- SYSTEM ULUBIONYCH ----------
+
+// Pobierz ulubione z localStorage
+function getFavorites() {
+  return JSON.parse(localStorage.getItem('favoriteDishes') || '{}');
+}
+
+// Zapisz ulubione do localStorage
+function saveFavorites(favorites) {
+  localStorage.setItem('favoriteDishes', JSON.stringify(favorites));
+}
+
+// Przełącz status ulubionego
+function toggleFavorite(kategoria, dishIndex) {
+  const favorites = getFavorites();
+  
+  if (!favorites[kategoria]) {
+    favorites[kategoria] = [];
+  }
+  
+  const idx = favorites[kategoria].indexOf(dishIndex);
+  if (idx > -1) {
+    favorites[kategoria].splice(idx, 1);
+  } else {
+    favorites[kategoria].push(dishIndex);
+  }
+  
+  saveFavorites(favorites);
+  
+  // Odśwież tylko jeśli filtr jest aktywny
+  const showOnlyFavorites = document.getElementById('showOnlyFavorites');
+  if (showOnlyFavorites && showOnlyFavorites.checked) {
+    createDropdowns();
+  }
+}
+
+// Filtruj dropdowny - pokaż tylko ulubione
+function toggleFavoritesFilter() {
+  createDropdowns();
+}
+
 // Make globally available for onclick handlers
 window.scrollToShoppingList = scrollToShoppingList;
 window.printMealPlan = printMealPlan;
+window.copyPreviousWeek = copyPreviousWeek;
+window.toggleFavorite = toggleFavorite;
+window.toggleFavoritesFilter = toggleFavoritesFilter;

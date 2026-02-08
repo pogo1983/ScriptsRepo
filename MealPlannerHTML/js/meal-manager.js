@@ -59,14 +59,28 @@ function addNewDish() {
 
 function displayDishList() {
   let html = '';
+  const favorites = getFavorites();
+  const favoritesEnabled = localStorage.getItem('favoritesFeatureEnabled') === 'true';
   
   ['śniadanie', 'obiad', 'podwieczorek', 'kolacja'].forEach(type => {
     if(dania[type] && dania[type].length > 0) {
       html += `<h4 style="color: #1d1d1f; font-weight: 700; margin-top: 24px; margin-bottom: 16px; font-size: 1.2rem;">${type.charAt(0).toUpperCase() + type.slice(1)}</h4>`;
       
       dania[type].forEach((dish, idx) => {
+        const isFavorite = favorites[type] && favorites[type].includes(idx);
+        const starClass = isFavorite ? 'favorite-star active' : 'favorite-star';
+        const starIcon = isFavorite ? '⭐' : '☆';
+        
         html += `<div class="dish-item">`;
+        html += `<div class="dish-header">`;
         html += `<h4>${dish.nazwa}</h4>`;
+        
+        // Pokaż gwiazdkę tylko jeśli funkcja jest włączona
+        if (favoritesEnabled) {
+          html += `<button class="${starClass}" onclick="toggleDishFavorite('${type}', ${idx})" title="${isFavorite ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}">${starIcon}</button>`;
+        }
+        
+        html += `</div>`;
         
         if(dish.kalorie) {
           const scaledCalories1 = Math.round(dish.kalorie * (currentCaloriesMichalina / BASE_CALORIES_MICHALINA));
@@ -310,3 +324,13 @@ function displaySavedPlans() {
   
   container.innerHTML = html;
 }
+
+// ---------- ZARZĄDZANIE ULUBIONYMI ----------
+
+function toggleDishFavorite(kategoria, dishIndex) {
+  toggleFavorite(kategoria, dishIndex);
+  displayDishList();
+}
+
+// Make function globally available
+window.toggleDishFavorite = toggleDishFavorite;

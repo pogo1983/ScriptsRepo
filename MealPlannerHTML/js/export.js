@@ -187,3 +187,131 @@ function showTextModal(text) {
     }
   });
 }
+
+// ---------- EKSPORT DO KALENDARZA (.ICS) ----------
+
+function exportToCalendar() {
+  if (!fullPlanData || !fullPlanData.dayMealsData) {
+    alert('❌ Najpierw wygeneruj plan tygodniowy!');
+    return;
+  }
+
+  // Funkcja do formatowania daty w formacie iCalendar (YYYYMMDDTHHMMSS)
+  function formatICalDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}${month}${day}T${hours}${minutes}${seconds}`;
+  }
+
+  // Rozpocznij od poniedziałku obecnego lub następnego tygodnia
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const daysUntilMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek) % 7;
+  const startDate = new Date(today);
+  startDate.setDate(today.getDate() + daysUntilMonday);
+  startDate.setHours(0, 0, 0, 0);
+
+  // Godziny posiłków
+  const mealTimes = {
+    'śniadanie': { hour: 7, minute: 0, duration: 30 },
+    'obiad': { hour: 13, minute: 0, duration: 60 },
+    'podwieczorek': { hour: 16, minute: 0, duration: 20 },
+    'kolacja': { hour: 19, minute: 0, duration: 45 }
+  };
+
+  const mealIcons = {
+    'śniadanie': '🌅',
+    'obiad': '🍴',
+    'podwieczorek': '🍎',
+    'kolacja': '🌙'
+  };
+
+  // Rozpocznij tworzenie pliku .ics
+  let icsContent = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Meal Planner//PL',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'X-WR-CALNAME:Plan posiłków',
+    'X-WR-TIMEZONE:Europe/Warsaw'
+  ].join('\r\n') + '\r\n';
+
+  // Dodaj wydarzenia dla każdego dnia i posiłku
+  fullPlanData.dayMealsData.forEach((dayData, dayIndex) => {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(startDate.getDate() + dayIndex);
+
+    dayData.meals.forEach(meal => {
+      const mealType = meal.type;
+      const time = mealTimes[mealType];
+      
+      if (!time) return;
+
+      // Data rozpoczęcia
+      const eventStart = new Date(currentDate);
+      eventStart.setHours(time.hour, time.minute, 0, 0);
+
+      // Data zakończenia
+      const eventEnd = new Date(eventStart);
+      eventEnd.setMinutes(eventStart.getMinutes() + time.duration);
+
+      // Nazwa dania
+      const mealName = meal.dish.nazwa;
+      const icon = mealIcons[mealType] || '🍽️';
+
+      // Opis z listą składników
+      let description = `Składniki:\\n`;
+      for (const [ingredient, grams] of Object.entries(meal.dish.skladniki)) {
+        if (Array.isArray(grams)) {
+          description += `• ${ingredient}: ${grams[0]}g / ${grams[1]}g (${namePerson1}/${namePerson2})\\n`;
+        } else {
+          description += `• ${ingredient}: ${grams}\\n`;
+        }
+      }
+      description += `\\nKalorie: ${meal.calories1} kcal / ${meal.calories2} kcal`;
+
+      // Utwórz event
+      const uid = `meal-${dayIndex}-${mealType}-${Date.now()}@mealplanner`;
+      const summary = `${icon} ${mealType.charAt(0).toUpperCase() + mealType.slice(1)}: ${mealName}`;
+
+      icsContent += [
+        'BEGIN:VEVENT',
+        `UID:${uid}`,
+        `DTSTAMP:${formatICalDate(new Date())}`,
+        `DTSTART:${formatICalDate(eventStart)}`,
+        `DTEND:${formatICalDate(eventEnd)}`,
+        `SUMMARY:${summary}`,
+        `DESCRIPTION:${description}`,
+        `STATUS:CONFIRMED`,
+        `SEQUENCE:0`,
+        'END:VEVENT'
+      ].join('\r\n') + '\r\n';
+    });
+  });
+
+  icsContent += 'END:VCALENDAR';
+
+  // Pobierz plik
+  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+
+  const fileName = `meal_plan_${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}.ics`;
+  link.setAttribute('href', url);
+  link.setAttribute('download', fileName);
+  link.style.visibility = 'hidden';
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  alert('✅ Plan posiłków został wyeksportowany do kalendarza!\n\nMożesz zaimportować plik .ics do Apple Calendar, Google Calendar lub Outlook.');
+}
+
+// Make function globally available
+window.exportToCalendar = exportToCalendar;

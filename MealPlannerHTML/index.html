@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="css/components.css">
 <link rel="stylesheet" href="css/meal-planner.css">
 <link rel="stylesheet" href="css/random-meal.css">
+<link rel="stylesheet" href="css/history.css">
 <link rel="stylesheet" href="css/modules.css">
 <link rel="stylesheet" href="css/responsive.css">
 </head>
@@ -69,10 +70,11 @@
   <nav class="tabs">
     <button class="tab active" onclick="switchTab('planner')">📅 Planner</button>
     <button class="tab" onclick="switchTab('random')">🎲 Chybił trafił</button>
-    <button class="tab" onclick="switchTab('activity')">🏃‍♂️ Aktywność</button>
-    <button class="tab" onclick="switchTab('fridge')">🧊 Lodówka</button>
+    <button class="tab" id="history-tab-btn" onclick="switchTab('history')">📚 Historia</button>
+    <button class="tab" id="activity-tab-btn" onclick="switchTab('activity')">🏃‍♂️ Aktywność</button>
+    <button class="tab" id="fridge-tab-btn" onclick="switchTab('fridge')">🧊 Lodówka</button>
     <button class="tab" onclick="switchTab('training')">💪 Trening</button>
-    <button class="tab" onclick="switchTab('stats')">📊 Statystyki & Garmin</button>
+    <button class="tab" id="stats-tab-btn" onclick="switchTab('stats')">📊 Statystyki & Garmin</button>
     <button class="tab" onclick="switchTab('manage')">⚙️ Zarządzaj danymi</button>
   </nav>
 
@@ -83,8 +85,16 @@
       <label><input type="radio" name="mealCount" value="4" checked onchange="updateMealCount()"> 4 posiłki (+ podwieczorek)</label>
     </div>
     
+    <div id="favorites-filter-container" class="favorites-filter" style="margin: 15px 0; padding: 12px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107; display: none;">
+      <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+        <input type="checkbox" id="showOnlyFavorites" onchange="toggleFavoritesFilter()" style="width: 18px; height: 18px; cursor: pointer;">
+        <span style="font-weight: 600;">⭐ Pokaż tylko ulubione dania</span>
+      </label>
+    </div>
+    
     <div class="action-buttons">
       <button class="btn-action btn-randomize" onclick="randomizujPlan()">🎲 Randomizuj cały tydzień</button>
+      <button class="btn-action btn-copy-week" onclick="copyPreviousWeek()">📋 Kopiuj poprzedni tydzień</button>
       <button class="btn-action btn-reset" onclick="resetujPlan()">🔄 Resetuj do pierwszych dań</button>
       <button class="btn-action btn-save" onclick="zapiszPlan()">💾 Zapisz aktualny plan</button>
       <button class="btn-action btn-load" onclick="toggleSavedPlans()">📂 Wczytaj zapisany plan</button>
@@ -184,6 +194,20 @@
     <div class="random-all-section">
       <button class="btn-random-all" onclick="losujWszystkie()">🎰 Losuj wszystkie posiłki na dziś!</button>
     </div>
+  </div>
+
+  <div id="history-tab" class="tab-content">
+    <h2>📚 Historia planów</h2>
+    <p class="intro">Przeglądaj i zarządzaj swoimi wcześniejszymi planami tygodniowymi.</p>
+    
+    <div class="history-actions" style="margin: 20px 0; display: flex; gap: 10px; flex-wrap: wrap;">
+      <button class="btn-primary" onclick="saveCurrentPlanToHistory()">💾 Zapisz obecny plan do historii</button>
+      <button class="btn-secondary" onclick="exportHistoryToJSON()">📤 Eksportuj całą historię</button>
+      <button class="btn-secondary" onclick="importHistoryFromJSON()">📥 Importuj historię</button>
+      <input type="file" id="historyFileInput" accept=".json" style="display: none;" onchange="handleHistoryImport(event)">
+    </div>
+    
+    <div id="historyList" class="history-list"></div>
   </div>
 
   <div id="activity-tab" class="tab-content">
@@ -560,6 +584,51 @@
       <p style="color: #856404; margin: 8px 0; font-size: 14px;">W przyszłości dodamy Supabase do syncowania danych między Mac i iPhone.<br>Na razie wszystko działa lokalnie w przeglądarce (localStorage).</p>
     </div>
     
+    <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; border: 2px solid #34C759; margin-bottom: 20px;">
+      <h3 style="color: #1d1d1f;">⚙️ Ustawienia funkcji</h3>
+      <p style="color: #666; margin-bottom: 15px; font-size: 14px;">Wybierz, które funkcje chcesz widzieć w aplikacji. Wyłączone funkcje będą ukryte.</p>
+      
+      <div class="form-group">
+        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+          <input type="checkbox" id="enableFavoritesFeature" onchange="toggleFavoritesFeature()" style="width: 20px; height: 20px; cursor: pointer;">
+          <span style="font-weight: 600; color: #1d1d1f;">⭐ Włącz funkcję ulubionych dań</span>
+        </label>
+        <small style="color: #666; display: block; margin-top: 8px; margin-left: 32px;">Gdy wyłączone, gwiazdki i filtr ulubionych będą ukryte</small>
+      </div>
+      
+      <div class="form-group">
+        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+          <input type="checkbox" id="enableHistoryFeature" onchange="toggleHistoryFeature()" style="width: 20px; height: 20px; cursor: pointer;">
+          <span style="font-weight: 600; color: #1d1d1f;">📚 Włącz funkcję historii planów</span>
+        </label>
+        <small style="color: #666; display: block; margin-top: 8px; margin-left: 32px;">Zarządzanie zapisanymi planami tygodniowymi</small>
+      </div>
+      
+      <div class="form-group">
+        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+          <input type="checkbox" id="enableStatsFeature" onchange="toggleStatsFeature()" style="width: 20px; height: 20px; cursor: pointer;">
+          <span style="font-weight: 600; color: #1d1d1f;">📊 Włącz statystyki i Garmin</span>
+        </label>
+        <small style="color: #666; display: block; margin-top: 8px; margin-left: 32px;">Import danych z Garmin Connect i wykresy treningów</small>
+      </div>
+      
+      <div class="form-group">
+        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+          <input type="checkbox" id="enableActivityFeature" onchange="toggleActivityFeature()" style="width: 20px; height: 20px; cursor: pointer;">
+          <span style="font-weight: 600; color: #1d1d1f;">🏃‍♂️ Włącz funkcję aktywności</span>
+        </label>
+        <small style="color: #666; display: block; margin-top: 8px; margin-left: 32px;">Kalkulator spalonych kalorii, dziennik aktywności, tracker wagi i wody</small>
+      </div>
+      
+      <div class="form-group">
+        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+          <input type="checkbox" id="enableFridgeFeature" onchange="toggleFridgeFeature()" style="width: 20px; height: 20px; cursor: pointer;">
+          <span style="font-weight: 600; color: #1d1d1f;">🧊 Włącz funkcję lodówki</span>
+        </label>
+        <small style="color: #666; display: block; margin-top: 8px; margin-left: 32px;">Zarządzanie produktami, sugestie dań i ceny zakupów</small>
+      </div>
+    </div>
+    
     <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; border: 2px solid #2196f3; margin-bottom: 20px;">
       <h3 style="color: #1d1d1f;">👤 Edytuj imiona użytkowników</h3>
       <div class="form-group">
@@ -619,7 +688,9 @@
 <script src="js/utils.js"></script>
 <script src="js/app.js"></script>
 <script src="js/meal-planner.js"></script>
+<script src="js/batch-cooking.js"></script>
 <script src="js/random-meal.js"></script>
+<script src="js/history.js"></script>
 <script src="js/meal-manager.js"></script>
 <script src="js/export.js"></script>
 <script src="js/activity.js"></script>

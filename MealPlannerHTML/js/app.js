@@ -61,6 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
   loadSavedNames();
   loadCustomDishes();
   
+  // Load feature settings
+  loadFavoritesFeatureSetting();
+  loadHistoryFeatureSetting();
+  loadStatsFeatureSetting();
+  loadActivityFeatureSetting();
+  loadFridgeFeatureSetting();
+  
   // Initialize meal planner dropdowns
   createDropdowns();
   
