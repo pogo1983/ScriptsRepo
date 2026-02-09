@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure DevOps - Bulk Comment Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .config-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .config-section h2 {
+            color: #495057;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        input, select, textarea {
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: #adb5bd;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .work-items-section {
+            margin-top: 30px;
+        }
+        
+        .work-items-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .work-items-header h2 {
+            color: #333;
+            font-size: 20px;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .stat strong {
+            color: #667eea;
+        }
+        
+        .work-items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .work-items-table th {
+            background: #495057;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .work-items-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .work-items-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .work-items-table tr.selected {
+            background: #e7f5ff;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-new { background: #d3f9d8; color: #2b8a3e; }
+        .status-active { background: #a5d8ff; color: #1971c2; }
+        .status-resolved { background: #ffec99; color: #e67700; }
+        .status-closed { background: #e9ecef; color: #495057; }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 18px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #ffe3e3;
+            border: 2px solid #ff6b6b;
+            color: #c92a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .success {
+            background: #d3f9d8;
+            border: 2px solid #51cf66;
+            color: #2b8a3e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .preview-section {
+            background: #fff9db;
+            border: 2px solid #ffd43b;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .preview-section h3 {
+            color: #e67700;
+            margin-bottom: 10px;
+        }
+        
+        .preview-comment {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .checkbox-cell {
+            width: 40px;
+            text-align: center;
+        }
+        
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .actions-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .single-item-section {
+            background: #fff9db;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px dashed #ffd43b;
+        }
+        
+        .single-item-section h3 {
+            color: #e67700;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .inline-form {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .filter-row select {
+            flex: 1;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover {
+            color: #667eea;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Azure DevOps - Bulk Comment Tool</h1>
+        <p class="subtitle">Add predefined comments to work items based on Planned Release and Status</p>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('main')">Main</button>
+            <button class="tab-btn" onclick="switchTab('settings')">Settings</button>
+        </div>
+        
+        <!-- Main Tab -->
+        <div id="mainTab" class="tab-content active">
+        
+        <!-- Filters Section -->
+        <div class="config-section">
+            <h2>🔍 Filters</h2>
+            <div class="filter-row">
+                <div class="form-group" style="flex: 1;">
+                    <label>Planned Release</label>
+                    <input type="text" id="plannedRelease" placeholder="e.g., 2026.02.R1" />
+                    <small style="color: #666; font-size: 11px; display: block; margin-top: 3px;">Enter the value from Custom.PlannedRelease field</small>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Status</label>
+                    <select id="status">
+                        <option value="">All</option>
+                        <option value="New">New</option>
+                        <option value="Active">Active</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Ready for Test">Ready for Test</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Work Item Type</label>
+                    <select id="workItemType">
+                        <option value="">All</option>
+                        <option value="Bug">Bug</option>
+                        <option value="User Story">User Story</option>
+                        <option value="Task">Task</option>
+                        <option value="Feature">Feature</option>
+                        <option value="Test Feedback">Test Feedback</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="fetchWorkItems()" style="margin-top: 15px;">Fetch Work Items</button>
+        </div>
+        
+        <!-- Comment Template Section -->
+        <div class="config-section">
+            <h2>💬 Comment Template</h2>
+            <div class="form-group">
+                <label>Select Comment Template</label>
+                <select id="commentTemplate" onchange="updatePreview()">
+                    <option value="readyForTest">Ready for Testing</option>
+                    <option value="closed">Closed / Resolved</option>
+                    <option value="custom">Custom (edit below)</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-top: 15px;">
+                <label>Comment Text (editable)</label>
+                <textarea id="customCommentText" rows="8" style="font-family: 'Courier New', monospace; font-size: 13px;" onchange="updatePreview()"></textarea>
+                <small style="color: #666; font-size: 11px; margin-top: 5px; display: block;">
+                    Available placeholders: {PLANNED_RELEASE}, {DEVELOPER}, {TESTER}
+                </small>
+            </div>
+        </div>
+        
+        <!-- Single Item Section -->
+        <div class="single-item-section">
+            <h3>📝 Add Comment to Single Item (by ID)</h3>
+            <div class="inline-form">
+                <div class="form-group">
+                    <label>Work Item ID</label>
+                    <input type="number" id="singleItemId" placeholder="e.g., 12345" style="width: 150px;" />
+                </div>
+                <button class="btn-secondary" onclick="fetchSingleItem()">Preview Item</button>
+                <button class="btn-success" onclick="addCommentToSingleItem()">Add Comment to This Item</button>
+            </div>
+        </div>
+        
+        <div id="loadingIndicator" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading work items...</p>
+        </div>
+        
+        <div id="errorMessage"></div>
+        
+        <!-- Work Items Section -->
+        <div class="work-items-section" id="workItemsSection" style="display: none;">
+            <div class="work-items-header">
+                <h2>📋 Work Items</h2>
+                <div class="stats">
+                    <div class="stat">
+                        <span>Total:</span>
+                        <strong id="totalCount">0</strong>
+                    </div>
+                    <div class="stat">
+                        <span>Selected:</span>
+                        <strong id="selectedCount">0</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="actions-bar">
+                <button class="btn-success" onclick="addCommentsToSelected()">Add Comments to Selected</button>
+                <button class="btn-secondary" onclick="selectAll()">Select All</button>
+                <button class="btn-secondary" onclick="deselectAll()">Deselect All</button>
+                <button class="btn-danger" onclick="clearResults()">Clear Results</button>
+            </div>
+            
+            <table class="work-items-table" id="workItemsTable">
+                <thead>
+                    <tr>
+                        <th class="checkbox-cell">
+                            <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()" />
+                        </th>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Planned Release</th>
+                        <th>Assigned To</th>
+                        <th>DEV Task</th>
+                        <th>INT Task</th>
+                    </tr>
+                </thead>
+                <tbody id="workItemsBody">
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Preview Section -->
+        <div class="preview-section" id="previewSection" style="display: none;">
+            <h3>👁️ Comment Preview (for first selected item)</h3>
+            <div class="preview-comment" id="previewComment"></div>
+        </div>
+        
+        </div>
+        <!-- End Main Tab -->
+        
+        <!-- Settings Tab -->
+        <div id="settingsTab" class="tab-content">
+            <div class="config-section">
+                <h2>⚙️ Configuration</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Organization</label>
+                        <select id="organization" onchange="updateProjectList()">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Project</label>
+                        <select id="project">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Personal Access Token (PAT)</label>
+                        <input type="password" id="pat" placeholder="Your PAT token" />
+                    </div>
+                </div>
+                <button onclick="saveConfig()">Save Configuration</button>
+                <button class="btn-secondary" onclick="loadConfig()">Load Saved</button>
+                <button class="btn-danger" onclick="clearPAT()">Clear PAT Token</button>
+            </div>
+        </div>
+        <!-- End Settings Tab -->
+        
+    </div>
+    
+    <script>
+        // Available organizations and projects
+        const availableConfigs = [
+            { organization: 'infomedics', project: 'TIM' }
+            // Add more configs here if needed
+            // { organization: 'another-org', project: 'Another Project' }
+        ];
+        
+        // Comment templates
+        const commentTemplates = {
+            readyForTest: `This item will be delivered in version specified in "planned release": {PLANNED_RELEASE}.
+Before picking up for QA, please make sure this version or higher is deployed on the test environment.
+
+Description and Context/Acceptance Criteria contain description of the fix. Testing scenarios are in the Attention for testing section.
+
+With questions please contact:
+Developer: {DEVELOPER}
+Tester: {TESTER}`,
+            
+            closed: `Integration Test Feedback was fixed and integrated with the original item, therefore closed. No further System Testing is required.`,
+            
+            custom: ``
+        };
+        
+        // Global state
+        let workItems = [];
+        let config = {
+            organization: 'infomedics',
+            project: 'TIM',
+            pat: ''
+        };
+        
+        // Load config from localStorage on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            populateConfigDropdowns();
+            loadConfig();
+            // Load default comment template
+            loadCommentTemplate();
+        });
+        
+        function populateConfigDropdowns() {
+            const orgSelect = document.getElementById('organization');
+            const projSelect = document.getElementById('project');
+            
+            // Clear existing options
+            orgSelect.innerHTML = '';
+            projSelect.innerHTML = '';
+            
+            // Get unique organizations
+            const organizations = [...new Set(availableConfigs.map(c => c.organization))];
+            
+            // Populate organization dropdown
+            organizations.forEach(org => {
+                const option = document.createElement('option');
+                option.value = org;
+                option.textContent = org;
+                orgSelect.appendChild(option);
+            });
+            
+            // Set default organization
+            orgSelect.value = 'infomedics';
+            
+            // Populate projects for selected organization
+            updateProjectList();
+        }
+        
+        function updateProjectList() {
+            const orgSelect = document.getElementById('organization');
+            const projSelect = document.getElementById('project');
+            const selectedOrg = orgSelect.value;
+            
+            // Clear existing options
+            projSelect.innerHTML = '';
+            
+            // Get projects for selected organization
+            const projects = availableConfigs
+                .filter(c => c.organization === selectedOrg)
+                .map(c => c.project);
+            
+            // Populate project dropdown
+            projects.forEach(proj => {
+                const option = document.createElement('option');
+                option.value = proj;
+                option.textContent = proj;
+                projSelect.appendChild(option);
+            });
+            
+            // Set default project
+            if (projects.includes('TIM')) {
+                projSelect.value = 'TIM';
+            }
+        }
+        
+        function saveConfig() {
+            config.organization = document.getElementById('organization').value.trim();
+            config.project = document.getElementById('project').value.trim();
+            config.pat = document.getElementById('pat').value.trim();
+            
+            if (!config.organization || !config.project || !config.pat) {
+                showError('Please fill in all configuration fields');
+                return;
+            }
+            
+            localStorage.setItem('azureDevOpsConfig', JSON.stringify(config));
+            showSuccess('Configuration saved successfully!');
+        }
+        
+        function loadConfig() {
+            const saved = localStorage.getItem('azureDevOpsConfig');
+            if (saved) {
+                config = JSON.parse(saved);
+                document.getElementById('organization').value = config.organization;
+                document.getElementById('project').value = config.project;
+                document.getElementById('pat').value = config.pat;
+                showSuccess('Configuration loaded from storage');
+            }
+        }
+        
+        function clearPAT() {
+            if (confirm('Are you sure you want to clear the PAT token?')) {
+                config.pat = '';
+                document.getElementById('pat').value = '';
+                
+                // Save config without PAT
+                localStorage.setItem('azureDevOpsConfig', JSON.stringify(config));
+                showSuccess('PAT token cleared. Organization and Project remain unchanged.');
+            }
+        }
+        
+        function loadCommentTemplate() {
+            const templateSelect = document.getElementById('commentTemplate');
+            const textArea = document.getElementById('customCommentText');
+            
+            const selectedTemplate = templateSelect.value;
+            textArea.value = commentTemplates[selectedTemplate];
+            
+            // Load saved custom template if exists
+            const savedCustom = localStorage.getItem('customCommentTemplate');
+            if (selectedTemplate === 'custom' && savedCustom) {
+                textArea.value = savedCustom;
+            }
+            
+            updatePreview();
+        }
+        
+        function saveCustomTemplate() {
+            const textArea = document.getElementById('customCommentText');
+            localStorage.setItem('customCommentTemplate', textArea.value);
+        }
+        
+        // Update comment template when dropdown changes
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('commentTemplate').addEventListener('change', function() {
+                loadCommentTemplate();
+            });
+            
+            document.getElementById('customCommentText').addEventListener('change', function() {
+                if (document.getElementById('commentTemplate').value === 'custom') {
+                    saveCustomTemplate();
+                }
+            });
+        });
+        
+        async function fetchWorkItems() {
+            if (!config.organization || !config.project || !config.pat) {
+                showError('Please configure Organization, Project, and PAT first');
+                return;
+            }
+            
+            const plannedRelease = document.getElementById('plannedRelease').value.trim();
+            const status = document.getElementById('status').value;
+            const workItemType = document.getElementById('workItemType').value;
+            
+            if (!plannedRelease) {
+                showError('Please specify Planned Release');
+                return;
+            }
+            
+            showLoading(true);
+            clearError();
+            
+            try {
+                // Build WIQL query
+                let wiql = `SELECT [System.Id], [System.Title], [System.State], [System.WorkItemType], [System.AssignedTo], [Custom.PlannedRelease] FROM WorkItems WHERE [System.TeamProject] = '${config.project}' AND [Custom.PlannedRelease] = '${plannedRelease}'`;
+                
+                if (status) {
+                    wiql += ` AND [System.State] = '${status}'`;
+                }
+                
+                if (workItemType) {
+                    wiql += ` AND [System.WorkItemType] = '${workItemType}'`;
+                }
+                
+                // Fetch work items using WIQL
+                const wiqlUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/wit/wiql?api-version=7.0`;
+                const wiqlResponse = await fetch(wiqlUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(':' + config.pat),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: wiql })
+                });
+                
+                if (!wiqlResponse.ok) {
+                    throw new Error(`WIQL query failed: ${wiqlResponse.statusText}`);
+                }
+                
+                const wiqlData = await wiqlResponse.json();
+                const workItemIds = wiqlData.workItems.map(wi => wi.id);
+                
+                if (workItemIds.length === 0) {
+                    showError('No work items found matching the filters');
+                    showLoading(false);
+                    return;
+                }
+                
+                // Fetch detailed work item data with relations
+                const batchUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/wit/workitems?ids=${workItemIds.join(',')}&$expand=relations&api-version=7.0`;
+                const batchResponse = await fetch(batchUrl, {
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(':' + config.pat)
+                    }
+                });
+                
+                if (!batchResponse.ok) {
+                    throw new Error(`Failed to fetch work item details: ${batchResponse.statusText}`);
+                }
+                
+                const batchData = await batchResponse.json();
+                workItems = await Promise.all(batchData.value.map(async (item) => {
+                    const childTasks = await fetchChildTasks(item);
+                    return {
+                        id: item.id,
+                        type: item.fields['System.WorkItemType'],
+                        title: item.fields['System.Title'],
+                        state: item.fields['System.State'],
+                        plannedRelease: item.fields['Custom.PlannedRelease'] || item.fields['System.IterationPath'] || 'N/A',
+                        assignedTo: item.fields['System.AssignedTo']?.displayName || 'Unassigned',
+                        devTask: childTasks.dev,
+                        intTask: childTasks.int,
+                        selected: false
+                    };
+                }));
+                
+                displayWorkItems();
+                showLoading(false);
+                
+            } catch (error) {
+                showError(`Error: ${error.message}`);
+                showLoading(false);
+            }
+        }
+        
+        async function fetchChildTasks(workItem) {
+            const result = { dev: null, int: null, mdev: null, mint: null };
+            
+            if (!workItem.relations) {
+                return result;
+            }
+            
+            const childRelations = workItem.relations.filter(rel => 
+                rel.rel === 'System.LinkTypes.Hierarchy-Forward'
+            );
+            
+            if (childRelations.length === 0) {
+                return result;
+            }
+            
+            // First pass - collect all child tasks
+            for (const relation of childRelations) {
+                const childId = relation.url.split('/').pop();
+                
+                try {
+                    const childUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/wit/workitems/${childId}?api-version=7.0`;
+                    const childResponse = await fetch(childUrl, {
+                        headers: {
+                            'Authorization': 'Basic ' + btoa(':' + config.pat)
+                        }
+                    });
+                    
+                    if (childResponse.ok) {
+                        const childData = await childResponse.json();
+                        const title = childData.fields['System.Title'] || '';
+                        const assignedTo = childData.fields['System.AssignedTo']?.displayName || 'Unassigned';
+                        
+                        const taskInfo = {
+                            id: childId,
+                            title: title,
+                            assignedTo: assignedTo
+                        };
+                        
+                        // Check for DEV task (exact match, higher priority)
+                        if (title.includes(' DEV') || title.startsWith('DEV')) {
+                            if (!result.dev) result.dev = taskInfo;
+                        }
+                        // Check for MDEV task (fallback)
+                        else if (title.includes('MDEV')) {
+                            if (!result.mdev) result.mdev = taskInfo;
+                        }
+                        
+                        // Check for INT task (exact match, higher priority)
+                        if (title.includes(' INT') || title.startsWith('INT')) {
+                            if (!result.int) result.int = taskInfo;
+                        }
+                        // Check for MINT task (fallback)
+                        else if (title.includes('MINT')) {
+                            if (!result.mint) result.mint = taskInfo;
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error fetching child task ${childId}:`, error);
+                }
+            }
+            
+            // Apply fallback logic: if DEV not found, use MDEV; if INT not found, use MINT
+            return {
+                dev: result.dev || result.mdev,
+                int: result.int || result.mint
+            };
+        }
+        
+        function displayWorkItems() {
+            const tbody = document.getElementById('workItemsBody');
+            tbody.innerHTML = '';
+            
+            workItems.forEach((item, index) => {
+                // Build Azure DevOps URL
+                const workItemUrl = `https://${config.organization}.visualstudio.com/${config.project}/_workitems/edit/${item.id}/`;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="checkbox-cell">
+                        <input type="checkbox" onchange="toggleItemSelection(${index})" ${item.selected ? 'checked' : ''} />
+                    </td>
+                    <td><a href="${workItemUrl}" target="_blank" style="color: #667eea; text-decoration: none; font-weight: 600;">${item.id}</a></td>
+                    <td>${item.type}</td>
+                    <td>${item.title}</td>
+                    <td><span class="status-badge status-${item.state.toLowerCase().replace(' ', '-')}">${item.state}</span></td>
+                    <td>${item.plannedRelease}</td>
+                    <td>${item.assignedTo}</td>
+                    <td>${item.devTask ? `${item.devTask.assignedTo}` : '❌ Not found'}</td>
+                    <td>${item.intTask ? `${item.intTask.assignedTo}` : '❌ Not found'}</td>
+                `;
+                
+                row.style.cursor = 'pointer';
+                row.onclick = (e) => {
+                    // Don't trigger when clicking checkbox or link
+                    if (e.target.type === 'checkbox' || e.target.tagName === 'A') return;
+                    showItemPreview(index);
+                };
+                
+                if (item.selected) {
+                    row.classList.add('selected');
+                }
+                
+                tbody.appendChild(row);
+            });
+            
+            document.getElementById('workItemsSection').style.display = 'block';
+            document.getElementById('totalCount').textContent = workItems.length;
+            updateSelectedCount();
+        }
+        
+        function toggleItemSelection(index) {
+            workItems[index].selected = !workItems[index].selected;
+            displayWorkItems();
+            updatePreview();
+        }
+        
+        function toggleSelectAll() {
+            const checked = document.getElementById('selectAllCheckbox').checked;
+            workItems.forEach(item => item.selected = checked);
+            displayWorkItems();
+            updatePreview();
+        }
+        
+        function selectAll() {
+            workItems.forEach(item => item.selected = true);
+            document.getElementById('selectAllCheckbox').checked = true;
+            displayWorkItems();
+            updatePreview();
+        }
+        
+        function deselectAll() {
+            workItems.forEach(item => item.selected = false);
+            document.getElementById('selectAllCheckbox').checked = false;
+            displayWorkItems();
+            updatePreview();
+        }
+        
+        function updateSelectedCount() {
+            const count = workItems.filter(item => item.selected).length;
+            document.getElementById('selectedCount').textContent = count;
+            updatePreview();
+        }
+        
+        function showItemPreview(index) {
+            const item = workItems[index];
+            const comment = generateComment(item);
+            
+            document.getElementById('previewComment').textContent = comment;
+            document.getElementById('previewSection').style.display = 'block';
+        }
+        
+        function updatePreview() {
+            const selectedItems = workItems.filter(item => item.selected);
+            
+            if (selectedItems.length === 0) {
+                document.getElementById('previewSection').style.display = 'none';
+                return;
+            }
+            
+            const firstItem = selectedItems[0];
+            const comment = generateComment(firstItem);
+            
+            document.getElementById('previewComment').textContent = comment;
+            document.getElementById('previewSection').style.display = 'block';
+        }
+        
+        function generateComment(item) {
+            const developer = item.devTask ? item.devTask.assignedTo : 'Not assigned';
+            const tester = item.intTask ? item.intTask.assignedTo : 'Not assigned';
+            
+            // Get selected template
+            const textArea = document.getElementById('customCommentText');
+            let template = textArea ? textArea.value : commentTemplates.readyForTest;
+            
+            // Replace placeholders
+            return template
+                .replace(/{PLANNED_RELEASE}/g, item.plannedRelease)
+                .replace(/{DEVELOPER}/g, developer)
+                .replace(/{TESTER}/g, tester);
+        }
+        
+        async function addCommentsToSelected() {
+            const selectedItems = workItems.filter(item => item.selected);
+            
+            if (selectedItems.length === 0) {
+                showError('Please select at least one work item');
+                return;
+            }
+            
+            if (!confirm(`Add comments to ${selectedItems.length} work item(s)?`)) {
+                return;
+            }
+            
+            showLoading(true);
+            clearError();
+            
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (const item of selectedItems) {
+                try {
+                    await addCommentToWorkItem(item.id, item);
+                    successCount++;
+                } catch (error) {
+                    console.error(`Failed to add comment to ${item.id}:`, error);
+                    errorCount++;
+                }
+            }
+            
+            showLoading(false);
+            
+            if (errorCount === 0) {
+                showSuccess(`Successfully added comments to ${successCount} work item(s)!`);
+            } else {
+                showError(`Added comments to ${successCount} work item(s), but ${errorCount} failed. Check console for details.`);
+            }
+        }
+        
+        async function fetchSingleItem() {
+            const itemId = document.getElementById('singleItemId').value.trim();
+            
+            if (!itemId) {
+                showError('Please enter a Work Item ID');
+                return;
+            }
+            
+            if (!config.organization || !config.project || !config.pat) {
+                showError('Please configure Organization, Project, and PAT first');
+                return;
+            }
+            
+            showLoading(true);
+            clearError();
+            
+            try {
+                // Fetch work item details
+                const itemUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/wit/workitems/${itemId}?$expand=relations&api-version=7.0`;
+                const itemResponse = await fetch(itemUrl, {
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(':' + config.pat)
+                    }
+                });
+                
+                if (!itemResponse.ok) {
+                    throw new Error(`Work item ${itemId} not found`);
+                }
+                
+                const itemData = await itemResponse.json();
+                const childTasks = await fetchChildTasks(itemData);
+                
+                const item = {
+                    id: itemData.id,
+                    type: itemData.fields['System.WorkItemType'],
+                    title: itemData.fields['System.Title'],
+                    state: itemData.fields['System.State'],
+                    plannedRelease: itemData.fields['Custom.PlannedRelease'] || itemData.fields['System.IterationPath'] || 'N/A',
+                    assignedTo: itemData.fields['System.AssignedTo']?.displayName || 'Unassigned',
+                    devTask: childTasks.dev,
+                    intTask: childTasks.int,
+                    selected: true
+                };
+                
+                // Replace workItems with single item
+                workItems = [item];
+                displayWorkItems();
+                showLoading(false);
+                showSuccess(`Work item ${itemId} loaded successfully!`);
+                
+            } catch (error) {
+                showLoading(false);
+                showError(`Error: ${error.message}`);
+            }
+        }
+        
+        async function addCommentToSingleItem() {
+            const itemId = document.getElementById('singleItemId').value.trim();
+            
+            if (!itemId) {
+                showError('Please enter a Work Item ID');
+                return;
+            }
+            
+            if (!config.organization || !config.project || !config.pat) {
+                showError('Please configure Organization, Project, and PAT first');
+                return;
+            }
+            
+            showLoading(true);
+            clearError();
+            
+            try {
+                // Fetch work item details
+                const itemUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/wit/workitems/${itemId}?$expand=relations&api-version=7.0`;
+                const itemResponse = await fetch(itemUrl, {
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(':' + config.pat)
+                    }
+                });
+                
+                if (!itemResponse.ok) {
+                    throw new Error(`Work item ${itemId} not found`);
+                }
+                
+                const itemData = await itemResponse.json();
+                const childTasks = await fetchChildTasks(itemData);
+                
+                const item = {
+                    id: itemData.id,
+                    plannedRelease: itemData.fields['Custom.PlannedRelease'] || itemData.fields['System.IterationPath'] || 'N/A',
+                    devTask: childTasks.dev,
+                    intTask: childTasks.int
+                };
+                
+                await addCommentToWorkItem(itemId, item);
+                
+                showLoading(false);
+                showSuccess(`Comment added successfully to work item ${itemId}!`);
+                
+            } catch (error) {
+                showLoading(false);
+                showError(`Error: ${error.message}`);
+            }
+        }
+        
+        async function addCommentToWorkItem(workItemId, item) {
+            const comment = generateComment(item);
+            
+            const commentUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/wit/workitems/${workItemId}/comments?api-version=7.0`;
+            
+            const response = await fetch(commentUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Basic ' + btoa(':' + config.pat),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: comment
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to add comment to ${workItemId}: ${response.statusText}`);
+            }
+            
+            return await response.json();
+        }
+        
+        function clearResults() {
+            workItems = [];
+            document.getElementById('workItemsSection').style.display = 'none';
+            document.getElementById('previewSection').style.display = 'none';
+            clearError();
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = `<div class="error">❌ ${message}</div>`;
+        }
+        
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = `<div class="success">✅ ${message}</div>`;
+            setTimeout(() => {
+                errorDiv.innerHTML = '';
+            }, 5000);
+        }
+        
+        function clearError() {
+            document.getElementById('errorMessage').innerHTML = '';
+        }
+        
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            if (tabName === 'main') {
+                document.getElementById('mainTab').classList.add('active');
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            } else if (tabName === 'settings') {
+                document.getElementById('settingsTab').classList.add('active');
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
