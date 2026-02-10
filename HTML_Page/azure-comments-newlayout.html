@@ -1313,7 +1313,9 @@ Tester: {TESTER}`,
             });
             
             if (!response.ok) {
-                throw new Error(`Failed to add comment to ${workItemId}: ${response.statusText}`);
+                const errorBody = await response.text();
+                console.error('Azure DevOps API Error:', errorBody);
+                throw new Error(`Failed to add comment to ${workItemId}: ${response.statusText} - ${errorBody}`);
             }
             
             return await response.json();
