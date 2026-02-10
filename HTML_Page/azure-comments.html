@@ -367,8 +367,8 @@
             <div class="filter-row">
                 <div class="form-group" style="flex: 1;">
                     <label>Planned Release</label>
-                    <input type="text" id="plannedRelease" placeholder="e.g., 2026.02.R1" />
-                    <small style="color: #666; font-size: 11px; display: block; margin-top: 3px;">Enter the value from Custom.PlannedRelease field</small>
+                    <input type="text" id="plannedRelease" placeholder="e.g. 26.3.0 or 26.3.0.INT" />
+                    <small style="color: #666; font-size: 11px; display: block; margin-top: 3px;">Enter the value from Custom.plannedrelease field</small>
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label>Status</label>
@@ -402,8 +402,8 @@
             <div class="form-group">
                 <label>Select Comment Template</label>
                 <select id="commentTemplate" onchange="updatePreview()">
-                    <option value="readyForTest">Ready for Testing</option>
-                    <option value="closed">Closed / Resolved</option>
+                    <option value="readyForTest">Ready for Test</option>
+                    <option value="closed">Closed</option>
                     <option value="custom">Custom (edit below)</option>
                 </select>
             </div>
@@ -701,7 +701,7 @@ Tester: {TESTER}`,
             
             try {
                 // Build WIQL query
-                let wiql = `SELECT [System.Id], [System.Title], [System.State], [System.WorkItemType], [System.AssignedTo], [Custom.PlannedRelease] FROM WorkItems WHERE [System.TeamProject] = '${config.project}' AND [Custom.PlannedRelease] = '${plannedRelease}'`;
+                let wiql = `SELECT [System.Id], [System.Title], [System.State], [System.WorkItemType], [System.AssignedTo], [Custom.plannedrelease] FROM WorkItems WHERE [System.TeamProject] = '${config.project}' AND [Custom.plannedrelease] = '${plannedRelease}'`;
                 
                 if (status) {
                     wiql += ` AND [System.State] = '${status}'`;
@@ -755,7 +755,7 @@ Tester: {TESTER}`,
                         type: item.fields['System.WorkItemType'],
                         title: item.fields['System.Title'],
                         state: item.fields['System.State'],
-                        plannedRelease: item.fields['Custom.PlannedRelease'] || item.fields['System.IterationPath'] || 'N/A',
+                        plannedRelease: item.fields['Custom.plannedrelease'] || 'N/A',
                         assignedTo: item.fields['System.AssignedTo']?.displayName || 'Unassigned',
                         devTask: childTasks.dev,
                         intTask: childTasks.int,
@@ -1027,7 +1027,7 @@ Tester: {TESTER}`,
                     type: itemData.fields['System.WorkItemType'],
                     title: itemData.fields['System.Title'],
                     state: itemData.fields['System.State'],
-                    plannedRelease: itemData.fields['Custom.PlannedRelease'] || itemData.fields['System.IterationPath'] || 'N/A',
+                    plannedRelease: itemData.fields['Custom.plannedrelease'] || 'N/A',
                     assignedTo: itemData.fields['System.AssignedTo']?.displayName || 'Unassigned',
                     devTask: childTasks.dev,
                     intTask: childTasks.int,
@@ -1080,7 +1080,7 @@ Tester: {TESTER}`,
                 
                 const item = {
                     id: itemData.id,
-                    plannedRelease: itemData.fields['Custom.PlannedRelease'] || itemData.fields['System.IterationPath'] || 'N/A',
+                    plannedRelease: itemData.fields['Custom.plannedrelease'] || 'N/A',
                     devTask: childTasks.dev,
                     intTask: childTasks.int
                 };
