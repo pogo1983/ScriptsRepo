@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azure DevOps - Bulk Comment Tool</title>
+    <title>Azure DevOps - Bulk Comment Tool (New Layout)</title>
+    
+    <!-- Font Awesome 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <!-- ============================================================================
          ⚠️⚠️⚠️ TESTING CONFIGURATION - REMOVE BEFORE GIT COMMIT ⚠️⚠️⚠️
@@ -20,6 +23,98 @@
     <!-- ============================================================================ -->
     
     <style>
+        :root {
+            --fa-style-family-brands: "Font Awesome 6 Brands";
+            --fa-font-brands: normal 400 1em/1 "Font Awesome 6 Brands";
+            --fa-font-regular: normal 400 1em/1 "Font Awesome 6 Free";
+            --fa-style-family-classic: "Font Awesome 6 Free";
+            --fa-font-solid: normal 900 1em/1 "Font Awesome 6 Free";
+            --dx-font-size-heading-1: 34px;
+            --dx-font-size-heading-2: 28px;
+            --dx-font-size-heading-3: 22px;
+            --dx-font-size-heading-4: 18px;
+            --dx-font-size-heading-5: 16px;
+            --dx-font-size-heading-6: 12px;
+            --dx-font-size-xl: 34px;
+            --dx-font-size-lg: 28px;
+            --dx-font-size-md: 20px;
+            --dx-font-size-sm: 18px;
+            --dx-font-size-xs: 12px;
+            --dx-list-item-padding-inline: 10px;
+            --dx-list-item-padding-block: 10px;
+            --dx-texteditor-color-text: #333;
+            --dx-texteditor-color-label: #999999;
+            --dx-button-padding-inline: 12px;
+            --dx-component-color-bg: #fff;
+            --dx-color-main-bg: #fff;
+            --dx-color-primary: #337ab7;
+            --dx-color-danger: #d9534f;
+            --dx-color-success: #5cb85c;
+            --dx-color-warning: #f0ad4e;
+            --dx-color-border: #ddd;
+            --dx-color-text: #333;
+            --dx-color-icon: #333;
+            --dx-color-spin-icon: #333;
+            --dx-color-link: #337ab7;
+            --dx-color-shadow: black;
+            --dx-color-separator: #ddd;
+            --dx-component-height: 36px;
+            --dx-font-size: 14px;
+            --dx-border-width: 1px;
+            --dx-border-radius: 4px;
+            --dx-font-size-icon: 18px;
+            --dx-toolbar-height: 36px;
+            --dx-popup-toolbar-item-padding-inline: 10px;
+            --bs-blue: #0d6efd;
+            --bs-indigo: #6610f2;
+            --bs-purple: #6f42c1;
+            --bs-pink: #d63384;
+            --bs-red: #dc3545;
+            --bs-orange: #fd7e14;
+            --bs-yellow: #ffc107;
+            --bs-green: #198754;
+            --bs-teal: #20c997;
+            --bs-cyan: #0dcaf0;
+            --bs-black: #000;
+            --bs-white: #fff;
+            --bs-gray: #6c757d;
+            --bs-gray-dark: #343a40;
+            --bs-gray-100: #f8f9fa;
+            --bs-gray-200: #e9ecef;
+            --bs-gray-300: #dee2e6;
+            --bs-gray-400: #ced4da;
+            --bs-gray-500: #adb5bd;
+            --bs-gray-600: #6c757d;
+            --bs-gray-700: #495057;
+            --bs-gray-800: #343a40;
+            --bs-gray-900: #212529;
+            --bs-primary: #0d6efd;
+            --bs-secondary: #6c757d;
+            --bs-success: #198754;
+            --bs-info: #0dcaf0;
+            --bs-warning: #ffc107;
+            --bs-danger: #dc3545;
+            --bs-light: #f8f9fa;
+            --bs-dark: #212529;
+            --bs-primary-rgb: 13, 110, 253;
+            --bs-secondary-rgb: 108, 117, 125;
+            --bs-success-rgb: 25, 135, 84;
+            --bs-info-rgb: 13, 202, 240;
+            --bs-warning-rgb: 255, 193, 7;
+            --bs-danger-rgb: 220, 53, 69;
+            --bs-light-rgb: 248, 249, 250;
+            --bs-dark-rgb: 33, 37, 41;
+            --bs-body-font-family: var(--bs-font-sans-serif);
+            --bs-body-font-size: 1rem;
+            --bs-body-font-weight: 400;
+            --bs-body-line-height: 1.5;
+            --bs-body-color: #212529;
+            --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            --bs-border-width: 1px;
+            --bs-border-radius: .375rem;
+            --bs-box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -27,45 +122,85 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: var(--bs-font-sans-serif);
+            background: #f3f2f1;
             min-height: 100vh;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
+            font-size: var(--bs-body-font-size);
+            font-weight: var(--bs-body-font-weight);
+            line-height: var(--bs-body-line-height);
+            color: var(--bs-body-color);
+        }
+        
+        .top-nav {
+            background: #0078d4;
+            color: white;
+            padding: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .top-nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            height: 48px;
+            padding: 0 20px;
+        }
+        
+        .top-nav-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            margin: 0;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .top-nav-user {
+            margin-left: auto;
+            color: white;
+            font-size: 14px;
         }
         
         .container {
             max-width: 1400px;
             margin: 0 auto;
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            min-height: calc(100vh - 48px);
             padding: 30px;
         }
         
         h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
+            color: #323130;
+            margin-bottom: 8px;
+            font-size: 24px;
+            font-weight: 600;
         }
         
         .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
+            color: #605e5c;
+            margin-bottom: 24px;
+            font-size: 13px;
         }
         
         .config-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 2px solid #e9ecef;
+            background: #faf9f8;
+            padding: 24px;
+            border-radius: 2px;
+            margin-bottom: 16px;
+            border: 1px solid #edebe9;
         }
         
         .config-section h2 {
-            color: #495057;
-            font-size: 18px;
-            margin-bottom: 15px;
+            color: #323130;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
         }
         
         .form-row {
@@ -101,20 +236,25 @@
         }
         
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: var(--bs-primary);
+            color: white !important;
             border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-size: 14px;
+            padding: var(--dx-button-padding-inline) calc(var(--dx-button-padding-inline) * 2);
+            border-radius: var(--bs-border-radius);
+            font-size: var(--dx-font-size);
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: var(--bs-box-shadow);
+            background: #0a58ca;
+            color: white !important;
         }
         
         button:active {
@@ -122,21 +262,39 @@
         }
         
         button:disabled {
-            background: #adb5bd;
+            background: var(--bs-gray-400);
             cursor: not-allowed;
             transform: none;
         }
         
         .btn-secondary {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: var(--bs-secondary);
+            color: white !important;
+        }
+        
+        .btn-secondary:hover {
+            background: #565e64;
+            color: white !important;
         }
         
         .btn-success {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: var(--bs-success);
+            color: white !important;
+        }
+        
+        .btn-success:hover {
+            background: #146c43;
+            color: white !important;
         }
         
         .btn-danger {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            background: var(--bs-danger);
+            color: white !important;
+        }
+        
+        .btn-danger:hover {
+            background: #b02a37;
+            color: white !important;
         }
         
         .work-items-section {
@@ -337,20 +495,22 @@
             cursor: pointer;
             font-size: 15px;
             font-weight: 600;
-            color: #666;
+            color: #666 !important;
             border-bottom: 3px solid transparent;
             transition: all 0.3s;
         }
         
         .tab-btn:hover {
-            color: #667eea;
+            color: #667eea !important;
+            background: transparent !important;
             transform: none;
             box-shadow: none;
         }
         
         .tab-btn.active {
-            color: #667eea;
+            color: #667eea !important;
             border-bottom-color: #667eea;
+            background: transparent !important;
         }
         
         .tab-content {
@@ -363,14 +523,28 @@
     </style>
 </head>
 <body>
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="top-nav-content">
+            <div class="top-nav-title">
+                <i class="fas fa-comment-dots"></i>
+                Azure DevOps Bulk Comment Tool
+            </div>
+            <div class="top-nav-user">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
-        <h1>🔧 Azure DevOps - Bulk Comment Tool</h1>
+        <div style="padding: 30px;">
+        <h1><i class="fas fa-tools"></i> Azure DevOps - Bulk Comment Tool</h1>
         <p class="subtitle">Add predefined comments to work items based on Planned Release and Status</p>
         
         <!-- Tabs -->
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('main')">Main</button>
-            <button class="tab-btn" onclick="switchTab('settings')">Settings</button>
+            <button class="tab-btn active" onclick="switchTab('main')"><i class="fas fa-home"></i> Main</button>
+            <button class="tab-btn" onclick="switchTab('settings')"><i class="fas fa-cog"></i> Settings</button>
         </div>
         
         <!-- Main Tab -->
@@ -378,7 +552,7 @@
         
         <!-- Filters Section -->
         <div class="config-section">
-            <h2>🔍 Filters</h2>
+            <h2><i class="fas fa-filter"></i> Filters</h2>
             <div class="filter-row">
                 <div class="form-group" style="flex: 1;">
                     <label>Planned Release</label>
@@ -391,6 +565,8 @@
                         <option value="">All</option>
                         <option value="New">New</option>
                         <option value="Active">Active</option>
+                        <option value="Development">Development</option>
+                        <option value="Integration">Integration</option>
                         <option value="Resolved">Resolved</option>
                         <option value="Ready for Test">Ready for Test</option>
                         <option value="Closed">Closed</option>
@@ -404,16 +580,16 @@
                         <option value="User Story">User Story</option>
                         <option value="Task">Task</option>
                         <option value="Feature">Feature</option>
-                        <option value="Test Feedback">Test Feedback</option>
+                        <option value="TestFeedback">TestFeedback</option>
                     </select>
                 </div>
             </div>
-            <button onclick="fetchWorkItems()" style="margin-top: 15px;">Fetch Work Items</button>
+            <button onclick="fetchWorkItems()" style="margin-top: 15px;"><i class="fas fa-search"></i> Fetch Work Items</button>
         </div>
         
         <!-- Comment Template Section -->
         <div class="config-section">
-            <h2>💬 Comment Template</h2>
+            <h2><i class="fas fa-comment-dots"></i> Comment Template</h2>
             <div class="form-group">
                 <label>Select Comment Template</label>
                 <select id="commentTemplate" onchange="updatePreview()">
@@ -433,14 +609,14 @@
         
         <!-- Single Item Section -->
         <div class="single-item-section">
-            <h3>📝 Add Comment to Single Item (by ID)</h3>
+            <h3><i class="fas fa-file-alt"></i> Add Comment to Single Item (by ID)</h3>
             <div class="inline-form">
                 <div class="form-group">
                     <label>Work Item ID</label>
                     <input type="number" id="singleItemId" placeholder="e.g., 12345" style="width: 150px;" />
                 </div>
-                <button class="btn-secondary" onclick="fetchSingleItem()">Preview Item</button>
-                <button class="btn-success" onclick="addCommentToSingleItem()">Add Comment to This Item</button>
+                <button class="btn-secondary" onclick="fetchSingleItem()"><i class="fas fa-eye"></i> Preview Item</button>
+                <button class="btn-success" onclick="addCommentToSingleItem()"><i class="fas fa-plus-circle"></i> Add Comment to This Item</button>
             </div>
         </div>
         
@@ -454,7 +630,7 @@
         <!-- Work Items Section -->
         <div class="work-items-section" id="workItemsSection" style="display: none;">
             <div class="work-items-header">
-                <h2>📋 Work Items</h2>
+                <h2><i class="fas fa-list"></i> Work Items</h2>
                 <div class="stats">
                     <div class="stat">
                         <span>Total:</span>
@@ -468,10 +644,10 @@
             </div>
             
             <div class="actions-bar">
-                <button class="btn-success" onclick="addCommentsToSelected()">Add Comments to Selected</button>
-                <button class="btn-secondary" onclick="selectAll()">Select All</button>
-                <button class="btn-secondary" onclick="deselectAll()">Deselect All</button>
-                <button class="btn-danger" onclick="clearResults()">Clear Results</button>
+                <button class="btn-success" onclick="addCommentsToSelected()"><i class="fas fa-comments"></i> Add Comments to Selected</button>
+                <button class="btn-secondary" onclick="selectAll()"><i class="fas fa-check-square"></i> Select All</button>
+                <button class="btn-secondary" onclick="deselectAll()"><i class="fas fa-square"></i> Deselect All</button>
+                <button class="btn-danger" onclick="clearResults()"><i class="fas fa-trash"></i> Clear Results</button>
             </div>
             
             <table class="work-items-table" id="workItemsTable">
@@ -507,31 +683,32 @@
         <!-- Settings Tab -->
         <div id="settingsTab" class="tab-content">
             <div class="config-section">
-                <h2>⚙️ Configuration</h2>
+                <h2><i class="fas fa-cog"></i> Configuration</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Organization</label>
+                        <label><i class="fas fa-building"></i> Organization</label>
                         <select id="organization" onchange="updateProjectList()">
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Project</label>
+                        <label><i class="fas fa-folder"></i> Project</label>
                         <select id="project">
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Personal Access Token (PAT)</label>
+                        <label><i class="fas fa-key"></i> Personal Access Token (PAT)</label>
                         <input type="password" id="pat" placeholder="Your PAT token" />
                     </div>
                 </div>
-                <button onclick="saveConfig()">Save Configuration</button>
-                <button class="btn-secondary" onclick="loadConfig()">Load Saved</button>
-                <button class="btn-danger" onclick="clearPAT()">Clear PAT Token</button>
+                <button onclick="saveConfig()"><i class="fas fa-save"></i> Save Configuration</button>
+                <button class="btn-secondary" onclick="loadConfig()"><i class="fas fa-download"></i> Load Saved</button>
+                <button class="btn-danger" onclick="clearPAT()"><i class="fas fa-eraser"></i> Clear PAT Token</button>
             </div>
         </div>
         <!-- End Settings Tab -->
         
-    </div>
+        </div><!-- End padding wrapper -->
+    </div><!-- End container -->
     
     <script>
         // Available organizations and projects
