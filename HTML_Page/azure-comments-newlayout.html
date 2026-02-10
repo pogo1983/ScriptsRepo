@@ -1305,7 +1305,7 @@ Tester: {TESTER}`,
                 method: 'POST',
                 headers: {
                     'Authorization': 'Basic ' + btoa(':' + config.pat),
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json-patch+json'
                 },
                 body: JSON.stringify({
                     text: comment
