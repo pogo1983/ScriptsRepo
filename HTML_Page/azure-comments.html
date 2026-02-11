@@ -1122,7 +1122,7 @@ Tester: {TESTER}`,
         async function addCommentToWorkItem(workItemId, item) {
             const comment = generateComment(item);
             
-            const commentUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/wit/workitems/${workItemId}/comments?api-version=7.0`;
+            const commentUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/wit/workitems/${workItemId}/comments?api-version=7.0-preview`;
             
             const response = await fetch(commentUrl, {
                 method: 'POST',
@@ -1136,7 +1136,9 @@ Tester: {TESTER}`,
             });
             
             if (!response.ok) {
-                throw new Error(`Failed to add comment to ${workItemId}: ${response.statusText}`);
+                const errorBody = await response.text();
+                console.error('Azure DevOps API Error:', errorBody);
+                throw new Error(`Failed to add comment to ${workItemId}: ${response.statusText} - ${errorBody}`);
             }
             
             return await response.json();
