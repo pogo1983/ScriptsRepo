@@ -726,8 +726,8 @@ Before picking up for QA, please make sure this version or higher is deployed on
 Description and Context/Acceptance Criteria contain description of the fix. Testing scenarios are in the Attention for testing section.
 
 With questions please contact:
-Developer: {DEVELOPER}
-Tester: {TESTER}`,
+Tester: {TESTER}
+Developer: {DEVELOPER}`,
             
             closed: `Integration Test Feedback was fixed and integrated with the original item, therefore closed. No further System Testing is required.`,
             
@@ -1142,15 +1142,24 @@ Tester: {TESTER}`,
             const developer = item.devTask ? item.devTask.assignedTo : 'Not assigned';
             const tester = item.intTask ? item.intTask.assignedTo : 'Not assigned';
             
+            // Add @ mention for Azure DevOps notifications (only if assigned)
+            const developerMention = developer !== 'Not assigned' ? `@${developer}` : developer;
+            const testerMention = tester !== 'Not assigned' ? `@${tester}` : tester;
+            
             // Get selected template
             const textArea = document.getElementById('customCommentText');
             let template = textArea ? textArea.value : commentTemplates.readyForTest;
             
-            // Replace placeholders
-            return template
+            // Replace placeholders and convert newlines to HTML
+            let comment = template
                 .replace(/{PLANNED_RELEASE}/g, item.plannedRelease)
-                .replace(/{DEVELOPER}/g, developer)
-                .replace(/{TESTER}/g, tester);
+                .replace(/{DEVELOPER}/g, developerMention)
+                .replace(/{TESTER}/g, testerMention);
+            
+            // Convert plain text newlines to HTML line breaks for Azure DevOps
+            comment = comment.replace(/\n/g, '<br>');
+            
+            return comment;
         }
         
         async function addCommentsToSelected() {
