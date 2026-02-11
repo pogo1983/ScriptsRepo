@@ -379,7 +379,6 @@ function generateReportHtml(data) {
     <li><a href="#executive-summary">Executive Summary</a></li>
     <li><a href="#test-failures">Test Execution Failures</a></li>
     <li><a href="#detailed-results">Detailed Test Results</a></li>
-    <li><a href="#summary-table">Test Summary by Suite</a></li>
 </ul>
 
 <h2 id="executive-summary">Executive Summary</h2>
@@ -405,9 +404,6 @@ ${generateFailedTestsList(data)}
 
 <h2 id="detailed-results">Detailed Test Results</h2>
 ${generateDetailedResults(data)}
-
-<h2 id="summary-table">Test Summary by Suite</h2>
-${generateSummaryTable(data)}
 `;
     
     return html;
@@ -566,8 +562,7 @@ function generateMarkdownReport(data) {
     md += `## Table of Contents\n\n`;
     md += `- [Executive Summary](#executive-summary)\n`;
     md += `- [Test Execution Failures](#test-failures)\n`;
-    md += `- [Detailed Test Results](#detailed-results)\n`;
-    md += `- [Test Summary by Suite](#summary-table)\n\n`;
+    md += `- [Detailed Test Results](#detailed-results)\n\n`;
     
     md += `## Executive Summary\n\n`;
     md += `| Property | Value |\n`;
@@ -591,9 +586,6 @@ function generateMarkdownReport(data) {
     
     md += `## Detailed Test Results\n\n`;
     md += generateDetailedResultsMarkdown(data);
-    
-    md += `## Test Summary by Suite\n\n`;
-    md += generateSummaryTableMarkdown(data);
     
     return md;
 }
