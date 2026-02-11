@@ -664,6 +664,7 @@
                         <th>Assigned To</th>
                         <th>DEV Task</th>
                         <th>INT Task</th>
+                        <th style="text-align: center; width: 50px;">⚠️</th>
                     </tr>
                 </thead>
                 <tbody id="workItemsBody">
@@ -950,6 +951,7 @@ Developer: {DEVELOPER}`,
                 const batchData = await batchResponse.json();
                 workItems = await Promise.all(batchData.value.map(async (item) => {
                     const childTasks = await fetchChildTasks(item);
+                    const hasComment = await checkExistingComment(item.id);
                     return {
                         id: item.id,
                         type: item.fields['System.WorkItemType'],
@@ -959,6 +961,7 @@ Developer: {DEVELOPER}`,
                         assignedTo: item.fields['System.AssignedTo']?.displayName || 'Unassigned',
                         devTask: childTasks.dev,
                         intTask: childTasks.int,
+                        hasExistingComment: hasComment,
                         selected: false
                     };
                 }));
@@ -969,6 +972,32 @@ Developer: {DEVELOPER}`,
             } catch (error) {
                 showError(`Error: ${error.message}`);
                 showLoading(false);
+            }
+        }
+        
+        async function checkExistingComment(workItemId) {
+            try {
+                const commentsUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/wit/workitems/${workItemId}/comments?api-version=7.0-preview`;
+                const response = await fetch(commentsUrl, {
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(':' + config.pat)
+                    }
+                });
+                
+                if (!response.ok) {
+                    return false;
+                }
+                
+                const data = await response.json();
+                
+                // Check if any comment contains the signature text
+                const signatureText = 'This item will be delivered in version specified in';
+                return data.comments && data.comments.some(comment => 
+                    comment.text && comment.text.includes(signatureText)
+                );
+            } catch (error) {
+                console.error(`Error checking comments for ${workItemId}:`, error);
+                return false;
             }
         }
         
@@ -1049,6 +1078,10 @@ Developer: {DEVELOPER}`,
                 const workItemUrl = `https://${config.organization}.visualstudio.com/${config.project}/_workitems/edit/${item.id}/`;
                 
                 const row = document.createElement('tr');
+                const commentWarning = item.hasExistingComment ? 
+                    '<span style="color: #ff6b6b; font-size: 18px; cursor: help;" title="Similar comment already exists on this work item">⚠️</span>' : 
+                    '';
+                
                 row.innerHTML = `
                     <td class="checkbox-cell">
                         <input type="checkbox" onchange="toggleItemSelection(${index})" ${item.selected ? 'checked' : ''} />
@@ -1061,6 +1094,7 @@ Developer: {DEVELOPER}`,
                     <td>${item.assignedTo}</td>
                     <td>${item.devTask ? `${item.devTask.assignedTo}` : '❌ Not found'}</td>
                     <td>${item.intTask ? `${item.intTask.assignedTo}` : '❌ Not found'}</td>
+                    <td style="text-align: center;">${commentWarning}</td>
                 `;
                 
                 row.style.cursor = 'pointer';
