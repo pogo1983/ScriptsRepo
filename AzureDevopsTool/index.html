@@ -29,6 +29,13 @@
         // To use: paste this token in Settings tab or it will auto-load on page load
     </script>
     <!-- ============================================================================ -->
+    
+    <!-- Load modular JavaScript files -->
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/workItems.js"></script>
+    <script src="js/testClosure.js"></script>
+    <script src="js/main.js"></script>
 </head>
 <body>
     <!-- Top Navigation -->
@@ -63,6 +70,7 @@
         <!-- Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('main')"><i class="fas fa-home"></i> Main</button>
+            <button class="tab-btn" onclick="switchTab('testClosure')"><i class="fas fa-file-alt"></i> Test Closure</button>
             <button class="tab-btn" onclick="switchTab('settings')"><i class="fas fa-cog"></i> Settings</button>
         </div>
         
@@ -248,6 +256,65 @@
         </div>
         <!-- End Main Tab -->
         
+        <!-- Test Closure Tab -->
+        <div id="testClosureTab" class="tab-content">
+            <div class="config-section">
+                <h2><i class="fas fa-file-alt"></i> Test Coverage Report Generator</h2>
+                <p style="color: #666; font-size: 13px; margin-bottom: 15px;">Generate comprehensive test coverage reports from Test Plans</p>
+                
+                <div class="form-group">
+                    <label>Search By:</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="searchType" value="id" onchange="toggleSearchType()">
+                            <span>Test Plan ID</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="searchType" value="release" checked onchange="toggleSearchType()">
+                            <span>Release Number</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label id="searchLabel">Release Number</label>
+                        <input type="text" id="testPlanSearch" placeholder="e.g., 26.1.4" />
+                        <small id="searchHint" style="color: #666; font-size: 11px; display: block; margin-top: 3px;">Enter the release number (e.g., for "INT - Release 26.1.4" enter "26.1.4")</small>
+                    </div>
+                </div>
+                
+                <button onclick="testSearchPlans()" class="btn-secondary" style="margin-top: 15px;" id="testSearchBtn"><i class="fas fa-search"></i> Test Search</button>
+                <button onclick="generateTestReport()" style="margin-top: 15px;"><i class="fas fa-chart-bar"></i> Generate Report</button>
+                <button class="btn-secondary" onclick="copyReportToClipboard()" id="copyReportBtn" style="margin-top: 15px; display: none;"><i class="fas fa-copy"></i> Copy HTML</button>
+                <button class="btn-secondary" onclick="copyMarkdownToClipboard()" id="copyMarkdownBtn" style="margin-top: 15px; display: none;"><i class="fas fa-file-code"></i> Copy Markdown</button>
+            </div>
+            
+            <div id="testSearchResults" style="display: none; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px; border-left: 4px solid #007bff;">
+                <h4 style="margin-top: 0; color: #007bff;"><i class="fas fa-list"></i> Search Results</h4>
+                <div id="testSearchContent"></div>
+            </div>
+            
+            <div id="testReportLoading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Generating test coverage report...</p>
+            </div>
+            
+            <div id="testReportError"></div>
+            
+            <!-- Report Preview -->
+            <div id="testReportSection" style="display: none; margin-top: 20px;">
+                <div style="background: #fff; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">Test Coverage Report Preview</h3>
+                        <button class="btn-secondary" onclick="copyReportToClipboard()"><i class="fas fa-copy"></i> Copy HTML</button>
+                    </div>
+                    <div id="testReportContent" style="border: 1px solid #e9ecef; padding: 20px; background: #f8f9fa; max-height: 600px; overflow-y: auto;"></div>
+                </div>
+            </div>
+        </div>
+        <!-- End Test Closure Tab -->
+        
         <!-- Settings Tab -->
         <div id="settingsTab" class="tab-content">
             <div class="config-section">
@@ -278,7 +345,11 @@
         </div><!-- End padding wrapper -->
     </div><!-- End container -->
     
-    <!-- External JavaScript -->
-    <script src="script.js"></script>
+    <!-- Modular JavaScript files -->
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/workItems.js"></script>
+    <script src="js/testClosure.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

@@ -806,8 +806,613 @@ function switchTab(tabName) {
     if (tabName === 'main') {
         document.getElementById('mainTab').classList.add('active');
         document.querySelectorAll('.tab-btn')[0].classList.add('active');
+    } else if (tabName === 'testClosure') {
+        document.getElementById('testClosureTab').classList.add('active');
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
     } else if (tabName === 'settings') {
         document.getElementById('settingsTab').classList.add('active');
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.querySelectorAll('.tab-btn')[2].classList.add('active');
     }
+}
+
+// ==================== TEST CLOSURE REPORT FUNCTIONS ====================
+
+let testReportData = null;
+
+function toggleSearchType() {
+    const searchType = document.querySelector('input[name="searchType"]:checked').value;
+    const label = document.getElementById('searchLabel');
+    const input = document.getElementById('testPlanSearch');
+    const hint = document.getElementById('searchHint');
+    
+    if (searchType === 'id') {
+        label.textContent = 'Test Plan ID:';
+        input.placeholder = 'Enter Test Plan ID (e.g., 12345)';
+        hint.textContent = 'Enter the numeric ID of the test plan';
+    } else {
+        label.textContent = 'Release Number:';
+        input.placeholder = 'Enter Release Number (e.g., 26.1.4)';
+        hint.textContent = 'Enter the release number that appears in test plan name (e.g., INT - Release 26.1.4)';
+    }
+}
+
+async function testSearchPlans() {
+    const searchValue = document.getElementById('testPlanSearch').value.trim();
+    const searchType = document.querySelector('input[name="searchType"]:checked').value;
+    
+    if (!searchValue) {
+        showTestReportError('Please enter a ' + (searchType === 'id' ? 'Test Plan ID' : 'Release Number'));
+        return;
+    }
+    
+    if (!config.organization || !config.project || !config.pat) {
+        showTestReportError('Please configure Organization, Project, and PAT in Settings first');
+        return;
+    }
+    
+    showTestReportLoading(true);
+    clearTestReportError();
+    
+    try {
+        const plansUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/testplan/plans?api-version=7.1-preview.1`;
+        const response = await fetch(plansUrl, {
+            headers: {
+                'Authorization': 'Basic ' + btoa(':' + config.pat)
+            }
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API Error:', response.status, errorText);
+            throw new Error(`Failed to fetch test plans (${response.status}): ${errorText}`);
+        }
+        
+        const data = await response.json();
+        
+        let html = `<p style="margin-bottom: 10px;"><strong>Total Test Plans found:</strong> ${data.value.length}</p>`;
+        
+        if (searchType === 'release') {
+            html += `<p style="margin-bottom: 15px; color: #666;"><strong>Searching for:</strong> "${searchValue}"</p>`;
+            
+            // Find matching plans
+            const matchingPlans = data.value.filter(plan => 
+                plan.name && plan.name.toLowerCase().includes(searchValue.toLowerCase())
+            );
+            
+            if (matchingPlans.length > 0) {
+                html += `<p style="color: #28a745; font-weight: bold; margin-bottom: 10px;"><i class="fas fa-check-circle"></i> Found ${matchingPlans.length} matching plan(s):</p>`;
+                html += '<table style="width: 100%; border-collapse: collapse; font-size: 13px;">';
+                html += '<tr style="background: #007bff; color: white;"><th style="padding: 8px; text-align: left;">ID</th><th style="padding: 8px; text-align: left;">Name</th><th style="padding: 8px; text-align: left;">State</th></tr>';
+                matchingPlans.forEach(plan => {
+                    html += `<tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 8px;">${plan.id}</td>
+                        <td style="padding: 8px;"><strong>${plan.name}</strong></td>
+                        <td style="padding: 8px;">${plan.state || 'N/A'}</td>
+                    </tr>`;
+                });
+                html += '</table>';
+            } else {
+                html += `<p style="color: #dc3545; font-weight: bold;"><i class="fas fa-times-circle"></i> No test plans found with "${searchValue}" in the name</p>`;
+            }
+            
+            // Show all available plans
+            html += `<details style="margin-top: 20px;">
+                <summary style="cursor: pointer; font-weight: bold; color: #007bff;">Show all available Test Plans (${data.value.length})</summary>
+                <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px;">
+                <tr style="background: #6c757d; color: white;"><th style="padding: 6px; text-align: left;">ID</th><th style="padding: 6px; text-align: left;">Name</th></tr>`;
+            
+            data.value.forEach(plan => {
+                const highlight = plan.name && plan.name.toLowerCase().includes(searchValue.toLowerCase());
+                html += `<tr style="border-bottom: 1px solid #ddd; ${highlight ? 'background: #fff3cd;' : ''}">
+                    <td style="padding: 6px;">${plan.id}</td>
+                    <td style="padding: 6px;">${plan.name}</td>
+                </tr>`;
+            });
+            html += '</table></details>';
+        } else {
+            // Just show all plans for ID search
+            html += '<table style="width: 100%; border-collapse: collapse; font-size: 13px;">';
+            html += '<tr style="background: #007bff; color: white;"><th style="padding: 8px; text-align: left;">ID</th><th style="padding: 8px; text-align: left;">Name</th><th style="padding: 8px; text-align: left;">State</th></tr>';
+            data.value.forEach(plan => {
+                const highlight = plan.id.toString() === searchValue;
+                html += `<tr style="border-bottom: 1px solid #ddd; ${highlight ? 'background: #d4edda;' : ''}">
+                    <td style="padding: 8px;"><strong>${plan.id}</strong></td>
+                    <td style="padding: 8px;">${plan.name}</td>
+                    <td style="padding: 8px;">${plan.state || 'N/A'}</td>
+                </tr>`;
+            });
+            html += '</table>';
+        }
+        
+        document.getElementById('testSearchContent').innerHTML = html;
+        document.getElementById('testSearchResults').style.display = 'block';
+        showTestReportLoading(false);
+        
+    } catch (error) {
+        showTestReportLoading(false);
+        showTestReportError(`Error: ${error.message}`);
+        console.error('Test search error:', error);
+    }
+}
+
+async function findTestPlanByRelease(releaseNumber) {
+    const plansUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/testplan/plans?api-version=7.1-preview.1`;
+    const response = await fetch(plansUrl, {
+        headers: {
+            'Authorization': 'Basic ' + btoa(':' + config.pat)
+        }
+    });
+    
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', response.status, errorText);
+        throw new Error(`Failed to fetch test plans (${response.status})`);
+    }
+    
+    const data = await response.json();
+    
+    // Search for plan with release number in name
+    const matchingPlan = data.value.find(plan => 
+        plan.name && plan.name.toLowerCase().includes(releaseNumber.toLowerCase())
+    );
+    
+    if (!matchingPlan) {
+        throw new Error(`No test plan found with release number "${releaseNumber}"`);
+    }
+    
+    return matchingPlan.id;
+}
+
+async function generateTestReport() {
+    const searchValue = document.getElementById('testPlanSearch').value.trim();
+    const searchType = document.querySelector('input[name="searchType"]:checked').value;
+    const targetRelease = document.getElementById('targetRelease').value.trim();
+    
+    if (!searchValue) {
+        showTestReportError('Please enter a ' + (searchType === 'id' ? 'Test Plan ID' : 'Release Number'));
+        return;
+    }
+    
+    if (!config.organization || !config.project || !config.pat) {
+        showTestReportError('Please configure Organization, Project, and PAT in Settings first');
+        return;
+    }
+    
+    showTestReportLoading(true);
+    clearTestReportError();
+    document.getElementById('testReportSection').style.display = 'none';
+    
+    try {
+        // Determine Test Plan ID
+        let testPlanId;
+        if (searchType === 'release') {
+            testPlanId = await findTestPlanByRelease(searchValue);
+            showTestReportSuccess(`Found Test Plan ID ${testPlanId} for release ${searchValue}`);
+        } else {
+            testPlanId = searchValue;
+        }
+        
+        // Fetch Test Plan details
+        const planUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/testplan/plans/${testPlanId}?api-version=7.1-preview.1`;
+        const planResponse = await fetch(planUrl, {
+            headers: {
+                'Authorization': 'Basic ' + btoa(':' + config.pat)
+            }
+        });
+        
+        if (!planResponse.ok) {
+            const errorText = await planResponse.text();
+            console.error('API Error:', planResponse.status, errorText);
+            throw new Error(`Test Plan ${testPlanId} not found (${planResponse.status})`);
+        }
+        
+        const planData = await planResponse.json();
+        
+        // Fetch Test Suites
+        const suitesUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/testplan/plans/${testPlanId}/suites?api-version=7.1-preview.1`;
+        const suitesResponse = await fetch(suitesUrl, {
+            headers: {
+                'Authorization': 'Basic ' + btoa(':' + config.pat)
+            }
+        });
+        
+        if (!suitesResponse.ok) {
+            const errorText = await suitesResponse.text();
+            console.error('API Error:', suitesResponse.status, errorText);
+            throw new Error(`Failed to fetch test suites (${suitesResponse.status})`);
+        }
+        
+        const suitesData = await suitesResponse.json();
+        
+        // Fetch Test Points for each suite
+        const suiteResults = await Promise.all(
+            suitesData.value.map(async (suite) => {
+                return await fetchTestSuiteDetails(testPlanId, suite);
+            })
+        );
+        
+        // Determine target release: use manual input if provided, otherwise use search value if searching by release
+        const finalTargetRelease = targetRelease || (searchType === 'release' ? searchValue : 'N/A');
+        
+        // Build report data
+        testReportData = {
+            planId: testPlanId,
+            planName: planData.name,
+            targetRelease: finalTargetRelease,
+            generated: new Date().toLocaleString('en-GB'),
+            suites: suiteResults
+        };
+        
+        // Calculate stats
+        calculateTestStats(testReportData);
+        
+        // Generate and display report
+        const reportHtml = generateReportHtml(testReportData);
+        document.getElementById('testReportContent').innerHTML = reportHtml;
+        document.getElementById('testReportSection').style.display = 'block';
+        document.getElementById('copyReportBtn').style.display = 'inline-flex';
+        
+        showTestReportLoading(false);
+        showTestReportSuccess('Test report generated successfully!');
+        
+    } catch (error) {
+        showTestReportLoading(false);
+        showTestReportError(`Error: ${error.message}`);
+        console.error('Test report generation error:', error);
+    }
+}
+
+async function fetchTestSuiteDetails(planId, suite) {
+    // Fetch test cases in suite using Test Plan API
+    const pointsUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/testplan/Plans/${planId}/Suites/${suite.id}/TestPoint?includePointDetails=true&api-version=7.1-preview.2`;
+    const pointsResponse = await fetch(pointsUrl, {
+        headers: {
+            'Authorization': 'Basic ' + btoa(':' + config.pat)
+        }
+    });
+    
+    if (!pointsResponse.ok) {
+        console.warn(`Failed to fetch test points for suite ${suite.id}`);
+        return {
+            id: suite.id,
+            name: suite.name,
+            testCases: [],
+            workItem: null
+        };
+    }
+    
+    const pointsData = await pointsResponse.json();
+    
+    // Enrich test cases with latest results
+    const testCases = await Promise.all((pointsData.value || []).map(async (point) => {
+        let latestResult = null;
+        
+        // Get the outcome from the test point
+        if (point.results) {
+            latestResult = {
+                outcome: point.results.outcome || 'Not Executed',
+                lastTestRun: point.results.lastTestRun,
+                completedDate: point.results.lastResultDetails?.dateCompleted
+            };
+        } else if (point.mostRecentResultOutcome) {
+            latestResult = {
+                outcome: point.mostRecentResultOutcome,
+                lastTestRun: null,
+                completedDate: point.mostRecentResultCompletedDate
+            };
+        }
+        
+        return {
+            testCase: {
+                id: point.testCaseReference?.id || point.testCase?.id,
+                name: point.testCaseReference?.name || point.testCase?.name || 'Unknown'
+            },
+            results: latestResult ? [latestResult] : [],
+            outcome: latestResult?.outcome || 'Not Executed'
+        };
+    }));
+    
+    // Fetch work item details if suite has parent work item
+    let workItem = null;
+    if (suite.requirementId) {
+        try {
+            const wiUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/wit/workitems/${suite.requirementId}?api-version=7.0`;
+            const wiResponse = await fetch(wiUrl, {
+                headers: {
+                    'Authorization': 'Basic ' + btoa(':' + config.pat)
+                }
+            });
+            
+            if (wiResponse.ok) {
+                const wiData = await wiResponse.json();
+                workItem = {
+                    id: wiData.id,
+                    type: wiData.fields['System.WorkItemType'],
+                    state: wiData.fields['System.State'],
+                    plannedRelease: wiData.fields['Custom.plannedrelease'] || 'N/A'
+                };
+            }
+        } catch (error) {
+            console.error(`Failed to fetch work item ${suite.requirementId}:`, error);
+        }
+    }
+    
+    return {
+        id: suite.id,
+        name: suite.name,
+        testCases: testCases,
+        workItem: workItem
+    };
+}
+
+function calculateTestStats(reportData) {
+    let totalTests = 0;
+    let executedTests = 0;
+    let passedTests = 0;
+    let failedTests = 0;
+    let blockedTests = 0;
+    let notExecutedTests = 0;
+    
+    reportData.suites.forEach(suite => {
+        suite.testCases.forEach(tc => {
+            totalTests++;
+            const outcome = tc.outcome || 'Not Executed';
+            
+            if (outcome !== 'Not Executed' && outcome !== 'Unspecified' && outcome !== 'None') {
+                executedTests++;
+            }
+            
+            if (outcome === 'Passed') {
+                passedTests++;
+            } else if (outcome === 'Failed') {
+                failedTests++;
+            } else if (outcome === 'Blocked') {
+                blockedTests++;
+            } else {
+                notExecutedTests++;
+            }
+        });
+    });
+    
+    reportData.stats = {
+        totalSuites: reportData.suites.length,
+        totalTests,
+        executedTests,
+        passedTests,
+        failedTests,
+        blockedTests,
+        notExecutedTests,
+        executionRate: totalTests > 0 ? ((executedTests / totalTests) * 100).toFixed(2) : 0,
+        passRate: executedTests > 0 ? ((passedTests / executedTests) * 100).toFixed(0) : 0
+    };
+}
+
+function generateReportHtml(data) {
+    const stats = data.stats;
+    const qualityGate = stats.passRate >= 95 && stats.executionRate >= 98 ? 'PASS' : 'FAIL';
+    
+    let html = `
+<h1>Integration - ${data.planName} - Test Coverage Report</h1>
+
+<h2>Table of Contents</h2>
+<ul>
+    <li><a href="#executive-summary">Executive Summary</a></li>
+    <li><a href="#quality-gate">Quality Gate Status</a></li>
+    <li><a href="#test-failures">Test Execution Failures</a></li>
+    <li><a href="#detailed-results">Detailed Test Results</a></li>
+    <li><a href="#summary-table">Test Summary by Suite</a></li>
+    <li><a href="#recommendations">Recommendations</a></li>
+</ul>
+
+<h2 id="executive-summary">Executive Summary</h2>
+<table>
+    <tr><td>Property</td><td>Value</td></tr>
+    <tr><td>Test Plan</td><td>${data.planName}</td></tr>
+    <tr><td>Target Release</td><td>${data.targetRelease}</td></tr>
+    <tr><td>Report Generated</td><td>${data.generated}</td></tr>
+    <tr><td>Total Test Suites</td><td>${stats.totalSuites}</td></tr>
+    <tr><td>Total Test Cases</td><td>${stats.totalTests}</td></tr>
+    <tr><td>Executed Tests</td><td>${stats.executedTests}</td></tr>
+    <tr><td>Passed Tests</td><td>${stats.passedTests}</td></tr>
+    <tr><td>Failed Tests</td><td>${stats.failedTests}</td></tr>
+    <tr><td>Blocked Tests</td><td>${stats.blockedTests}</td></tr>
+    <tr><td>Not Executed Tests</td><td>${stats.notExecutedTests}</td></tr>
+    <tr><td>Execution Rate</td><td>${stats.executionRate}%</td></tr>
+    <tr><td>Pass Rate</td><td>${stats.passRate}%</td></tr>
+</table>
+
+<h2 id="quality-gate">Quality Gate Status</h2>
+<p><strong>${qualityGate}</strong> - ${qualityGate === 'PASS' ? 'Quality criteria met' : 'Insufficient test coverage or significant test failures'}</p>
+
+<h2 id="test-failures">Test Execution Failures</h2>
+<p>Summary: ${stats.failedTests} test case(s) have failed in their most recent execution.</p>
+${generateFailedTestsList(data)}
+
+<h2 id="detailed-results">Detailed Test Results</h2>
+${generateDetailedResults(data)}
+
+<h2 id="summary-table">Test Summary by Suite</h2>
+${generateSummaryTable(data)}
+
+<h2 id="recommendations">Recommendations</h2>
+${generateRecommendations(data)}
+`;
+    
+    return html;
+}
+
+function generateFailedTestsList(data) {
+    let html = '';
+    data.suites.forEach(suite => {
+        const failedTests = suite.testCases.filter(tc => tc.outcome === 'Failed');
+        if (failedTests.length > 0) {
+            html += `<h3>Suite: ${suite.name}</h3>`;
+            failedTests.forEach(tc => {
+                const lastRun = tc.results?.[0];
+                html += `
+<p>
+    <strong>Test Case:</strong> ${tc.testCase?.name || 'Unknown'} (ID: ${tc.testCase?.id || 'N/A'})<br>
+    <strong>Last Failure:</strong> ${lastRun?.completedDate ? new Date(lastRun.completedDate).toLocaleDateString('en-GB') : 'N/A'}<br>
+    <strong>Test Run:</strong> ${lastRun?.lastTestRun?.name || 'N/A'}
+</p>`;
+            });
+        }
+    });
+    return html || '<p>No test failures</p>';
+}
+
+function generateDetailedResults(data) {
+    let html = '';
+    
+    data.suites.forEach(suite => {
+        const totalTests = suite.testCases.length;
+        const executedTests = suite.testCases.filter(tc => tc.outcome && tc.outcome !== 'Not Executed' && tc.outcome !== 'Unspecified' && tc.outcome !== 'None').length;
+        const passedTests = suite.testCases.filter(tc => tc.outcome === 'Passed').length;
+        const failedTests = suite.testCases.filter(tc => tc.outcome === 'Failed').length;
+        const notExecutedTests = totalTests - executedTests;
+        
+        html += `
+<h3>${suite.name}</h3>`;
+        
+        if (suite.workItem) {
+            html += `
+<h4>Work Item Details</h4>
+<table>
+    <tr><td>Property</td><td>Value</td></tr>
+    <tr><td>ID</td><td>${suite.workItem.id}</td></tr>
+    <tr><td>Type</td><td>${suite.workItem.type}</td></tr>
+    <tr><td>State</td><td>${suite.workItem.state}</td></tr>
+    <tr><td>Planned Release</td><td>${suite.workItem.plannedRelease}</td></tr>
+</table>`;
+        }
+        
+        html += `
+<h4>Suite Overview</h4>
+<p>
+    Total Test Cases: ${totalTests}<br>
+    Executed: ${executedTests} (${totalTests > 0 ? ((executedTests/totalTests)*100).toFixed(1) : 0}%)<br>
+    Passed: ${passedTests} (${executedTests > 0 ? ((passedTests/executedTests)*100).toFixed(1) : 0}%)<br>
+    ${failedTests > 0 ? `Failed: ${failedTests}<br>` : ''}
+    ${notExecutedTests > 0 ? `Not Executed: ${notExecutedTests}` : ''}
+</p>
+
+<h4>Test Cases</h4>`;
+        
+        suite.testCases.forEach(tc => {
+            const outcome = tc.outcome || 'Not Executed';
+            const outcomeIcon = outcome === 'Passed' ? 'PASS' : outcome === 'Failed' ? 'FAIL' : outcome === 'Blocked' ? 'BLOCKED' : 'NOT EXECUTED';
+            
+            html += `
+<h5>${tc.testCase?.name || 'Unknown Test Case'}</h5>
+<p>
+    Test Case ID: ${tc.testCase?.id || 'N/A'}<br>
+    ${outcome !== 'Not Executed' && outcome !== 'Unspecified' && outcome !== 'None' ? `
+    Execution History:<br>
+    ${tc.results?.[0]?.completedDate ? new Date(tc.results[0].completedDate).toLocaleDateString('en-GB') : 'N/A'}: ${outcomeIcon}<br>
+    Test Run: ${tc.results?.[0]?.lastTestRun?.name || 'N/A'}
+    ` : `Status: ${outcomeIcon}`}
+</p>`;
+        });
+    });
+    
+    return html;
+}
+
+function generateSummaryTable(data) {
+    let html = `
+<table>
+    <tr>
+        <th>Suite</th>
+        <th>Total</th>
+        <th>Executed</th>
+        <th>Passed</th>
+        <th>Failed</th>
+        <th>Not Executed</th>
+        <th>Execution %</th>
+        <th>Pass %</th>
+    </tr>`;
+    
+    data.suites.forEach(suite => {
+        const totalTests = suite.testCases.length;
+        const executedTests = suite.testCases.filter(tc => tc.outcome && tc.outcome !== 'Not Executed' && tc.outcome !== 'Unspecified' && tc.outcome !== 'None').length;
+        const passedTests = suite.testCases.filter(tc => tc.outcome === 'Passed').length;
+        const failedTests = suite.testCases.filter(tc => tc.outcome === 'Failed').length;
+        const notExecutedTests = totalTests - executedTests;
+        const executionRate = totalTests > 0 ? ((executedTests/totalTests)*100).toFixed(1) : 0;
+        const passRate = executedTests > 0 ? ((passedTests/executedTests)*100).toFixed(0) : 0;
+        
+        html += `
+    <tr>
+        <td>${suite.name.substring(0, 30)}...</td>
+        <td>${totalTests}</td>
+        <td>${executedTests}</td>
+        <td>${passedTests}</td>
+        <td>${failedTests}</td>
+        <td>${notExecutedTests}</td>
+        <td>${executionRate}%</td>
+        <td>${passRate}%</td>
+    </tr>`;
+    });
+    
+    html += `
+</table>`;
+    
+    return html;
+}
+
+function generateRecommendations(data) {
+    const stats = data.stats;
+    let recommendations = '';
+    
+    if (stats.failedTests > 0) {
+        recommendations += `<p>Failed Test Cases (${stats.failedTests} tests) - Investigate and fix failing tests before release</p>`;
+    }
+    
+    if (stats.notExecutedTests > 0) {
+        recommendations += `<p>Unexecuted Tests (${stats.notExecutedTests} tests) - Schedule execution of remaining test cases</p>`;
+    }
+    
+    if (stats.executionRate < 98) {
+        recommendations += `<p>Low execution rate (${stats.executionRate}%) - Increase test coverage</p>`;
+    }
+    
+    if (recommendations === '') {
+        recommendations = '<p>All quality criteria met - Ready for release</p>';
+    }
+    
+    recommendations += `
+<p>Report generated automatically from Azure DevOps</p>
+<p>Last updated: ${new Date().toISOString()}</p>`;
+    
+    return recommendations;
+}
+
+function copyReportToClipboard() {
+    const reportHtml = document.getElementById('testReportContent').innerHTML;
+    navigator.clipboard.writeText(reportHtml).then(() => {
+        showTestReportSuccess('Report HTML copied to clipboard!');
+    }).catch(err => {
+        showTestReportError('Failed to copy to clipboard: ' + err);
+    });
+}
+
+function showTestReportLoading(show) {
+    document.getElementById('testReportLoading').style.display = show ? 'block' : 'none';
+}
+
+function showTestReportError(message) {
+    const errorDiv = document.getElementById('testReportError');
+    errorDiv.innerHTML = `<div class="error">${message}</div>`;
+}
+
+function showTestReportSuccess(message) {
+    const errorDiv = document.getElementById('testReportError');
+    errorDiv.innerHTML = `<div class="success">${message}</div>`;
+    setTimeout(() => {
+        errorDiv.innerHTML = '';
+    }, 5000);
+}
+
+function clearTestReportError() {
+    document.getElementById('testReportError').innerHTML = '';
 }
