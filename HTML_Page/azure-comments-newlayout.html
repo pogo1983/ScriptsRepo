@@ -1299,7 +1299,7 @@ Tester: {TESTER}`,
         async function addCommentToWorkItem(workItemId, item) {
             const comment = generateComment(item);
             
-            const commentUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/wit/workitems/${workItemId}/comments?api-version=7.0`;
+            const commentUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/wit/workitems/${workItemId}/comments?api-version=7.0-preview`;
             
             const response = await fetch(commentUrl, {
                 method: 'POST',
