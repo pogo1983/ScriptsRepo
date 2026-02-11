@@ -372,7 +372,7 @@ function generateReportHtml(data) {
     const qualityGate = stats.passRate >= 95 && stats.executionRate >= 98 ? 'PASS' : 'FAIL';
     
     let html = `
-<h1>Integration - ${data.planName} - Test Coverage Report</h1>
+<h1>Integration - ${data.planName}</h1>
 
 <h2>Table of Contents</h2>
 <ul>
@@ -386,7 +386,6 @@ function generateReportHtml(data) {
     <tr><td>Property</td><td>Value</td></tr>
     <tr><td>Test Plan</td><td>${data.planName}</td></tr>
     <tr><td>Target Release</td><td>${data.targetRelease}</td></tr>
-    <tr><td>Report Generated</td><td>${data.generated}</td></tr>
     <tr><td>Total Test Suites</td><td>${stats.totalSuites}</td></tr>
     <tr><td>Total Test Cases</td><td>${stats.totalTests}</td></tr>
     <tr><td>Executed Tests</td><td>${stats.executedTests}</td></tr>
@@ -557,7 +556,7 @@ function generateMarkdownReport(data) {
     const stats = data.stats;
     const qualityGate = stats.passRate >= 95 && stats.executionRate >= 98 ? 'PASS' : 'FAIL';
     
-    let md = `# Integration - ${data.planName} - Test Coverage Report\n\n`;
+    let md = `# Integration - ${data.planName}\n\n`;
     
     md += `## Table of Contents\n\n`;
     md += `- [Executive Summary](#executive-summary)\n`;
@@ -569,7 +568,6 @@ function generateMarkdownReport(data) {
     md += `|----------|-------|\n`;
     md += `| Test Plan | ${data.planName} |\n`;
     md += `| Target Release | ${data.targetRelease} |\n`;
-    md += `| Report Generated | ${data.generated} |\n`;
     md += `| Total Test Suites | ${stats.totalSuites} |\n`;
     md += `| Total Test Cases | ${stats.totalTests} |\n`;
     md += `| Executed Tests | ${stats.executedTests} |\n`;
