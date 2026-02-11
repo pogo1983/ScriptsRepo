@@ -562,7 +562,20 @@
             <div class="filter-row" style="align-items: flex-start;">
                 <div class="form-group" style="flex: 1;">
                     <label>Planned Release</label>
-                    <input type="text" id="plannedRelease" placeholder="e.g. 26.3.0 or 26.3.0.INT" />
+                    <input type="text" id="plannedRelease" placeholder="e.g. 26.3.0 or 26.3.0.INT" onchange="checkMultipleVersions()" />
+                    <div style="margin-top: 5px;">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px; font-weight: normal;">
+                            <input type="radio" name="matchType" id="exactMatch" value="exact" checked style="margin: 0;" />
+                            Exact match
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px; font-weight: normal;">
+                            <input type="radio" name="matchType" id="containsMatch" value="contains" style="margin: 0;" />
+                            Contains (finds items with multiple versions)
+                        </label>
+                    </div>
+                    <div id="versionDetectionInfo" style="display: none; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 6px; margin-top: 5px; font-size: 11px; color: #856404;">
+                        <i class="fas fa-exclamation-triangle"></i> Multiple versions detected. Consider using <strong>Contains</strong> to find all work items.
+                    </div>
                     <small style="color: #666; font-size: 11px; display: block; margin-top: 3px;">Enter the value from Custom.plannedrelease field</small>
                 </div>
                 <div class="form-group" style="flex: 1;">
@@ -678,6 +691,10 @@
                 <button class="btn-secondary" onclick="selectAll()"><i class="fas fa-check-square"></i> Select All</button>
                 <button class="btn-secondary" onclick="deselectAll()"><i class="fas fa-square"></i> Deselect All</button>
                 <button class="btn-danger" onclick="clearResults()"><i class="fas fa-trash"></i> Clear Results</button>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; margin-left: auto; background: #fff3cd; padding: 6px 12px; border-radius: 4px; border: 1px solid #ffc107;">
+                    <input type="checkbox" id="filterMultipleVersions" onchange="displayWorkItems()" style="margin: 0;" />
+                    <i class="fas fa-filter"></i> Show only items with multiple versions
+                </label>
             </div>
             
             <table class="work-items-table" id="workItemsTable">
@@ -878,6 +895,22 @@ Developer: {DEVELOPER}`,
             }
         }
         
+        function checkMultipleVersions() {
+            const plannedRelease = document.getElementById('plannedRelease').value.trim();
+            const infoDiv = document.getElementById('versionDetectionInfo');
+            
+            // Check if input contains multiple versions (separated by ; or ,)
+            const hasMultipleVersions = plannedRelease.includes(';') || plannedRelease.includes(',');
+            
+            if (hasMultipleVersions) {
+                infoDiv.style.display = 'block';
+                // Auto-suggest Contains match
+                document.getElementById('containsMatch').checked = true;
+            } else {
+                infoDiv.style.display = 'none';
+            }
+        }
+        
         function getSelectedWorkItemTypes() {
             const checkboxes = document.querySelectorAll('[id^="type"]:checked');
             const selected = Array.from(checkboxes).map(cb => cb.value);
@@ -947,6 +980,7 @@ Developer: {DEVELOPER}`,
             const plannedRelease = document.getElementById('plannedRelease').value.trim();
             const status = document.getElementById('status').value;
             const selectedTypes = getSelectedWorkItemTypes();
+            const matchType = document.querySelector('input[name="matchType"]:checked').value;
             
             if (!plannedRelease) {
                 showError('Please specify Planned Release');
@@ -962,8 +996,14 @@ Developer: {DEVELOPER}`,
             clearError();
             
             try {
-                // Build WIQL query
-                let wiql = `SELECT [System.Id], [System.Title], [System.State], [System.WorkItemType], [System.AssignedTo], [Custom.plannedrelease] FROM WorkItems WHERE [System.TeamProject] = '${config.project}' AND [Custom.plannedrelease] = '${plannedRelease}'`;
+                // Build WIQL query with Exact or Contains matching
+                let wiql = `SELECT [System.Id], [System.Title], [System.State], [System.WorkItemType], [System.AssignedTo], [Custom.plannedrelease] FROM WorkItems WHERE [System.TeamProject] = '${config.project}'`;
+                
+                if (matchType === 'exact') {
+                    wiql += ` AND [Custom.plannedrelease] = '${plannedRelease}'`;
+                } else {
+                    wiql += ` AND [Custom.plannedrelease] CONTAINS '${plannedRelease}'`;
+                }
                 
                 if (status) {
                     wiql += ` AND [System.State] = '${status}'`;
@@ -1026,6 +1066,12 @@ Developer: {DEVELOPER}`,
                         selected: false
                     };
                 }));
+                
+                // Store search context for displayWorkItems
+                window.searchContext = {
+                    searchTerm: plannedRelease,
+                    matchType: matchType
+                };
                 
                 displayWorkItems();
                 showLoading(false);
@@ -1133,8 +1179,30 @@ Developer: {DEVELOPER}`,
         function displayWorkItems() {
             const tbody = document.getElementById('workItemsBody');
             tbody.innerHTML = '';
+            const filterMultipleVersions = document.getElementById('filterMultipleVersions')?.checked || false;
+            
+            let displayedCount = 0;
+            const searchContext = window.searchContext || { matchType: 'exact', searchTerm: '' };
             
             workItems.forEach((item, index) => {
+                // Check if item has multiple versions (semicolon or comma separated)
+                const hasMultipleVersions = item.plannedRelease && (item.plannedRelease.includes(';') || item.plannedRelease.includes(','));
+                
+                // Check if item is a partial match (in Contains mode, when planned release doesn't exactly match search term)
+                const isPartialMatch = searchContext.matchType === 'contains' && 
+                    item.plannedRelease !== searchContext.searchTerm && 
+                    item.plannedRelease !== 'N/A';
+                
+                // Mark as suspicious if has multiple versions OR is a partial match
+                const isSuspicious = hasMultipleVersions || isPartialMatch;
+                
+                // Apply filter if checked
+                if (filterMultipleVersions && !isSuspicious) {
+                    return; // Skip this item
+                }
+                
+                displayedCount++;
+                
                 // Build Azure DevOps URL
                 const workItemUrl = `https://${config.organization}.visualstudio.com/${config.project}/_workitems/edit/${item.id}/`;
                 
@@ -1142,6 +1210,14 @@ Developer: {DEVELOPER}`,
                 const commentWarning = item.hasExistingComment ? 
                     '<span style="color: #ff6b6b; font-size: 18px; cursor: help;" title="Similar comment already exists on this work item">⚠️</span>' : 
                     '';
+                
+                // Add exclamation icon for suspicious items
+                let multipleVersionsIcon = '';
+                if (hasMultipleVersions) {
+                    multipleVersionsIcon = '<span style="color: #ffc107; margin-left: 5px; cursor: help;" title="This work item has multiple versions (separated by ; or ,) in Planned Release field">⚠️</span>';
+                } else if (isPartialMatch) {
+                    multipleVersionsIcon = '<span style="color: #17a2b8; margin-left: 5px; cursor: help;" title="Partial match: searched for \"' + searchContext.searchTerm + '\" but found \"' + item.plannedRelease + '\"">ℹ️</span>';
+                }
                 
                 row.innerHTML = `
                     <td class="checkbox-cell">
@@ -1151,7 +1227,7 @@ Developer: {DEVELOPER}`,
                     <td>${item.type}</td>
                     <td>${item.title}</td>
                     <td><span class="status-badge status-${item.state.toLowerCase().replace(' ', '-')}">${item.state}</span></td>
-                    <td>${item.plannedRelease}</td>
+                    <td>${item.plannedRelease}${multipleVersionsIcon}</td>
                     <td>${item.assignedTo}</td>
                     <td>${item.devTask ? `${item.devTask.assignedTo}` : '❌ Not found'}</td>
                     <td>${item.intTask ? `${item.intTask.assignedTo}` : '❌ Not found'}</td>
@@ -1173,7 +1249,12 @@ Developer: {DEVELOPER}`,
             });
             
             document.getElementById('workItemsSection').style.display = 'block';
-            document.getElementById('totalCount').textContent = workItems.length;
+            const totalElement = document.getElementById('totalCount');
+            if (filterMultipleVersions && displayedCount < workItems.length) {
+                totalElement.textContent = `${displayedCount} (of ${workItems.length})`;
+            } else {
+                totalElement.textContent = workItems.length;
+            }
             updateSelectedCount();
         }
         
