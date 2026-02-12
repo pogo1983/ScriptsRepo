@@ -222,7 +222,9 @@ async function generateTestReport() {
             planName: planData.name,
             targetRelease: finalTargetRelease,
             generated: new Date().toLocaleString('en-GB'),
-            suites: suiteResults
+            suites: suiteResults,
+            organization: config.organization,
+            project: config.project
         };
         
         // Calculate stats
@@ -355,7 +357,7 @@ function calculateTestStats(reportData) {
     });
     
     reportData.stats = {
-        totalSuites: reportData.suites.length,
+        totalSuites: reportData.suites.filter(suite => suite.testCases.length > 0).length,
         totalTests,
         executedTests,
         passedTests,
@@ -370,6 +372,7 @@ function calculateTestStats(reportData) {
 function generateReportHtml(data) {
     const stats = data.stats;
     const qualityGate = stats.passRate >= 95 && stats.executionRate >= 98 ? 'PASS' : 'FAIL';
+    const testPlanUrl = `https://dev.azure.com/${data.organization}/${data.project}/_testPlans?planId=${data.planId}`;
     
     let html = `
 <h1>Integration - ${data.planName}</h1>
@@ -384,7 +387,7 @@ function generateReportHtml(data) {
 <h2 id="executive-summary">Executive Summary</h2>
 <table>
     <tr><td>Property</td><td>Value</td></tr>
-    <tr><td>Test Plan</td><td>${data.planName}</td></tr>
+    <tr><td>Test Plan</td><td><a href="${testPlanUrl}" target="_blank">${data.planName}</a></td></tr>
     <tr><td>Target Release</td><td>${data.targetRelease}</td></tr>
     <tr><td>Total Test Suites</td><td>${stats.totalSuites}</td></tr>
     <tr><td>Total Test Cases</td><td>${stats.totalTests}</td></tr>
@@ -555,6 +558,7 @@ function copyMarkdownToClipboard() {
 function generateMarkdownReport(data) {
     const stats = data.stats;
     const qualityGate = stats.passRate >= 95 && stats.executionRate >= 98 ? 'PASS' : 'FAIL';
+    const testPlanUrl = `https://dev.azure.com/${data.organization}/${data.project}/_testPlans?planId=${data.planId}`;
     
     let md = `# Integration - ${data.planName}\n\n`;
     
@@ -566,7 +570,7 @@ function generateMarkdownReport(data) {
     md += `## Executive Summary\n\n`;
     md += `| Property | Value |\n`;
     md += `|----------|-------|\n`;
-    md += `| Test Plan | ${data.planName} |\n`;
+    md += `| Test Plan | [${data.planName}](${testPlanUrl}) |\n`;
     md += `| Target Release | ${data.targetRelease} |\n`;
     md += `| Total Test Suites | ${stats.totalSuites} |\n`;
     md += `| Total Test Cases | ${stats.totalTests} |\n`;
