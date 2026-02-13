@@ -207,14 +207,17 @@ async function generateTestReport() {
         const suitesData = await suitesResponse.json();
         
         // Fetch Test Points for each suite
-        const suiteResults = await Promise.all(
-            suitesData.value.map(async (suite) => {
-                return await fetchTestSuiteDetails(testPlanId, suite);
-            })
-        );
-        
         // Use search value as target release when searching by release number
         const finalTargetRelease = searchType === 'release' ? searchValue : 'N/A';
+        
+        // Check if user wants to include execution history
+        const includeHistory = document.getElementById('includeHistory').checked;
+        
+        const suiteResults = await Promise.all(
+            suitesData.value.map(async (suite) => {
+                return await fetchTestSuiteDetails(testPlanId, suite, finalTargetRelease, includeHistory);
+            })
+        );
         
         // Build report data
         testReportData = {
@@ -247,7 +250,99 @@ async function generateTestReport() {
     }
 }
 
-async function fetchTestSuiteDetails(planId, suite) {
+async function fetchTestCaseHistory(testCaseId, targetRelease) {
+    // Fetch all test runs for this test case filtered by release
+    try {
+        const runsUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/test/runs?api-version=7.0&$top=100`;
+        const runsResponse = await fetch(runsUrl, {
+            headers: {
+                'Authorization': 'Basic ' + btoa(':' + config.pat)
+            }
+        });
+        
+        if (!runsResponse.ok) {
+            return [];
+        }
+        
+        const runsData = await runsResponse.json();
+        const history = [];
+        
+        // Filter runs by release name if provided
+        const relevantRuns = targetRelease && targetRelease !== 'N/A' 
+            ? runsData.value.filter(run => run.name && run.name.includes(targetRelease))
+            : runsData.value;
+        
+        // Fetch results for each run
+        for (const run of relevantRuns) {
+            const resultsUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/test/Runs/${run.id}/results?api-version=7.0`;
+            const resultsResponse = await fetch(resultsUrl, {
+                headers: {
+                    'Authorization': 'Basic ' + btoa(':' + config.pat)
+                }
+            });
+            
+            if (resultsResponse.ok) {
+                const resultsData = await resultsResponse.json();
+                const tcResults = resultsData.value.filter(r => r.testCase && r.testCase.id == testCaseId);
+                
+                for (const result of tcResults) {
+                    const outcome = result.outcome ? result.outcome.charAt(0).toUpperCase() + result.outcome.slice(1) : 'Not Executed';
+                    
+                    // Fetch linked bugs/test feedback for failed/blocked tests
+                    let linkedWorkItems = [];
+                    if (outcome === 'Failed' || outcome === 'Blocked') {
+                        linkedWorkItems = await fetchLinkedBugs(result.id, run.id);
+                    }
+                    
+                    history.push({
+                        outcome: outcome,
+                        completedDate: result.completedDate,
+                        runName: run.name,
+                        linkedWorkItems: linkedWorkItems
+                    });
+                }
+            }
+        }
+        
+        // Sort by date (oldest first)
+        history.sort((a, b) => new Date(a.completedDate) - new Date(b.completedDate));
+        
+        return history;
+    } catch (error) {
+        console.error(`Failed to fetch history for TC ${testCaseId}:`, error);
+        return [];
+    }
+}
+
+async function fetchLinkedBugs(resultId, runId) {
+    try {
+        const workItemsUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/test/Runs/${runId}/results/${resultId}?detailsToInclude=WorkItems&api-version=7.0`;
+        const response = await fetch(workItemsUrl, {
+            headers: {
+                'Authorization': 'Basic ' + btoa(':' + config.pat)
+            }
+        });
+        
+        if (!response.ok) {
+            return [];
+        }
+        
+        const data = await response.json();
+        if (data.associatedBugs && data.associatedBugs.length > 0) {
+            return data.associatedBugs.map(bug => ({
+                id: bug.id,
+                url: bug.url
+            }));
+        }
+        
+        return [];
+    } catch (error) {
+        console.error(`Failed to fetch linked bugs for result ${resultId}:`, error);
+        return [];
+    }
+}
+
+async function fetchTestSuiteDetails(planId, suite, targetRelease, includeHistory) {
     // Fetch test cases in suite using Test Plan API
     const pointsUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/testplan/Plans/${planId}/Suites/${suite.id}/TestPoint?includePointDetails=true&api-version=7.1-preview.2`;
     const pointsResponse = await fetch(pointsUrl, {
@@ -268,31 +363,29 @@ async function fetchTestSuiteDetails(planId, suite) {
     
     const pointsData = await pointsResponse.json();
     
-    // Enrich test cases with latest results
-    const testCases = (pointsData.value || []).map((point) => {
-        let latestResult = null;
+    // Enrich test cases with execution history
+    const testCases = await Promise.all((pointsData.value || []).map(async (point) => {
         let outcome = 'Not Executed';
+        const testCaseId = point.testCaseReference?.id || point.testCase?.id;
         
         // Check results.outcome which contains the actual test execution outcome
         if (point.results && point.results.outcome) {
             // Capitalize first letter: "passed" -> "Passed"
             outcome = point.results.outcome.charAt(0).toUpperCase() + point.results.outcome.slice(1);
-            latestResult = {
-                outcome: outcome,
-                lastTestRun: { name: 'N/A' },
-                completedDate: point.results.lastResultDetails?.dateCompleted || point.lastUpdatedDate
-            };
         }
+        
+        // Fetch execution history for this test case only if requested
+        const history = includeHistory ? await fetchTestCaseHistory(testCaseId, targetRelease) : [];
         
         return {
             testCase: {
-                id: point.testCaseReference?.id || point.testCase?.id,
+                id: testCaseId,
                 name: point.testCaseReference?.name || point.testCase?.name || 'Unknown'
             },
-            results: latestResult ? [latestResult] : [],
-            outcome: outcome
+            outcome: outcome,
+            history: history  // Array of executions with dates and linked bugs (empty if not requested)
         };
-    });
+    }));
     
     // Fetch work item details if suite has parent work item
     let workItem = null;
@@ -414,17 +507,52 @@ ${generateDetailedResults(data)}
 function generateFailedTestsList(data) {
     let html = '';
     data.suites.forEach(suite => {
-        const failedTests = suite.testCases.filter(tc => tc.outcome === 'Failed');
+        const failedTests = suite.testCases.filter(tc => tc.outcome === 'Failed' || tc.outcome === 'Blocked');
         if (failedTests.length > 0) {
             html += `<h3>Suite: ${suite.name}</h3>`;
             failedTests.forEach(tc => {
-                const lastRun = tc.results?.[0];
+                // Get the latest execution from history (last element)
+                const latestExec = tc.history && tc.history.length > 0 ? tc.history[tc.history.length - 1] : null;
+                
                 html += `
 <p>
     <strong>Test Case:</strong> ${tc.testCase?.name || 'Unknown'} (ID: ${tc.testCase?.id || 'N/A'})<br>
-    <strong>Last Failure:</strong> ${lastRun?.completedDate ? new Date(lastRun.completedDate).toLocaleDateString('en-GB') : 'N/A'}<br>
-    <strong>Test Run:</strong> ${lastRun?.lastTestRun?.name || 'N/A'}
-</p>`;
+    <strong>Status:</strong> <span style="color:red; font-weight:bold;">${tc.outcome}</span><br>`;
+                
+                if (latestExec) {
+                    html += `    <strong>Last Execution:</strong> ${latestExec.completedDate ? new Date(latestExec.completedDate).toLocaleDateString('en-GB') : 'N/A'}<br>`;
+                    html += `    <strong>Test Run:</strong> ${latestExec.runName || 'N/A'}<br>`;
+                    
+                    // Show linked bugs/test feedback
+                    if (latestExec.linkedWorkItems && latestExec.linkedWorkItems.length > 0) {
+                        html += `    <strong>Linked Bugs:</strong> `;
+                        latestExec.linkedWorkItems.forEach((wi, idx) => {
+                            if (idx > 0) html += ', ';
+                            html += `<a href="https://dev.azure.com/${data.organization}/${data.project}/_workitems/edit/${wi.id}" target="_blank">#${wi.id}</a>`;
+                        });
+                        html += `<br>`;
+                    }
+                }
+                
+                // Show execution history if available
+                if (tc.history && tc.history.length > 1) {
+                    html += `    <strong>Execution History:</strong><br>`;
+                    html += `    <div style="margin-left: 20px; font-size: 0.9em;">` ;
+                    tc.history.forEach(exec => {
+                        const date = exec.completedDate ? new Date(exec.completedDate).toLocaleDateString('en-GB') : 'N/A';
+                        const color = exec.outcome === 'Passed' ? 'green' : exec.outcome === 'Failed' ? 'red' : 'orange';
+                        html += `${date}: <span style="color:${color}; font-weight:bold;">${exec.outcome}</span>`;
+                        if (exec.linkedWorkItems && exec.linkedWorkItems.length > 0) {
+                            exec.linkedWorkItems.forEach(wi => {
+                                html += ` - <a href="https://dev.azure.com/${data.organization}/${data.project}/_workitems/edit/${wi.id}" target="_blank">Bug #${wi.id}</a>`;
+                            });
+                        }
+                        html += `<br>`;
+                    });
+                    html += `    </div>`;
+                }
+                
+                html += `</p>`;
             });
         }
     });
@@ -466,6 +594,26 @@ function generateDetailedResults(data) {
             
             html += `
 <p><strong>TC ${tc.testCase?.id || 'N/A'}:</strong> ${tc.testCase?.name || 'Unknown Test Case'} - <strong>${outcomeIcon}</strong></p>`;
+            
+            // Show execution history if multiple executions exist
+            if (tc.history && tc.history.length > 1) {
+                html += `<div style="margin-left: 20px; font-size: 0.9em; color: #666;">`;
+                html += `<p><strong>Execution History:</strong></p>`;
+                tc.history.forEach(exec => {
+                    const date = exec.completedDate ? new Date(exec.completedDate).toLocaleDateString('en-GB') : 'N/A';
+                    const execOutcome = exec.outcome === 'Passed' ? 'PASS' : exec.outcome === 'Failed' ? 'FAIL' : exec.outcome === 'Blocked' ? 'BLOCKED' : 'NOT EXECUTED';
+                    html += `<p style="margin: 5px 0;">- ${date}: <strong>${execOutcome}</strong>`;
+                    
+                    // Show linked bugs/test feedback
+                    if (exec.linkedWorkItems && exec.linkedWorkItems.length > 0) {
+                        exec.linkedWorkItems.forEach(wi => {
+                            html += ` - Bug <a href="https://dev.azure.com/${config.organization}/${config.project}/_workitems/edit/${wi.id}" target="_blank">#${wi.id}</a>`;
+                        });
+                    }
+                    html += `</p>`;
+                });
+                html += `</div>`;
+            }
         });
     });
     
@@ -595,14 +743,49 @@ function generateMarkdownReport(data) {
 function generateFailedTestsMarkdown(data) {
     let md = '';
     data.suites.forEach(suite => {
-        const failedTests = suite.testCases.filter(tc => tc.outcome === 'Failed');
+        const failedTests = suite.testCases.filter(tc => tc.outcome === 'Failed' || tc.outcome === 'Blocked');
         if (failedTests.length > 0) {
             md += `### Suite: ${suite.name}\n\n`;
             failedTests.forEach(tc => {
-                const lastRun = tc.results?.[0];
+                // Get the latest execution from history (last element)
+                const latestExec = tc.history && tc.history.length > 0 ? tc.history[tc.history.length - 1] : null;
+                
+                const statusColor = tc.outcome === 'Failed' ? 'red' : 'orange';
                 md += `**Test Case:** ${tc.testCase?.name || 'Unknown'} (ID: ${tc.testCase?.id || 'N/A'})\n`;
-                md += `**Last Failure:** ${lastRun?.completedDate ? new Date(lastRun.completedDate).toLocaleDateString('en-GB') : 'N/A'}\n`;
-                md += `**Test Run:** ${lastRun?.lastTestRun?.name || 'N/A'}\n\n`;
+                md += `**Status:** <span style="color:${statusColor}; font-weight:bold;">${tc.outcome}</span>\n`;
+                
+                if (latestExec) {
+                    md += `**Last Execution:** ${latestExec.completedDate ? new Date(latestExec.completedDate).toLocaleDateString('en-GB') : 'N/A'}\n`;
+                    md += `**Test Run:** ${latestExec.runName || 'N/A'}\n`;
+                    
+                    // Show linked bugs/test feedback
+                    if (latestExec.linkedWorkItems && latestExec.linkedWorkItems.length > 0) {
+                        md += `**Linked Bugs:** `;
+                        latestExec.linkedWorkItems.forEach((wi, idx) => {
+                            if (idx > 0) md += ', ';
+                            md += `[#${wi.id}](https://dev.azure.com/${data.organization}/${data.project}/_workitems/edit/${wi.id})`;
+                        });
+                        md += `\n`;
+                    }
+                }
+                
+                // Show execution history if available
+                if (tc.history && tc.history.length > 1) {
+                    md += `**Execution History:**\n`;
+                    tc.history.forEach(exec => {
+                        const date = exec.completedDate ? new Date(exec.completedDate).toLocaleDateString('en-GB') : 'N/A';
+                        const color = exec.outcome === 'Passed' ? 'green' : exec.outcome === 'Failed' ? 'red' : 'orange';
+                        md += `- ${date}: <span style="color:${color}; font-weight:bold;">${exec.outcome}</span>`;
+                        if (exec.linkedWorkItems && exec.linkedWorkItems.length > 0) {
+                            exec.linkedWorkItems.forEach(wi => {
+                                md += ` - [Bug #${wi.id}](https://dev.azure.com/${data.organization}/${data.project}/_workitems/edit/${wi.id})`;
+                            });
+                        }
+                        md += `\n`;
+                    });
+                }
+                
+                md += `\n`;
             });
         }
     });
@@ -663,6 +846,35 @@ function generateDetailedResultsMarkdown(data) {
             }
             
             md += `- **TC ${tc.testCase?.id || 'N/A'}:** ${tc.testCase?.name || 'Unknown Test Case'} - ${outcomeFormatted}\n`;
+            
+            // Show execution history if multiple executions exist
+            if (tc.history && tc.history.length > 1) {
+                md += `  - **Execution History:**\n`;
+                tc.history.forEach(exec => {
+                    const date = exec.completedDate ? new Date(exec.completedDate).toLocaleDateString('en-GB') : 'N/A';
+                    let execOutcome = '';
+                    
+                    if (exec.outcome === 'Passed') {
+                        execOutcome = '<span style="color:green; font-weight:bold;">PASS</span>';
+                    } else if (exec.outcome === 'Failed') {
+                        execOutcome = '<span style="color:red; font-weight:bold;">FAIL</span>';
+                    } else if (exec.outcome === 'Blocked') {
+                        execOutcome = '<span style="color:orange; font-weight:bold;">BLOCKED</span>';
+                    } else {
+                        execOutcome = '<span style="color:gray; font-weight:bold;">NOT EXECUTED</span>';
+                    }
+                    
+                    md += `    - ${date}: ${execOutcome}`;
+                    
+                    // Show linked bugs/test feedback
+                    if (exec.linkedWorkItems && exec.linkedWorkItems.length > 0) {
+                        exec.linkedWorkItems.forEach(wi => {
+                            md += ` - Bug [#${wi.id}](https://dev.azure.com/${config.organization}/${config.project}/_workitems/edit/${wi.id})`;
+                        });
+                    }
+                    md += `\n`;
+                });
+            }
         });
     });
     
