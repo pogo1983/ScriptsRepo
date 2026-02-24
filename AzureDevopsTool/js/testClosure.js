@@ -685,9 +685,62 @@ function generateRecommendations(data) {
     return recommendations;
 }
 
+// Helper function to copy text to clipboard with fallback
+function copyToClipboardSafe(text) {
+    return new Promise((resolve, reject) => {
+        // Try modern clipboard API first
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text)
+                .then(resolve)
+                .catch(err => {
+                    // If modern API fails, try fallback
+                    fallbackCopyToClipboard(text, resolve, reject);
+                });
+        } else {
+            // Use fallback if clipboard API not available
+            fallbackCopyToClipboard(text, resolve, reject);
+        }
+    });
+}
+
+// Fallback method using temporary textarea and execCommand
+function fallbackCopyToClipboard(text, resolve, reject) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.top = '0';
+    textarea.style.left = '0';
+    textarea.style.width = '2em';
+    textarea.style.height = '2em';
+    textarea.style.padding = '0';
+    textarea.style.border = 'none';
+    textarea.style.outline = 'none';
+    textarea.style.boxShadow = 'none';
+    textarea.style.background = 'transparent';
+    textarea.style.opacity = '0';
+    
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        
+        if (successful) {
+            resolve();
+        } else {
+            reject(new Error('execCommand copy failed'));
+        }
+    } catch (err) {
+        document.body.removeChild(textarea);
+        reject(err);
+    }
+}
+
 function copyReportToClipboard() {
     const reportHtml = document.getElementById('testReportContent').innerHTML;
-    navigator.clipboard.writeText(reportHtml).then(() => {
+    copyToClipboardSafe(reportHtml).then(() => {
         showTestReportSuccess('Report HTML copied to clipboard!');
     }).catch(err => {
         showTestReportError('Failed to copy to clipboard: ' + err);
@@ -696,7 +749,7 @@ function copyReportToClipboard() {
 
 function copyMarkdownToClipboard() {
     const markdown = generateMarkdownReport(testReportData);
-    navigator.clipboard.writeText(markdown).then(() => {
+    copyToClipboardSafe(markdown).then(() => {
         showTestReportSuccess('Report Markdown copied to clipboard! Ready for Azure Wiki.');
     }).catch(err => {
         showTestReportError('Failed to copy to clipboard: ' + err);
