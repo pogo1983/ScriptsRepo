@@ -16,6 +16,8 @@ With questions please contact:
 Tester: {TESTER}
 Developer: {DEVELOPER}`,
     
+    readyForProduction: `Item has been verified during system testing and is ready for production deployment.`,
+    
     closed: `Integration Test Feedback was fixed and integrated with the original item, therefore closed. No further System Testing is required.`,
     
     custom: ``

@@ -364,13 +364,23 @@ function toggleItemSelection(index) {
 
 function toggleSelectAll() {
     const checked = document.getElementById('selectAllCheckbox').checked;
-    workItems.forEach(item => item.selected = checked);
+    // Only toggle selection for items that are currently visible according to active filters
+    workItems.forEach(item => {
+        if (isItemVisible(item)) {
+            item.selected = checked;
+        }
+    });
     displayWorkItems();
     updatePreview();
 }
 
 function selectAll() {
-    workItems.forEach(item => item.selected = true);
+    // Only select items that are currently visible according to active filters
+    workItems.forEach(item => {
+        if (isItemVisible(item)) {
+            item.selected = true;
+        }
+    });
     document.getElementById('selectAllCheckbox').checked = true;
     displayWorkItems();
     updatePreview();
@@ -379,7 +389,8 @@ function selectAll() {
 function selectWithoutComment() {
     let selectedCount = 0;
     workItems.forEach(item => {
-        if (!item.hasExistingComment) {
+        // Only select items without comment that are also visible according to active filters
+        if (!item.hasExistingComment && isItemVisible(item)) {
             item.selected = true;
             selectedCount++;
         } else {
@@ -400,7 +411,8 @@ function deselectAll() {
 }
 
 function updateSelectedCount() {
-    const count = workItems.filter(item => item.selected).length;
+    // Count only selected items that are visible according to active filters
+    const count = workItems.filter(item => item.selected && isItemVisible(item)).length;
     document.getElementById('selectedCount').textContent = count;
     updatePreview();
 }
@@ -414,7 +426,8 @@ function showItemPreview(index) {
 }
 
 function updatePreview() {
-    const selectedItems = workItems.filter(item => item.selected);
+    // Show preview only for selected items that are visible according to active filters
+    const selectedItems = workItems.filter(item => item.selected && isItemVisible(item));
     
     if (selectedItems.length === 0) {
         document.getElementById('previewSection').style.display = 'none';
@@ -452,11 +465,40 @@ function generateComment(item) {
     return comment;
 }
 
+// Helper function to check if item is visible according to active filters
+function isItemVisible(item) {
+    const filterMultipleVersions = document.getElementById('filterMultipleVersions')?.checked || false;
+    const filterWithoutComment = document.getElementById('filterWithoutComment')?.checked || false;
+    const searchContext = window.searchContext || { matchType: 'exact', searchTerm: '' };
+    
+    // Check if item has multiple versions (semicolon or comma separated)
+    const hasMultipleVersions = item.plannedRelease && (item.plannedRelease.includes(';') || item.plannedRelease.includes(','));
+    
+    // Check if item is a partial match (in Contains mode, when planned release doesn't exactly match search term)
+    const isPartialMatch = searchContext.matchType === 'contains' && 
+        item.plannedRelease !== searchContext.searchTerm && 
+        item.plannedRelease !== 'N/A';
+    
+    // Mark as suspicious if has multiple versions OR is a partial match
+    const isSuspicious = hasMultipleVersions || isPartialMatch;
+    
+    // Apply filters
+    if (filterMultipleVersions && !isSuspicious) {
+        return false; // Item is filtered out
+    }
+    if (filterWithoutComment && item.hasExistingComment) {
+        return false; // Item is filtered out
+    }
+    
+    return true; // Item is visible
+}
+
 async function addCommentsToSelected() {
-    const selectedItems = workItems.filter(item => item.selected);
+    // Filter to get only selected AND visible items (respecting active filters)
+    const selectedItems = workItems.filter(item => item.selected && isItemVisible(item));
     
     if (selectedItems.length === 0) {
-        showError('Please select at least one work item');
+        showError('Please select at least one visible work item');
         return;
     }
     
