@@ -176,26 +176,61 @@ async function fetchWorkItems() {
     }
 }
 
+// Unique signature fragments for each comment template
+const commentSignatures = {
+    readyForTest:        'This item will be delivered in version specified in',
+    readyForProduction:  'ready for production deployment',
+    closed:              'No further System Testing is required',
+    custom:              null  // custom - nie sprawdzamy
+};
+
 async function checkExistingComment(workItemId) {
     try {
-        const commentsUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/wit/workitems/${workItemId}/comments?api-version=7.0-preview`;
-        const response = await fetch(commentsUrl, {
-            headers: {
-                'Authorization': 'Basic ' + btoa(':' + config.pat)
-            }
-        });
-        
-        if (!response.ok) {
+        // Pobierz aktualnie wybrany szablon
+        const selectedTemplate = document.getElementById('commentTemplate')?.value || 'readyForTest';
+        const signatureText = commentSignatures[selectedTemplate];
+
+        // Dla szablonu custom nie sprawdzamy duplikatów
+        if (!signatureText) {
             return false;
         }
-        
-        const data = await response.json();
-        
-        // Check if any comment contains the signature text
-        const signatureText = 'This item will be delivered in version specified in';
-        return data.comments && data.comments.some(comment => 
-            comment.text && comment.text.includes(signatureText)
-        );
+
+        // Obsługa paginacji — API może zwrócić tylko część komentarzy
+        let continuationToken = null;
+        do {
+            const tokenParam = continuationToken ? `&continuationToken=${encodeURIComponent(continuationToken)}` : '';
+            const commentsUrl = `https://dev.azure.com/${config.organization}/${config.project}/_apis/wit/workitems/${workItemId}/comments?$top=200${tokenParam}&api-version=7.0-preview`;
+            const response = await fetch(commentsUrl, {
+                headers: {
+                    'Authorization': 'Basic ' + btoa(':' + config.pat)
+                }
+            });
+
+            if (!response.ok) {
+                return false;
+            }
+
+            const data = await response.json();
+            // Obsługa obu formatów odpowiedzi (comments vs value)
+            const comments = data.comments || data.value || [];
+
+            if (comments.some(comment => {
+                if (!comment.text) return false;
+                // Normalizuj tekst: usuń \n, \r, &nbsp; i znormalizuj spacje
+                const normalized = comment.text
+                    .replace(/&nbsp;/gi, ' ')
+                    .replace(/[\r\n]+/g, ' ')
+                    .replace(/\s+/g, ' ');
+                return normalized.includes(signatureText);
+            })) {
+                return true;
+            }
+
+            // Przejdź do następnej strony jeśli istnieje
+            continuationToken = data.continuationToken || null;
+        } while (continuationToken);
+
+        return false;
     } catch (error) {
         console.error(`Error checking comments for ${workItemId}:`, error);
         return false;

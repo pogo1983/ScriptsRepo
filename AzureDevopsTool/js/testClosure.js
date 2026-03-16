@@ -467,6 +467,13 @@ function generateReportHtml(data) {
     const qualityGate = stats.passRate >= 95 && stats.executionRate >= 98 ? 'PASS' : 'FAIL';
     const testPlanUrl = `https://dev.azure.com/${data.organization}/${data.project}/_testPlans?planId=${data.planId}`;
     
+    // Sprawdź checkbox showQualityGate (dotyczy wszystkich etykiet PASS/FAIL w raporcie)
+    let showPassFail = true;
+    if (typeof document !== 'undefined') {
+        const checkbox = document.getElementById('showQualityGate');
+        if (checkbox) showPassFail = checkbox.checked;
+    }
+
     let html = `
 <h1>Integration - ${data.planName}</h1>
 
@@ -491,6 +498,7 @@ function generateReportHtml(data) {
     <tr><td>Not Executed Tests</td><td>${stats.notExecutedTests}</td></tr>
     <tr><td>Execution Rate</td><td>${stats.executionRate}%</td></tr>
     <tr><td>Pass Rate</td><td>${stats.passRate}%</td></tr>
+    ${showPassFail ? `<tr><td>Quality Gate</td><td style="font-weight:bold; color:${qualityGate==='PASS'?'green':'red'};">${qualityGate}</td></tr>` : ''}
 </table>
 
 <h2 id="test-failures">Test Execution Failures</h2>
@@ -498,7 +506,7 @@ function generateReportHtml(data) {
 ${generateFailedTestsList(data)}
 
 <h2 id="detailed-results">Detailed Test Results</h2>
-${generateDetailedResults(data)}
+${generateDetailedResults(data, showPassFail)}
 `;
     
     return html;
@@ -559,7 +567,7 @@ function generateFailedTestsList(data) {
     return html || '<p>No test failures</p>';
 }
 
-function generateDetailedResults(data) {
+function generateDetailedResults(data, showPassFail = true) {
     let html = '';
     
     data.suites.forEach(suite => {
@@ -591,9 +599,10 @@ function generateDetailedResults(data) {
         suite.testCases.forEach(tc => {
             const outcome = tc.outcome || 'Not Executed';
             const outcomeIcon = outcome === 'Passed' ? 'PASS' : outcome === 'Failed' ? 'FAIL' : outcome === 'Blocked' ? 'BLOCKED' : 'NOT EXECUTED';
+            const outcomeSuffix = showPassFail ? ` - <strong>${outcomeIcon}</strong>` : '';
             
             html += `
-<p><strong>TC ${tc.testCase?.id || 'N/A'}:</strong> ${tc.testCase?.name || 'Unknown Test Case'} - <strong>${outcomeIcon}</strong></p>`;
+<p><strong>TC ${tc.testCase?.id || 'N/A'}:</strong> ${tc.testCase?.name || 'Unknown Test Case'}${outcomeSuffix}</p>`;
             
             // Show execution history if multiple executions exist
             if (tc.history && tc.history.length > 1) {
@@ -602,7 +611,8 @@ function generateDetailedResults(data) {
                 tc.history.forEach(exec => {
                     const date = exec.completedDate ? new Date(exec.completedDate).toLocaleDateString('en-GB') : 'N/A';
                     const execOutcome = exec.outcome === 'Passed' ? 'PASS' : exec.outcome === 'Failed' ? 'FAIL' : exec.outcome === 'Blocked' ? 'BLOCKED' : 'NOT EXECUTED';
-                    html += `<p style="margin: 5px 0;">- ${date}: <strong>${execOutcome}</strong>`;
+                    const execSuffix = showPassFail ? `: <strong>${execOutcome}</strong>` : '';
+                    html += `<p style="margin: 5px 0;">- ${date}${execSuffix}`;
                     
                     // Show linked bugs/test feedback
                     if (exec.linkedWorkItems && exec.linkedWorkItems.length > 0) {
@@ -760,6 +770,12 @@ function generateMarkdownReport(data) {
     const stats = data.stats;
     const qualityGate = stats.passRate >= 95 && stats.executionRate >= 98 ? 'PASS' : 'FAIL';
     const testPlanUrl = `https://dev.azure.com/${data.organization}/${data.project}/_testPlans?planId=${data.planId}`;
+
+    let showPassFail = true;
+    if (typeof document !== 'undefined') {
+        const checkbox = document.getElementById('showQualityGate');
+        if (checkbox) showPassFail = checkbox.checked;
+    }
     
     let md = `# Integration - ${data.planName}\n\n`;
     
@@ -788,7 +804,7 @@ function generateMarkdownReport(data) {
     md += generateFailedTestsMarkdown(data);
     
     md += `## Detailed Test Results\n\n`;
-    md += generateDetailedResultsMarkdown(data);
+    md += generateDetailedResultsMarkdown(data, showPassFail);
     
     return md;
 }
@@ -845,7 +861,7 @@ function generateFailedTestsMarkdown(data) {
     return md || 'No test failures\n\n';
 }
 
-function generateDetailedResultsMarkdown(data) {
+function generateDetailedResultsMarkdown(data, showPassFail = true) {
     let md = '';
     
     data.suites.forEach((suite, index) => {
@@ -898,7 +914,8 @@ function generateDetailedResultsMarkdown(data) {
                 outcomeFormatted = '<span style="color:gray; font-weight:bold;">NOT EXECUTED</span>';
             }
             
-            md += `- **TC ${tc.testCase?.id || 'N/A'}:** ${tc.testCase?.name || 'Unknown Test Case'} - ${outcomeFormatted}\n`;
+            const outcomeSuffix = showPassFail ? ` - ${outcomeFormatted}` : '';
+            md += `- **TC ${tc.testCase?.id || 'N/A'}:** ${tc.testCase?.name || 'Unknown Test Case'}${outcomeSuffix}\n`;
             
             // Show execution history if multiple executions exist
             if (tc.history && tc.history.length > 1) {
@@ -917,7 +934,8 @@ function generateDetailedResultsMarkdown(data) {
                         execOutcome = '<span style="color:gray; font-weight:bold;">NOT EXECUTED</span>';
                     }
                     
-                    md += `    - ${date}: ${execOutcome}`;
+                    const execSuffix = showPassFail ? `: ${execOutcome}` : '';
+                    md += `    - ${date}${execSuffix}`;
                     
                     // Show linked bugs/test feedback
                     if (exec.linkedWorkItems && exec.linkedWorkItems.length > 0) {

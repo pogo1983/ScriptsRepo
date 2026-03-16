@@ -293,6 +293,12 @@
                     </label>
                     <small style="color: #666; font-size: 11px; display: block; margin-top: 3px;">Show all test executions for each TC (including failed runs with linked bugs). Note: This will take longer to generate.</small>
                 </div>
+                <div class="form-group" style="margin-top: 5px;">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="showQualityGate" checked>
+                        <span>Show PASS/FAIL result</span>
+                    </label>
+                </div>
                 
                 <button onclick="testSearchPlans()" class="btn-secondary" style="margin-top: 15px;" id="testSearchBtn"><i class="fas fa-search"></i> Test Search</button>
                 <button onclick="generateTestReport()" style="margin-top: 15px;"><i class="fas fa-chart-bar"></i> Generate Report</button>
