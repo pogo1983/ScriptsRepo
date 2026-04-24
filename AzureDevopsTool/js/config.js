@@ -29,7 +29,8 @@ Developer: {DEVELOPER}`,
 let config = {
     organization: 'infomedics',
     project: 'TIM',
-    pat: ''
+    pat: '',
+    areaPath: ''
 };
 
 function populateConfigDropdowns() {
@@ -89,6 +90,7 @@ function saveConfig() {
     config.organization = document.getElementById('organization').value.trim();
     config.project = document.getElementById('project').value.trim();
     config.pat = document.getElementById('pat').value.trim();
+    config.areaPath = document.getElementById('areaPathConfig').value.trim();
     
     if (!config.organization || !config.project || !config.pat) {
         showError('Please fill in all configuration fields');
@@ -106,6 +108,7 @@ function loadConfig() {
         document.getElementById('organization').value = config.organization;
         document.getElementById('project').value = config.project;
         document.getElementById('pat').value = config.pat;
+        if (config.areaPath) document.getElementById('areaPathConfig').value = config.areaPath;
         showSuccess('Configuration loaded from storage');
     }
 }

@@ -30,12 +30,6 @@
     </script>
     <!-- ============================================================================ -->
     
-    <!-- Load modular JavaScript files -->
-    <script src="js/config.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/workItems.js"></script>
-    <script src="js/testClosure.js"></script>
-    <script src="js/main.js"></script>
 </head>
 <body>
     <!-- Top Navigation -->
@@ -71,6 +65,7 @@
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('main')"><i class="fas fa-home"></i> Main</button>
             <button class="tab-btn" onclick="switchTab('testClosure')"><i class="fas fa-file-alt"></i> Test Closure</button>
+            <button class="tab-btn" onclick="switchTab('testPlanBuilder')"><i class="fas fa-sitemap"></i> Test Plan Builder</button>
             <button class="tab-btn" onclick="switchTab('settings')"><i class="fas fa-cog"></i> Settings</button>
         </div>
         
@@ -331,6 +326,85 @@
         </div>
         <!-- End Test Closure Tab -->
         
+        <!-- Test Plan Builder Tab -->
+        <div id="testPlanBuilderTab" class="tab-content">
+            <div class="config-section">
+                <h2><i class="fas fa-sitemap"></i> Test Plan Builder</h2>
+                <p style="color: #666; font-size: 13px; margin-bottom: 15px;">Create or update a Test Plan with static suites based on work items from a query. Only Test Cases matching the configured Area Path will be added.</p>
+
+                <!-- Filters -->
+                <div class="filter-row" style="align-items: flex-start;">
+                    <div class="form-group" style="flex: 1;">
+                        <label><i class="fas fa-tag"></i> Planned Release</label>
+                        <input type="text" id="tpbPlannedRelease" placeholder="e.g. 26.4.1" />
+                        <small style="color: #666; font-size: 11px; margin-top: 3px; display: block;">Exact match on Custom.plannedrelease field</small>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label><i class="fas fa-hashtag"></i> Tag filter <span style="font-weight: normal; color: #888;">(optional)</span></label>
+                        <input type="text" id="tpbTag" placeholder="e.g. Yellow 1" />
+                        <small style="color: #666; font-size: 11px; margin-top: 3px; display: block;">Filters work items by System.Tags CONTAINS</small>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label><i class="fas fa-folder-open"></i> Area Path (TC filter)</label>
+                        <input type="text" id="tpbAreaPath" placeholder="e.g. TIM\Yellow 1" />
+                        <small style="color: #666; font-size: 11px; margin-top: 3px; display: block;">Only TCs with this Area Path (or sub-paths) will be added</small>
+                    </div>
+                </div>
+
+                <!-- Test Plan selection -->
+                <div class="form-group" style="margin-top: 5px;">
+                    <label><i class="fas fa-clipboard-list"></i> Test Plan</label>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <select id="tpbPlanSelect" style="flex: 1; min-width: 250px;" onchange="tpbOnPlanSelectChange()"><option value="">-- Load plans first --</option></select>
+                        <button class="btn-secondary" onclick="tpbLoadTestPlans()" style="white-space: nowrap;"><i class="fas fa-sync-alt"></i> Refresh plans</button>
+                    </div>
+                </div>
+                <div id="tpbNewPlanRow" style="display: none; gap: 10px; align-items: center; margin-top: 8px;">
+                    <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                        <label>New Test Plan name</label>
+                        <input type="text" id="tpbNewPlanName" placeholder="e.g. INT - Release 26.4.1" />
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button onclick="tpbAnalyzeDelta()"><i class="fas fa-search"></i> Analyze Delta</button>
+                </div>
+            </div>
+
+            <!-- Create Tested By from existing suites -->
+            <div class="config-section" style="margin-top: 20px;">
+                <h3 style="margin-top: 0;"><i class="fas fa-link"></i> Create Tested By from existing suites</h3>
+                <p style="color: #666; font-size: 13px; margin-bottom: 12px;">Reads all static suites in the selected plan, extracts Work Item IDs from suite names, and creates missing <strong>Tested By</strong> relations between each Work Item and its Test Cases in the suite.</p>
+                <button class="btn-secondary" onclick="tpbCreateTestedByFromSuites()"><i class="fas fa-link"></i> Create missing Tested By relations</button>
+                <div id="tpbTestedByLog" style="margin-top: 12px;"></div>
+            </div>
+
+            <!-- Loading indicator -->
+            <div id="tpbLoading" style="display: none; align-items: center; gap: 12px; padding: 15px; background: #f0f4ff; border-radius: 6px; margin-top: 15px; border-left: 4px solid #667eea;">
+                <div class="spinner" style="width: 20px; height: 20px;"></div>
+                <span class="tpb-loading-text" style="font-size: 13px; color: #495057;">Loading...</span>
+            </div>
+
+            <div id="tpbError" style="margin-top: 10px;"></div>
+
+            <!-- Delta preview panel -->
+            <div id="tpbDeltaPanel" style="display: none; margin-top: 20px;">
+                <div class="config-section" style="margin-bottom: 0;">
+                    <h3 style="margin-top: 0;"><i class="fas fa-exchange-alt"></i> Changes Preview</h3>
+                    <div id="tpbDeltaBody"></div>
+                    <div style="margin-top: 15px;">
+                        <button id="tpbApplyBtn" class="btn-success" style="display: none;" onclick="tpbApplyChanges()"><i class="fas fa-play"></i> Apply Changes</button>
+                        <label id="tpbTestedByRow" style="display: none; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; margin-left: 14px; background: #f0f8ff; padding: 6px 12px; border-radius: 4px; border: 1px solid #b8daff;">
+                            <input type="checkbox" id="tpbCreateTestedBy" checked style="margin: 0;" />
+                            <i class="fas fa-link" style="color: #004085;"></i>
+                            Create <strong>Tested By</strong> relations on work items
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Test Plan Builder Tab -->
+
         <!-- Settings Tab -->
         <div id="settingsTab" class="tab-content">
             <div class="config-section">
@@ -350,6 +424,11 @@
                         <label><i class="fas fa-key"></i> Personal Access Token (PAT)</label>
                         <input type="password" id="pat" placeholder="Your PAT token" />
                     </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-folder-open"></i> Default Area Path (for Test Plan Builder)</label>
+                        <input type="text" id="areaPathConfig" placeholder="e.g. TIM\Yellow 1" />
+                        <small style="color: #666; font-size: 11px; margin-top: 3px; display: block;">Used as default TC Area Path filter in the Test Plan Builder tab</small>
+                    </div>
                 </div>
                 <button onclick="saveConfig()"><i class="fas fa-save"></i> Save Configuration</button>
                 <button class="btn-secondary" onclick="loadConfig()"><i class="fas fa-download"></i> Load Saved</button>
@@ -366,6 +445,7 @@
     <script src="js/utils.js"></script>
     <script src="js/workItems.js"></script>
     <script src="js/testClosure.js"></script>
+    <script src="js/testPlanBuilder.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

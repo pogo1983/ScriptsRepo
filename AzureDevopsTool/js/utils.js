@@ -31,14 +31,20 @@ function switchTab(tabName) {
     });
     
     // Show selected tab
-    if (tabName === 'main') {
-        document.getElementById('mainTab').classList.add('active');
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-    } else if (tabName === 'testClosure') {
-        document.getElementById('testClosureTab').classList.add('active');
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-    } else if (tabName === 'settings') {
-        document.getElementById('settingsTab').classList.add('active');
-        document.querySelectorAll('.tab-btn')[2].classList.add('active');
+    const tabMap = {
+        main:            { id: 'mainTab',            btnIndex: 0 },
+        testClosure:     { id: 'testClosureTab',     btnIndex: 1 },
+        testPlanBuilder: { id: 'testPlanBuilderTab', btnIndex: 2 },
+        settings:        { id: 'settingsTab',        btnIndex: 3 }
+    };
+
+    const target = tabMap[tabName];
+    if (target) {
+        document.getElementById(target.id).classList.add('active');
+        document.querySelectorAll('.tab-btn')[target.btnIndex].classList.add('active');
+    }
+
+    if (tabName === 'testPlanBuilder') {
+        tpbInit();
     }
 }
