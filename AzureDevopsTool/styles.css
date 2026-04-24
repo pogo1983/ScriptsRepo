@@ -714,3 +714,102 @@ input[type="checkbox"] {
 .tpb-type-bug { background: #fde8e8; color: #c0392b; }
 .tpb-type-userstory { background: #e8f4fd; color: #2980b9; }
 .tpb-type-testfeedback { background: #fef9e7; color: #d68910; }
+
+/* Summary bar */
+.tpb-summary-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+/* TC filter bar */
+.tpb-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 16px;
+}
+
+/* Work item row */
+.tpb-wi-row {
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.tpb-wi-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    flex-wrap: wrap;
+    font-size: 13px;
+}
+
+/* TC list */
+.tpb-tc-list {
+    padding: 6px 8px;
+}
+
+.tpb-tc-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: normal;
+    transition: background 0.1s;
+}
+
+.tpb-tc-item:hover {
+    background: #f0f4ff;
+}
+
+.tpb-tc-no-testedby {
+    background: #fffbec;
+    border-left: 2px solid #ffc107;
+}
+
+.tpb-tc-no-testedby:hover {
+    background: #fff5cc;
+}
+
+/* Inline badges on TC items */
+.tpb-tc-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.tpb-badge-done {
+    background: #d4edda;
+    color: #155724;
+}
+
+.tpb-tc-title {
+    flex: 1;
+    color: #212529;
+}
+
+.tpb-tc-meta {
+    color: #6c757d;
+    font-size: 11px;
+    white-space: nowrap;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
