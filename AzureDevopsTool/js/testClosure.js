@@ -230,11 +230,11 @@ async function generateTestReport() {
             project: config.project
         };
         
-        // Calculate stats
+        // Calculate stats on full (unfiltered) dataset
         calculateTestStats(testReportData);
         
-        // Generate and display report
-        const reportHtml = generateReportHtml(testReportData);
+        // Generate and display report using active filter
+        const reportHtml = generateReportHtml(getFilteredReportData());
         document.getElementById('testReportContent').innerHTML = reportHtml;
         document.getElementById('testReportSection').style.display = 'block';
         document.getElementById('copyReportBtn').style.display = 'inline-flex';
@@ -382,6 +382,7 @@ async function fetchTestSuiteDetails(planId, suite, targetRelease, includeHistor
                 id: testCaseId,
                 name: point.testCaseReference?.name || point.testCase?.name || 'Unknown'
             },
+            assignedTo: point.tester || point.assignedTo || null,
             outcome: outcome,
             history: history  // Array of executions with dates and linked bugs (empty if not requested)
         };
@@ -696,6 +697,50 @@ function generateRecommendations(data) {
 }
 
 // Helper function to copy text to clipboard with fallback
+function getAssignedToFilterValue() {
+    return document.querySelector('input[name="assignedToFilter"]:checked')?.value || 'all';
+}
+
+function getFilteredReportData() {
+    if (!testReportData) return null;
+
+    const filterValue = getAssignedToFilterValue();
+    if (filterValue === 'all') {
+        // Return a shallow copy with recalculated stats for safety
+        const data = { ...testReportData };
+        calculateTestStats(data);
+        return data;
+    }
+
+    const filteredSuites = testReportData.suites.map(suite => ({
+        ...suite,
+        testCases: suite.testCases.filter(tc => {
+            const displayName = (tc.assignedTo?.displayName || '').toLowerCase();
+            const uniqueName = (tc.assignedTo?.uniqueName || '').toLowerCase();
+            const combined = displayName + ' ' + uniqueName;
+            if (filterValue === 'infoprojekt') {
+                return combined.includes('infoprojekt') || displayName.includes('infprojekt');
+            } else if (filterValue === 'others') {
+                return !combined.includes('infoprojekt') && !displayName.includes('infprojekt');
+            }
+            return true;
+        })
+    }));
+
+    const filteredData = { ...testReportData, suites: filteredSuites };
+    calculateTestStats(filteredData);
+    return filteredData;
+}
+
+function applyAssignedToFilter() {
+    if (!testReportData) return;
+
+    const filteredData = getFilteredReportData();
+    const reportHtml = generateReportHtml(filteredData);
+    document.getElementById('testReportContent').innerHTML = reportHtml;
+}
+
+// Helper function to copy text to clipboard with fallback
 function copyToClipboardSafe(text) {
     return new Promise((resolve, reject) => {
         // Try modern clipboard API first
@@ -758,7 +803,7 @@ function copyReportToClipboard() {
 }
 
 function copyMarkdownToClipboard() {
-    const markdown = generateMarkdownReport(testReportData);
+    const markdown = generateMarkdownReport(getFilteredReportData() || testReportData);
     copyToClipboardSafe(markdown).then(() => {
         showTestReportSuccess('Report Markdown copied to clipboard! Ready for Azure Wiki.');
     }).catch(err => {
