@@ -31,8 +31,11 @@
 #    & .\2_Update-TA-Inventory.ps1 -Sync                  # wykryj nowe + sprawdz czy stare sciezki wciaz istnieja
 #    & .\2_Update-TA-Inventory.ps1 -Sync -UpdateBase      # pelny update z podmiana bazy
 #    & .\2_Update-TA-Inventory.ps1 -Sync -DiffOnly        # tylko raport (bez zapisu)
+#    & .\2_Update-TA-Inventory.ps1 -SkipGitAuthor         # nie pobieraj autora z git log
 # ============================================================
-param([switch]$DiffOnly, [switch]$Sync, [switch]$UpdateBase)
+param([switch]$DiffOnly, [switch]$Sync, [switch]$UpdateBase, [switch]$SkipGitAuthor)
+
+$GitRoot = "d:\git\TimTestAutomation"
 
 $RepoRoot      = "d:\git\TimTestAutomation\AutomationTests"
 $InventoryFile = "d:\SQL\SQL\TA_LIST_Sanity_Smoke\TA_Inventory.xlsx"
@@ -116,8 +119,19 @@ $features = Get-ChildItem -Path $RepoRoot -Recurse -Filter "*.feature" |
 $newFiles = $features |
     Where-Object { -not $mappedBasenames.Contains($_.BaseName) } |
     ForEach-Object {
-        $rel = $_.FullName -replace [regex]::Escape($RepoRoot + "\"), ""
-        [PSCustomObject]@{ BaseName = $_.BaseName; RelPath = $rel }
+        $rel    = $_.FullName -replace [regex]::Escape($RepoRoot + "\"), ""
+        $lines  = Get-Content $_.FullName -TotalCount 25
+        $allTags = ($lines | Where-Object { $_ -match "^\s*@" }) -join " "
+        $domain  = if ($allTags -match "@Domain:(\S+)")  { $Matches[1] -replace "@.*", "" } else { "" }
+        $actor   = if ($allTags -match "@Actor:(\w+)")   { $Matches[1] } else { "" }
+        $suite   = if ($allTags -match "@Suite:(\w+)")   { $Matches[1] } else { "" }
+        $gitRel  = $_.FullName -replace [regex]::Escape($GitRoot + "\\"), "" -replace "\\", "/"
+        $author  = if (-not $SkipGitAuthor) {
+            $raw = git -C $GitRoot log --diff-filter=A --follow --format="%an" -- $gitRel 2>$null | Select-Object -First 1
+            if (-not $raw) { $raw = git -C $GitRoot log --follow --format="%an" -1 -- $gitRel 2>$null | Select-Object -First 1 }
+            $raw
+        } else { "" }
+        [PSCustomObject]@{ BaseName = $_.BaseName; RelPath = $rel; Domain = $domain; Actor = $actor; Suite = $suite; Author = $author }
     } | Sort-Object RelPath
 
 Write-Host "  -> Znaleziono $($features.Count) .feature files w repo" -ForegroundColor Green
@@ -233,14 +247,17 @@ foreach ($f in $newFiles) {
 
     # Zamien CamelCase na spacje jako propozycja nazwy
     $testName = $f.BaseName -creplace "([a-z])([A-Z])", '$1 $2'
+    $actor    = if ($f.Actor) { $f.Actor } else { "?" }
+    $testType = if ($f.Suite -eq "Sanity") { "Sanity" } elseif ($f.Suite -eq "Smoke") { "Smoke" } else { "" }
+    $person   = if ($f.Author) { $f.Author } else { "" }
 
-    $ws.Cells.Item($rowIdx, $colActor).Value2        = "?"
+    $ws.Cells.Item($rowIdx, $colActor).Value2        = $actor
     $ws.Cells.Item($rowIdx, $colTcId).Value2         = $tcId
     $ws.Cells.Item($rowIdx, $colTestName).Value2     = $testName
-    $ws.Cells.Item($rowIdx, $colDomain).Value2       = ""
-    $ws.Cells.Item($rowIdx, $colTestType).Value2     = ""
+    $ws.Cells.Item($rowIdx, $colDomain).Value2       = $f.Domain
+    $ws.Cells.Item($rowIdx, $colTestType).Value2     = $testType
     $ws.Cells.Item($rowIdx, $colStatus).Value2       = "DONE"
-    $ws.Cells.Item($rowIdx, $colPerson).Value2       = ""
+    $ws.Cells.Item($rowIdx, $colPerson).Value2       = $person
     $ws.Cells.Item($rowIdx, $colPriority).Value2     = "Medium"
     $ws.Cells.Item($rowIdx, $colFeatureFiles).Value2 = $f.RelPath
     $ws.Cells.Item($rowIdx, $colNotes).Value2        = "[AUTO] $(Get-Date -Format 'yyyy-MM-dd')"
