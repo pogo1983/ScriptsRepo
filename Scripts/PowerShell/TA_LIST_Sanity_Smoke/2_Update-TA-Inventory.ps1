@@ -1,30 +1,28 @@
 # ============================================================
-#  [SKRYPT 2/2]  Update-TA-Inventory.ps1
+#  [SKRYPT 2/3]  2_Update-TA-Inventory.ps1
 # ============================================================
-#  CEL: Codzienne/regularne aktualizacje inventory.
-#       Uruchamiaj po dodaniu nowych .feature files do repo.
+#  CEL: Jedyne narzedzie do codziennej obslugi inventory.
+#       Uruchamiaj po kazdej zmianie w repo lub inventory.
 #
 #  CO ROBI:
-#    - Czyta TA_Inventory.xlsx jako baze (nigdy go nie modyfikuje)
+#    - Czyta TA_Inventory.xlsx jako baze
 #    - Skanuje repo w poszukiwaniu .feature files
-#    - Porownuje z tym co juz jest w inventory
 #    - Jezeli znajdzie nowe pliki -> dodaje je jako TC-NNN z Status=DONE
-#    - Zapisuje NOWY plik: TA_Inventory_YYYY-MM-DD.xlsx
+#    - Zapisuje datowany plik: TA_Inventory_YYYY-MM-DD.xlsx
+#    - Opcjonalnie (-UpdateBase) podmienia TA_Inventory.xlsx
 #
 #  ZASADY:
 #    + Tylko DODAJE nowe wiersze - nigdy nic nie usuwa ani nie nadpisuje
-#    + Istniejace statusy / osoby / notatki sa nienaruszone
+#    + Istniejace dane (statusy, osoby, notatki, ADO linki) sa nienaruszone
 #    + Nowe TC dostaja: Actor=?, Status=DONE, Notes=[AUTO] data
-#    + Plik datowany wgrywasz na SharePoint jako aktualna wersja
+#    + Odporna na nowe kolumny - uzywa nazwanych stalych dla nr kolumn
 #
-#  WORKFLOW:
+#  WORKFLOW (zalecany):
 #    1. Deweloper dodaje nowy .feature do repo
-#    2. Uruchamiasz: & .\Update-TA-Inventory.ps1
-#    3. Skrypt tworzy TA_Inventory_YYYY-MM-DD.xlsx
+#    2. Uruchamiasz: & .\2_Update-TA-Inventory.ps1 -UpdateBase
+#    3. Skrypt tworzy TA_Inventory_YYYY-MM-DD.xlsx (kopia datowana)
+#       i automatycznie podmienia TA_Inventory.xlsx (nowa baza)
 #    4. Uzupelniasz Actor / Domain / Person w nowych wierszach
-#    5. Wgrywasz plik na SharePoint (podmiana)
-#    6. (opcjonalnie) Skopiuj datowany plik jako TA_Inventory.xlsx
-#       zeby byl podstawa dla kolejnego update
 #
 #  Uzycie:
 #    & .\2_Update-TA-Inventory.ps1                        # wykryj nowe + zapisz datowany plik
