@@ -34,13 +34,8 @@
 #    # Twórz nawet jesli ADO juz istnieje (nadpisz linki)
 #    & .\Create_ADO_Tasks.ps1 -Force
 # ============================================================
-# ============================================================
-#  WPISZ SWÓJ PAT TUTAJ (lub podaj przez parametr -PAT)
-# ============================================================
-$DefaultPAT = ""  # <-- wklej swój token
-
 param(
-    [string]$PAT = $DefaultPAT,
+    [string]$PAT = "",
 
     [string]$OrganizationUrl   = "https://dev.azure.com/infomedics",
     [string]$ProjectName       = "TIM",
@@ -56,6 +51,11 @@ param(
     [switch]$Force,                # twórz nawet jeśli ADO_Dev/ADO_Int już wypełnione
     [switch]$WhatIf                # tylko pokaż co by zostało utworzone
 )
+
+# ============================================================
+#  WPISZ SWÓJ PAT TUTAJ (jeśli nie podajesz przez -PAT)
+# ============================================================
+if (-not $PAT) { $PAT = "" }  # <-- wklej token między cudzysłowy
 
 # ============================================================
 # Kolumny w TA_Report (1-based)
@@ -77,7 +77,7 @@ $colAdoInt       = 12
 # 1. Czytaj TA_Inventory.xlsx
 # ============================================================
 if (-not $PAT) {
-    Write-Host "BLAD: Nie podano PAT. Wpisz token w zmiennej `$DefaultPAT na gorze skryptu lub przekaz przez -PAT." -ForegroundColor Red
+    Write-Host "BLAD: Nie podano PAT. Wpisz token w 'if (-not `$PAT)' na gorze skryptu lub przekaz przez -PAT." -ForegroundColor Red
     exit 1
 }
 
