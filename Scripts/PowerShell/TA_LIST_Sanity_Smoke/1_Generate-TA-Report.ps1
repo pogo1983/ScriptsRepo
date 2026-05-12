@@ -673,13 +673,13 @@ Add-RefSheet -wb $wb2 -name "Test_Types" -headerColor $refSheetColor `
 
 # Actors
 Add-RefSheet -wb $wb2 -name "Actors" -headerColor $refSheetColor `
-    -headers @("Actor","Description") `
+    -headers @("Actor") `
     -data @(
-        @("Agent",    "Agent TIM — pracownik biura"),
-        @("Provider", "Provider Inzicht — placówka/lekarz"),
-        @("Patient",  "Patient — Payment Page"),
-        @("Admin",    "Admin — IAM / zarządzanie użytkownikami"),
-        @("System",   "System — testy automatyczne bez UI")
+        @("Agent"),
+        @("Provider"),
+        @("Patient"),
+        @("Admin"),
+        @("System")
     ) | Out-Null
 
 # Status_Options
