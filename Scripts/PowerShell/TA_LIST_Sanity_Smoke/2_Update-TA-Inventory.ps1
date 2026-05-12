@@ -27,10 +27,14 @@
 #       zeby byl podstawa dla kolejnego update
 #
 #  Uzycie:
-#    & .\Update-TA-Inventory.ps1              # wykryj nowe + zapisz datowany plik
-#    & .\Update-TA-Inventory.ps1 -DiffOnly    # tylko pokaz co jest nowe (bez zapisu)
+#    & .\2_Update-TA-Inventory.ps1                        # wykryj nowe + zapisz datowany plik
+#    & .\2_Update-TA-Inventory.ps1 -UpdateBase            # jak wyzej + podmien TA_Inventory.xlsx
+#    & .\2_Update-TA-Inventory.ps1 -DiffOnly              # tylko pokaz co jest nowe (bez zapisu)
+#    & .\2_Update-TA-Inventory.ps1 -Sync                  # wykryj nowe + sprawdz czy stare sciezki wciaz istnieja
+#    & .\2_Update-TA-Inventory.ps1 -Sync -UpdateBase      # pelny update z podmiana bazy
+#    & .\2_Update-TA-Inventory.ps1 -Sync -DiffOnly        # tylko raport (bez zapisu)
 # ============================================================
-param([switch]$DiffOnly)
+param([switch]$DiffOnly, [switch]$Sync, [switch]$UpdateBase)
 
 $RepoRoot      = "d:\git\TimTestAutomation\AutomationTests"
 $InventoryFile = "d:\SQL\SQL\TA_LIST_Sanity_Smoke\TA_Inventory.xlsx"
@@ -67,6 +71,8 @@ $ws = $wb.Sheets.Item("TA_Report")
 # Zbierz wszystkie zmapowane basename'y z kolumny Feature_Files
 $mappedBasenames = [System.Collections.Generic.HashSet[string]]::new(
     [System.StringComparer]::OrdinalIgnoreCase)
+# Dla trybu Sync: lista wierszy z ich sciezkami (do weryfikacji)
+$rowPaths = [System.Collections.Generic.List[PSCustomObject]]::new()
 $maxTcNum = 0
 $tcCount  = 0
 $r = 2
@@ -88,6 +94,9 @@ while ($true) {
             if ($trimmed) {
                 $basename = [System.IO.Path]::GetFileNameWithoutExtension($trimmed).ToLower()
                 $mappedBasenames.Add($basename) | Out-Null
+                if ($Sync) {
+                    $rowPaths.Add([PSCustomObject]@{ Row=$r; TcId=$tcId; RelPath=$trimmed })
+                }
             }
         }
     }
@@ -115,12 +124,52 @@ $newFiles = $features |
 
 Write-Host "  -> Znaleziono $($features.Count) .feature files w repo" -ForegroundColor Green
 
+# Zbuduj set aktualnych sciezek (lowercase) dla weryfikacji
+$repoRelPaths = [System.Collections.Generic.HashSet[string]]::new(
+    [System.StringComparer]::OrdinalIgnoreCase)
+foreach ($f in $features) {
+    $rel = $f.FullName -replace [regex]::Escape($RepoRoot + "\"), ""
+    $repoRelPaths.Add($rel) | Out-Null
+}
+
 # ============================================================
-# 3. Wynik
+# 3. Sync — weryfikacja istniejacych sciezek (opcjonalnie)
+# ============================================================
+$brokenRows = [System.Collections.Generic.List[PSCustomObject]]::new()
+if ($Sync -and $rowPaths.Count -gt 0) {
+    Write-Host ""
+    Write-Host "Weryfikuję istniejące ścieżki (-Sync)..." -ForegroundColor Cyan
+    $colorBroken = 0xFFD966  # pomarańczowy/żółty
+    foreach ($entry in $rowPaths) {
+        $absPath = Join-Path $RepoRoot $entry.RelPath
+        if (-not (Test-Path $absPath)) {
+            $brokenRows.Add($entry)
+            # Podswietl komorke Feature_Files na pomaranczowo
+            $ws.Cells.Item($entry.Row, $colFeatureFiles).Interior.Color = $colorBroken
+            # Dodaj notatke w Notes jezeli jej nie ma
+            $currentNote = $ws.Cells.Item($entry.Row, $colNotes).Value2
+            if (-not ($currentNote -like "*BRAK PLIKU*")) {
+                $ws.Cells.Item($entry.Row, $colNotes).Value2 = "[BRAK PLIKU] $(Get-Date -Format 'yyyy-MM-dd')" + $(if ($currentNote) { " | $currentNote" } else { "" })
+            }
+        }
+    }
+    if ($brokenRows.Count -eq 0) {
+        Write-Host "  -> Wszystkie ścieżki poprawne!" -ForegroundColor Green
+    } else {
+        Write-Host "  -> Znaleziono $($brokenRows.Count) wpisów z brakującym plikiem:" -ForegroundColor Red
+        foreach ($b in $brokenRows) {
+            Write-Host "     $($b.TcId)  $($b.RelPath)" -ForegroundColor Red
+        }
+        Write-Host "  -> Wpisy oznaczone pomarańczowo w kolumnie Feature_Files" -ForegroundColor Yellow
+    }
+}
+
+# ============================================================
+# 4. Wynik — nowe pliki
 # ============================================================
 Write-Host ""
 
-if ($newFiles.Count -eq 0) {
+if ($newFiles.Count -eq 0 -and $brokenRows.Count -eq 0) {
     Write-Host "Inventory jest aktualne - brak nowych feature files!" -ForegroundColor Green
     $wb.Close($false)
     $excel.Quit()
@@ -128,8 +177,34 @@ if ($newFiles.Count -eq 0) {
     exit 0
 }
 
-Write-Host "Nowe feature files ($($newFiles.Count) szt):" -ForegroundColor Yellow
-$newFiles | ForEach-Object { Write-Host "  $_($_.RelPath)" -ForegroundColor White }
+if ($newFiles.Count -eq 0 -and $brokenRows.Count -gt 0) {
+    # Tylko broken - zapisz plik z oznaczeniami i wyjdz
+    if (-not $DiffOnly) {
+        try {
+            $wb.SaveAs($OutputFile, 51)
+        } finally {
+            $wb.Close($false)
+            $excel.Quit()
+            [System.Runtime.InteropServices.Marshal]::ReleaseComObject($excel) | Out-Null
+        }
+        Write-Host ""
+        Write-Host "Zapisano: $OutputFile" -ForegroundColor Green
+        if ($UpdateBase) {
+            Copy-Item $OutputFile $InventoryFile -Force
+            Write-Host "Zaktualizowano bazę: $([System.IO.Path]::GetFileName($InventoryFile))" -ForegroundColor Cyan
+        }
+    } else {
+        $wb.Close($false)
+        $excel.Quit()
+        [System.Runtime.InteropServices.Marshal]::ReleaseComObject($excel) | Out-Null
+    }
+    exit 0
+}
+
+if ($newFiles.Count -gt 0) {
+    Write-Host "Nowe feature files ($($newFiles.Count) szt):" -ForegroundColor Yellow
+    $newFiles | ForEach-Object { Write-Host "  $($_.RelPath)" -ForegroundColor White }
+}
 
 if ($DiffOnly) {
     Write-Host ""
@@ -146,6 +221,9 @@ if ($DiffOnly) {
 Write-Host ""
 Write-Host "Dodaję nowe wiersze..." -ForegroundColor Cyan
 
+# ============================================================
+# 5. Dodaj nowe wiersze do inventory
+# ============================================================
 $colorDone = 0xC6EFCE  # zielony jak DONE
 
 $tcIndex = $maxTcNum + 1
@@ -184,6 +262,14 @@ try {
     $wb.Close($false)
     $excel.Quit()
     [System.Runtime.InteropServices.Marshal]::ReleaseComObject($excel) | Out-Null
+}
+
+Write-Host ""
+Write-Host "Zapisano: $OutputFile" -ForegroundColor Green
+
+if ($UpdateBase) {
+    Copy-Item $OutputFile $InventoryFile -Force
+    Write-Host "Zaktualizowano baze: $([System.IO.Path]::GetFileName($InventoryFile))" -ForegroundColor Cyan
 }
 
 Write-Host ""

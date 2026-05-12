@@ -8,20 +8,20 @@ Ten folder zawiera skrypty do zarządzania inwentaryzacją test cases (TC) dla p
 
 ## Skrypty — zasady i workflow
 
-### [SKRYPT 1/2] `Generate-TA-Report.ps1` — bootstrap
+### [SKRYPT 1/3] `1_Generate-TA-Report.ps1` — bootstrap
 - **Uruchamiaj rzadko** — tylko gdy zmieniasz `$mapping`, `$extraTCs` lub strukturę kolumn
 - Czyta `TestAutomation_tests_list.xlsx` (81 TC) + skanuje repo (111 `.feature` files)
 - **Nadpisuje `TA_Inventory.xlsx` bezpowrotnie** — ręczne zmiany w pliku zostaną utracone
 - TC z podpiętym feature file → status automatycznie = `DONE`
-- Tryb diff (nie zapisuje): `& .\Generate-TA-Report.ps1 -DiffOnly`
+- Tryb diff (nie zapisuje): `& .\1_Generate-TA-Report.ps1 -DiffOnly`
 
-### [SKRYPT 2/2] `Update-TA-Inventory.ps1` — codzienny update
+### [SKRYPT 2/3] `2_Update-TA-Inventory.ps1` — codzienny update
 - **Uruchamiaj po każdym nowym `.feature` dodanym do repo**
 - Czyta `TA_Inventory.xlsx` jako bazę — **nigdy go nie modyfikuje**
 - Tylko dodaje nowe wiersze — nigdy nic nie usuwa
 - Nowe TC: `Actor=?`, `Status=DONE`, `Notes=[AUTO] yyyy-MM-dd`
 - Zapisuje **nowy plik datowany**: `TA_Inventory_YYYY-MM-DD.xlsx` → wgrywasz na SharePoint
-- Tryb diff (bez zapisu): `& .\Update-TA-Inventory.ps1 -DiffOnly`
+- Tryb diff (bez zapisu): `& .\2_Update-TA-Inventory.ps1 -DiffOnly`
 
 ---
 
@@ -42,6 +42,7 @@ Ten folder zawiera skrypty do zarządzania inwentaryzacją test cases (TC) dla p
 | 10 | Notes | Notatki, `[AUTO] data` dla auto-dodanych |
 | 11 | ADO_Dev | Link do ADO (Dev) |
 | 12 | ADO_Int | Link do ADO (Int) |
+| 13 | Related_TC | Powiązane TC (np. TC-012, TC-034) |
 
 ### Arkusze referencyjne
 `Test_Types`, `Actors`, `Status_Options`, `Priorities`, `Domains`, `Team_Members`

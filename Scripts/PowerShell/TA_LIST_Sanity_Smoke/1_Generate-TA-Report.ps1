@@ -377,7 +377,7 @@ $extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="MZ Claim File with Corr
 $extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="MZ Claim File with Incorrect BSN";                   Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ClaimFile\\BSN\\MZWithIncorrectBSN.feature") })
 $extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Process CHA Claim File - Agent (IM001)";             Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ClaimFile\\ProcessFile\\CHA_IM001.feature") })
 $extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Process Claim File Inzicht - GDS801v1";              Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\ClaimFile\ProcessFile\GDS801v1.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Process Claim File Inzicht - CHA_IM001";             Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\ClaimFile\ProcessFile\CHA_IM001.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Process Claim File - CHA_IM001";                    Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\ClaimFile\ProcessFile\CHA_IM001.feature") })
 $extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Process Claim File Inzicht - CHA_IM002";             Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\ClaimFile\ProcessFile\CHA_IM002.feature") })
 $extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Upload Claim File from Home Page";                   Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\ClaimFile\UploadFile\SuccessfulUploadFileFromHomePage.feature") })
 $extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Failed Upload Claim File from Home Page";            Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\ClaimFile\UploadFile\FailedUploadFileFromHomePage.feature") })
@@ -460,6 +460,7 @@ foreach ($tc in $tcList) {
     $hasFeature = $false
 
     foreach ($p in $paths) {
+        $p = $p -replace '\\\\', '\'
         $info = Get-FeatureInfo $p
         if ($info) {
             $hasFeature = $true
@@ -515,6 +516,7 @@ foreach ($etc in $extraTCs) {
     $matchedFiles = [System.Collections.Generic.List[string]]::new()
     $suiteTags    = [System.Collections.Generic.List[string]]::new()
     foreach ($fp in $etc.Files) {
+        $fp = $fp -replace '\\\\', '\'
         $info = Get-FeatureInfo $fp
         $matchedFiles.Add($fp)
         if ($info -and $info.Suite) { $suiteTags.Add($info.Suite) }
@@ -563,7 +565,7 @@ $colorNoFeature  = 0xF2DCDB  # blady rozowy
 $colorHeader     = 0x4472C4  # niebieski naglowek
 
 # Naglowki
-$headers = @("Actor","TC_ID","Test_Name","Domain","Test_Type","Excel_Status","Person","Priority","Feature_Files","Notes","ADO_Dev","ADO_Int")
+$headers = @("Actor","TC_ID","Test_Name","Domain","Test_Type","Excel_Status","Person","Priority","Feature_Files","Notes","ADO_Dev","ADO_Int","Related_TC")
 for ($c = 1; $c -le $headers.Count; $c++) {
     $cell = $ws.Cells.Item(1, $c)
     $cell.Value2 = $headers[$c - 1]
@@ -631,6 +633,8 @@ $ws.Range($ws.Cells.Item(2, 9), $ws.Cells.Item($dataRows + 1, 9)).WrapText = $tr
 # ADO link columns
 $ws.Columns.Item(11).ColumnWidth = 12
 $ws.Columns.Item(12).ColumnWidth = 12
+# Related_TC
+$ws.Columns.Item(13).ColumnWidth = 20
 
 # ============================================================
 # Zakładki słownikowe (Actors, Statuses, Priorities, Domains, Team_Members)

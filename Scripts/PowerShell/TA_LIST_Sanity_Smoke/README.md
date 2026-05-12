@@ -1,8 +1,11 @@
-# TA Report Generator — Instrukcja
+# TA Inventory — Instrukcja
 
 ## Co to jest?
 
-Skrypt `Generate-TA-Report.ps1` porównuje listę Test Cases z Excela z faktycznym stanem plików `.feature` w repozytorium `TimTestAutomation`. Wynikiem jest plik `.xlsx` z kolorowaniem, dropdownami i filtrami.
+Zestaw dwóch skryptów PowerShell do zarządzania inwentaryzacją test cases (TC) projektu **TimTestAutomation**.
+Łączy dane ze źródłowego Excela z faktycznym stanem plików `.feature` w repo i zapisuje wynik jako `TA_Inventory.xlsx`.
+
+> **Wymagania:** Microsoft Excel zainstalowany lokalnie. Repo sklonowane w `d:\git\TimTestAutomation\`.
 
 ---
 
@@ -10,184 +13,236 @@ Skrypt `Generate-TA-Report.ps1` porównuje listę Test Cases z Excela z faktyczn
 
 | Plik | Opis |
 |------|------|
-| `TestAutomation_tests_list.xlsx` | **Źródło prawdy** — lista TC, statusy, przypisane osoby, linki ADO |
-| `Generate-TA-Report.ps1` | Skrypt generujący raport |
-| `Create_TFS_Tasks.ps1` | Skrypt do tworzenia tasków w Azure DevOps |
-| `README.md` | Ten plik |
-| `TA_Report_<data>.xlsx` | Wygenerowane raporty (można usuwać stare) |
+| `1_Generate-TA-Report.ps1` | **Skrypt 1** — bootstrap, buduje `TA_Inventory.xlsx` od zera |
+| `2_Update-TA-Inventory.ps1` | **Skrypt 2** — codzienny update, dodaje nowe TC |
+| `3_Create-ADO-Tasks.ps1` | **Skrypt 3** — tworzy taski DEV+INT w ADO na podstawie `TA_Inventory.xlsx` |
+| `TA_Inventory.xlsx` | Baza inventory — główny plik roboczy |
+| `TestAutomation_tests_list.xlsx` | Źródłowy Excel z 81 TC (nie modyfikuj) |
+| `TA_Workspace.code-workspace` | VS Code workspace |
 
 ---
 
-## Jak uruchomić skrypt?
+## Skrypt 1 — `1_Generate-TA-Report.ps1` (bootstrap)
 
-Otwórz terminal PowerShell w tym folderze i wpisz:
+**Kiedy uruchamiać:** tylko gdy zmieniasz mapowanie (`$mapping` / `$extraTCs`) lub strukturę kolumn.
+
+**Co robi:**
+- Czyta `TestAutomation_tests_list.xlsx` (81 TC)
+- Skanuje repo (`AutomationTests\`) w poszukiwaniu `.feature` files
+- Łączy dane wg `$mapping` + `$extraTCs` — zasada **1 feature = 1 TC**
+- TC z podpiętym feature file → status = `DONE` automatycznie
+- **Nadpisuje `TA_Inventory.xlsx` bezpowrotnie** — ręczne zmiany zostaną utracone
 
 ```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-& ".\Generate-TA-Report.ps1"
+# Generuj pełny raport
+& .\1_Generate-TA-Report.ps1
+
+# Tylko sprawdź czy są niezamapowane pliki (bez zapisu)
+& .\1_Generate-TA-Report.ps1 -DiffOnly
 ```
 
-Skrypt otworzy Excel w tle, przeskanuje repo i zapisze nowy plik `TA_Report_YYYYMMDD_HHmmss.xlsx`.
+---
 
-> **Wymagania:** Microsoft Excel musi być zainstalowany. Repo `TimTestAutomation` musi być sklonowane w `d:\git\TimTestAutomation\`.
+## Skrypt 2 — `2_Update-TA-Inventory.ps1` (codzienny update)
+
+**Kiedy uruchamiać:** po każdym nowym `.feature` dodanym do repo.
+
+**Co robi:**
+- Czyta `TA_Inventory.xlsx` jako bazę — **nigdy go nie modyfikuje**
+- Tylko dodaje nowe wiersze — nigdy nic nie usuwa
+- Nowe TC: `Actor=?`, `Status=DONE` (zielone), `Notes=[AUTO] yyyy-MM-dd`
+- Zapisuje **nowy plik datowany**: `TA_Inventory_YYYY-MM-DD.xlsx` → wgrywasz na SharePoint
+
+```powershell
+# Wykryj nowe feature files + zapisz datowany plik
+& .\2_Update-TA-Inventory.ps1
+
+# Jak wyżej + automatycznie podmień TA_Inventory.xlsx (zalecane)
+& .\2_Update-TA-Inventory.ps1 -UpdateBase
+
+# Tylko sprawdź co nowego (bez zapisu)
+& .\2_Update-TA-Inventory.ps1 -DiffOnly
+
+# Sprawdź też czy istniejące ścieżki wciąż istnieją w repo (wykrywa przemianowania)
+& .\2_Update-TA-Inventory.ps1 -Sync -UpdateBase
+
+# Sprawdź bez zapisu
+& .\2_Update-TA-Inventory.ps1 -Sync -DiffOnly
+```
+
+### Opcja `-Sync` — co wykrywa?
+
+Gdy feature file zostanie **przemianowany lub przeniesiony**, inventory ma martwą ścieżkę.
+`-Sync` sprawdza każdy wpis w kolumnie `Feature_Files` i:
+- Jeśli plik nie istnieje → podświetla wiersz na **pomarańczowo** + dodaje `[BRAK PLIKU]` w Notes
+- Daje znać że trzeba ręcznie zaktualizować ścieżkę lub usunąć wpis
 
 ---
 
-## Struktura raportu (kolumny w .xlsx)
+## Workflow — jak to działa w praktyce?
 
-| # | Kolumna | Opis | Dropdown |
-|---|---------|------|----------|
-| 1 | `Actor` | Kto wykonuje test | ✅ Agent / Provider / Patient / Admin / System |
-| 2 | `TC_ID` | Numer TC w formacie `TC-001` (auto-generowany) | — |
-| 3 | `Test_Name` | Nazwa TC z Excela | — |
-| 4 | `Domain` | Domena biznesowa (np. `Banking`, `Factoring`) | ✅ 15 opcji z zakładki Domains |
-| 5 | `Test_Type` | Typ testu: `Sanity` / `Smoke` / `Functional` itp. | ✅ 5 opcji z zakładki Test_Types |
-| 6 | `Excel_Status` | Status z Excela (kolorowany) | ✅ TODO / IN PROGRESS / ALMOST / DONE / BLOCKED / ON HOLD |
-| 7 | `Person` | Przypisana osoba | ✅ 56 osób z zakładki Team_Members |
-| 8 | `Priority` | Priorytet | ✅ Low / Medium / High / Critical |
-| 9 | `Feature_Files` | Ścieżki do `.feature` w repo (wieloliniowe) | — |
-| 10 | `Notes` | Notatki z Excela | — |
-| 11 | `ADO_Dev` | Klikalny link do taska DEV w Azure DevOps | — |
-| 12 | `ADO_Int` | Klikalny link do taska INT w Azure DevOps | — |
+```
+1. [jednorazowo] & .\1_Generate-TA-Report.ps1
+        ↓
+   TA_Inventory.xlsx (baza, 156 TC)
+
+2. [ręcznie] edytujesz TA_Inventory.xlsx
+   (zmieniasz statusy, przypisujesz osoby, uzupełniasz Domain/Actor)
+
+3. [deweloper dodaje nowy .feature do repo]
+
+4. & .\2_Update-TA-Inventory.ps1
+        ↓
+   TA_Inventory_2026-05-12.xlsx (nowy plik z dodanym TC)
+
+5. Wgrywasz datowany plik na SharePoint
+
+6. Kopiujesz jako nową bazę:
+   Copy-Item .\TA_Inventory_2026-05-12.xlsx .\TA_Inventory.xlsx -Force
+
+7. [co jakiś czas] & .\2_Update-TA-Inventory.ps1 -Sync
+   (sprawdza czy żaden feature nie został przemianowany)
+
+8. [tworzenie tasków ADO] & .\3_Create-ADO-Tasks.ps1
+   (dla TODO / IN PROGRESS / ALMOST bez istniejącego ADO linku)
+```
 
 ---
 
-## Kolorowanie komórki Excel_Status
+## Struktura `TA_Inventory.xlsx`
 
-| Kolor | Znaczenie |
-|-------|-----------|
+### Arkusz `TA_Report` — kolumny
+
+| # | Nazwa | Opis | Dropdown |
+|---|-------|------|----------|
+| 1 | Actor | Agent / Provider / Patient / Admin / System | ✅ |
+| 2 | TC_ID | TC-001, TC-002, ... (auto) | — |
+| 3 | Test_Name | Nazwa test case | — |
+| 4 | Domain | Domena biznesowa | ✅ 15 opcji |
+| 5 | Test_Type | Sanity / Smoke / "" (z tagu `@Suite`) | ✅ |
+| 6 | Excel_Status | DONE / IN PROGRESS / ALMOST / TODO | ✅ (kolorowane) |
+| 7 | Person | Przypisana osoba | ✅ 56 nazwisk |
+| 8 | Priority | High / Medium / Low | ✅ |
+| 9 | Feature_Files | Ścieżka do `.feature` (1 plik = 1 TC) | — |
+| 10 | Notes | Notatki, `[AUTO] data` dla auto-dodanych | — |
+| 11 | ADO_Dev | Klikalny link ADO (Dev) | — |
+| 12 | ADO_Int | Klikalny link ADO (Int) | — |
+| 13 | Related_TC | Powiązane TC (np. TC-012, TC-034) | — |
+
+### Kolorowanie statusów
+
+| Kolor | Status |
+|-------|--------|
 | 🟢 Zielony | `DONE` |
 | 🟡 Żółty | `IN PROGRESS` / `ALMOST` |
-| 🔴 Czerwony/różowy | `TODO` |
+| 🔴 Czerwony | `TODO` |
+| 🟠 Pomarańczowy | `Feature_Files` — brakujący plik (wykryty przez `-Sync`) |
+
+### Arkusze referencyjne (tylko do odczytu)
+
+`Test_Types` · `Actors` · `Status_Options` · `Priorities` · `Domains` · `Team_Members`
 
 ---
 
-## Zakładki słownikowe (reference sheets)
+## Aktualny stan inventory (maj 2026)
 
-Raport zawiera 6 zakładek pomocniczych (tylko do odczytu — nie edytuj):
+- **156 TC** łącznie: 81 ze źródłowego Excel + 75 z `$extraTCs`
+- **DONE: 124** · IN PROGRESS: 9 · ALMOST: 1 · **TODO: 20**
+- **111 `.feature` files** w repo — wszystkie zmapowane
+- Zasada: **1 feature file = 1 TC** (bez wyjątków)
 
-| Zakładka | Zawartość |
-|----------|-----------|
-| `Test_Types` | Sanity, Smoke, Functional, Regression, E2E |
-| `Actors` | Agent, Provider, Patient, Admin, System |
-| `Status_Options` | TODO, IN PROGRESS, ALMOST, DONE, BLOCKED, ON HOLD |
-| `Priorities` | Low, Medium, High, Critical |
-| `Domains` | 15 domen biznesowych |
-| `Team_Members` | 56 pełnych nazwisk członków zespołu |
+### TODO — TC bez feature file (20 szt.)
 
----
-
-## ADO linki (Azure DevOps)
-
-Kolumny `ADO_Dev` i `ADO_Int` są wypełniane automatycznie z source Excela:
-
-- **Source Excel kolumny:** `DevTaskID` (kol 9), `IntTaskID` (kol 10), `DEV Task Link` (kol 11), `INT Task Link` (kol 12)
-- Jeśli URL jest wypełniony → komórka w raporcie jest **klikalnym hyperlinkiem** (wyświetla tylko ID, klick otwiera ADO)
-- Jeśli tylko ID bez URL → wyświetla sam numer
-
-Żeby dodać/zaktualizować link do ADO dla TC:
-1. Otwórz `TestAutomation_tests_list.xlsx`, arkusz `TA_List`
-2. Wpisz ID taska w kolumnie `DevTaskID` lub `IntTaskID`
-3. Wpisz pełny URL w kolumnie `DEV Task Link` lub `INT Task Link` (np. `https://dev.azure.com/org/project/_workitems/edit/12345`)
-4. Uruchom skrypt → linki pojawią się automatycznie w raporcie
+TC-004, TC-005, TC-006, TC-008, TC-017, TC-024, TC-029, TC-033, TC-044, TC-050,
+TC-052, TC-054, TC-056, TC-057, TC-058, TC-059, TC-075, TC-077, TC-078 + kilka Ledger Connector
 
 ---
 
-## Jak filtrować?
+## Jak dodać nowy TC do mappingu?
 
-Po otwarciu pliku w Excelu użyj **Data → Filter** (lub `Ctrl+Shift+L`). Każda kolumna ma dropdown. Przydatne filtry:
+### A) Nowy TC spoza source Excela → dodaj do `$extraTCs` w skrypcie 1
 
-- `Actor = Provider` → wszystkie testy Provider
-- `Excel_Status = TODO` → co jeszcze do zrobienia
-- `Domain = Banking` → testy dla konkretnej domeny
-- `Test_Type = Sanity` lub `Smoke` → testy oznaczone jako Sanity/Smoke
-- `Person = Kamil Małysiak` → testy przypisane do konkretnej osoby
-
----
-
-## Jak aktualizować listę TC?
-
-1. Otwórz `TestAutomation_tests_list.xlsx`
-2. Edytuj arkusz `TA_List` — zmień status, przypisz osobę (pełne nazwisko), dodaj linki ADO
-3. Uruchom skrypt → wygeneruje nowy raport z aktualnym stanem repo
-
-> Nie edytuj pliku `TA_Report_*.xlsx` bezpośrednio — jest generowany automatycznie i zostanie nadpisany.
-
----
-
-## Jak dodać nowy TC do skryptu?
-
-Gdy dodasz nowy TC do Excela (nowy wiersz w `TA_List`), musisz też dodać go do skryptu w dwóch miejscach:
-
-**1. Mapping aktor** (`$actorMapping` w skrypcie, sekcja 3a):
 ```powershell
-"S99" = "Agent"  # nazwa nowego TC
+$extraTCs.Add([PSCustomObject]@{
+    Actor    = "Agent"
+    Name     = "Mój Nowy Test"
+    Domain   = "Payment Matching"
+    Priority = "Medium"
+    Status   = "TODO"
+    Person   = ""
+    Files    = @("Agent\Folder\MójNowyTest.feature")
+})
 ```
 
-**2. Mapping feature files** (`$mapping` w skrypcie, sekcja 3b):
-```powershell
-"S99" = @("Agent\Sciezka\Do\NowegoPlikuFeature.feature")
-```
+### B) Nowy TC z source Excela (nowy wiersz w `TestAutomation_tests_list.xlsx`)
 
-Jeśli test jest `TODO` i plik jeszcze nie istnieje, wpisz pustą tablicę:
-```powershell
-"S99" = @()
-```
-
-> `TC_ID` w formacie `TC-001` jest nadawany automatycznie przez skrypt wg kolejności wierszy w source Excelu — nie trzeba go nigdzie wpisywać.
+1. Dodaj klucz do `$actorMapping`: `"S99" = "Agent"`
+2. Dodaj klucz do `$mapping`: `"S99" = @("Agent\Folder\Feature.feature")`
+3. Jeśli plik jeszcze nie istnieje: `"S99" = @()`
+4. Uruchom `Generate-TA-Report.ps1`
 
 ---
 
 ## Normalizacja nazwisk
 
-Skrypt automatycznie konwertuje stare skróty z source Excela na pełne nazwiska:
+Stare skróty z source Excela są automatycznie konwertowane:
 
-| Skrót w Excelu | Pełne nazwisko |
-|----------------|----------------|
+| Skrót | Pełne nazwisko |
+|-------|----------------|
 | `CezaryF` | Cezary Frączkowski |
 | `KamilM` | Kamil Małysiak |
 | `KamilK` | Kamil Kosko |
 | `TomaszS` | Tomasz Statkowski |
 | `Sylwia` | Sylwia Kulig |
 
-Żeby dodać nową normalizację — edytuj `$personNormalize` w skrypcie (sekcja przed `$report`).
+Nową normalizację dodaj w `$personNormalize` w skrypcie 1.
 
 ---
 
-## Statusy TC — co oznaczają?
+## Zombie procesy Excel — jak czyścić?
 
-| Status | Znaczenie |
-|--------|-----------|
-| `DONE` | Test zaimplementowany i działa |
-| `IN PROGRESS` | W trakcie implementacji |
-| `ALMOST` | Prawie gotowy — wymaga drobnych poprawek |
-| `TODO` | Jeszcze nie zaczęty |
-| `BLOCKED` | Zablokowany — czeka na zewnętrzną zależność |
-| `ON HOLD` | Wstrzymany |
+Jeśli skrypt przerwie się z błędem (np. plik zablokowany), mogą zostać procesy w tle:
+
+```powershell
+Get-Process EXCEL | Where-Object { $_.MainWindowTitle -eq "" } | Stop-Process -Force
+```
 
 ---
 
-## Feature files bez TC w Excelu
+## `3_Create-ADO-Tasks.ps1` — tworzenie tasków ADO
 
-W repo istnieje **54 pliki `.feature`** (poza `Prepare/`) które nie są podpięte pod żaden TC w source Excelu. Są to głównie:
+Tworzy taski **DEV + INT** w Azure DevOps dla TC z `TA_Inventory.xlsx`.
+Po utworzeniu zapisuje klikalny link z powrotem do kolumn `ADO_Dev` / `ADO_Int`.
 
-- `Agent\BulkFee\` — ApproveFee, DeclineFee
-- `Agent\BusinessAccount\SpecialAgreementNote`
-- `Agent\Claim\Search\` — ClaimSearchFromForm, ClaimSearchFromUri
-- `Agent\ClaimFile\AdminCode\` — 4 pliki
-- `Agent\ClaimFile\BSN\` — 4 pliki
-- `Agent\ClaimFile\ProcessFile\CHA_IM001`
-- `Agent\Maintenance\` — NotificationCSV, NotificationTIMInzichtIntegration, ObjectionReason
-- `Agent\RuleInterpreter\` — RuleInterpretationDetails, RuleInterpreter
-- `Agent\Rules\` — AddNewRule, DeleteRule, UpdateRule
-- `Agent\ToDo\Matching\` — 9 plików (AssignPayments, Filter, Sort, Forward, itp.)
-- `Automated\InvoiceExpiration\` — 5 plików
-- `Patient\Claim\` — 5 plików (ShowClaim, ExtendDueDate)
-- `Provider\Claim\AddressChange\` — 2 pliki
-- `Provider\Claim\Retrocessions\` — 2 pliki
-- `Provider\Login\` — AuthenticatorLogin, EmailLogin, SMSLogin
-- `Provider\NavigationTOREMOVEMAYBE\` — 3 pliki (prawdopodobnie do usunięcia)
-- `Provider\Report\DownloadAllClaimFiles`
-- `Admin\User\DeleteUser`
+> **Konfiguracja:** wklej swój PAT w zmiennej `$DefaultPAT` na górze skryptu.
 
-Żeby je podpiąć: dodaj nowy TC do `TestAutomation_tests_list.xlsx` i zmapuj w skrypcie w sekcji `$mapping`.
+### Domyślne zachowanie
+
+- Tworzy taski tylko dla statusów **TODO / IN PROGRESS / ALMOST** — pomija DONE
+- Pomija TC które już mają ADO link (chyba że `-Force`)
+
+```powershell
+# Podgląd — co by zostało utworzone (bez API calls)
+& .\3_Create-ADO-Tasks.ps1 -WhatIf
+
+# Utwórz taski (TODO + IN PROGRESS + ALMOST bez ADO linku)
+& .\3_Create-ADO-Tasks.ps1
+
+# Tylko konkretny status
+& .\3_Create-ADO-Tasks.ps1 -FilterStatus "TODO"
+
+# Tylko konkretny TC
+& .\3_Create-ADO-Tasks.ps1 -FilterTcId "TC-005"
+
+# Tylko DEV lub tylko INT
+& .\3_Create-ADO-Tasks.ps1 -OnlyDev
+& .\3_Create-ADO-Tasks.ps1 -OnlyInt
+
+# Uwzględnij też DONE (np. wpiąć ADO linki historycznie)
+& .\3_Create-ADO-Tasks.ps1 -IncludeDone
+
+# Nadpisz istniejące ADO linki
+& .\3_Create-ADO-Tasks.ps1 -Force
+```
+
+Wynik zapisywany jako `TA_Inventory_YYYY-MM-DD.xlsx` z uzupełnionymi linkami ADO.
