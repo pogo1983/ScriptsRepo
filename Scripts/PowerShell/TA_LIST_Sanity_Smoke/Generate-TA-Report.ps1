@@ -1,12 +1,34 @@
 # ============================================================
-#  Generate-TA-Report.ps1
-#  Generuje raport porownawczy: Excel TC list <-> repo .feature files
-#  Output: TA_Report_<date>.csv  (mozna otworzyc w Excelu)
-#  Grupowanie: po Aktorze (Agent / Provider / Patient / Admin / System)
+#  [SKRYPT 1/2]  Generate-TA-Report.ps1
 # ============================================================
+#  CEL: Bootstrap - tworzy TA_Inventory.xlsx od zera.
+#       Uruchamiaj tylko gdy chcesz odbudowac cala baze
+#       (np. po zmianach w $mapping / $extraTCs).
+#
+#  CO ROBI:
+#    - Czyta TestAutomation_tests_list.xlsx (81 TC ze zrodla)
+#    - Skanuje repo w poszukiwaniu .feature files
+#    - Laczy dane wg $mapping + $extraTCs (1 feature = 1 TC)
+#    - Jezeli TC ma feature -> status = DONE (automatycznie)
+#    - Zapisuje TA_Inventory.xlsx (nadpisuje poprzedni)
+#
+#  KIEDY UZYWAC:
+#    1. Pierwsze uruchomienie na nowym srodowisku
+#    2. Po dodaniu/zmianie wpisow w $mapping lub $extraTCs
+#    3. Po zmianach struktury kolumn / ref sheetow
+#
+#  UWAGA: Nadpisuje TA_Inventory.xlsx bezpowrotnie!
+#         Recznie zmienione statusy/osoby zostana UTRACONE.
+#         Do codziennego update uzywaj Skryptu 2.
+#
+#  Uzycie:
+#    & .\Generate-TA-Report.ps1             # generuj pelny raport
+#    & .\Generate-TA-Report.ps1 -DiffOnly   # pokaz niezamapowane feature files
+# ============================================================
+param([switch]$DiffOnly)
 
 $RepoRoot     = "d:\git\TimTestAutomation\AutomationTests"
-$OutputXlsx   = "d:\SQL\SQL\TA_LIST_Sanity_Smoke\TA_Report_$(Get-Date -Format 'yyyyMMdd_HHmmss').xlsx"
+$OutputXlsx   = "d:\SQL\SQL\TA_LIST_Sanity_Smoke\TA_Inventory.xlsx"
 $ExcelFile    = "d:\SQL\SQL\TA_LIST_Sanity_Smoke\TestAutomation_tests_list.xlsx"
 
 # ============================================================
@@ -179,12 +201,7 @@ $actorMapping = @{
 #    (recznie uzupelnione na podstawie analizy repo)
 # ============================================================
 $mapping = @{
-    "S01"  = @("Provider\Claim\Stop\FullStop.feature",
-                "Provider\Claim\Stop\PartialStopClaimLines.feature",
-                "Provider\Claim\Stop\LeniencyStop.feature",
-                "Provider\Claim\Stop\OutstandingAmountStop.feature",
-                "Provider\Claim\Stop\LeniencyFixedAmountStop.feature",
-                "Provider\Claim\Stop\LeniencyPercentageAmountStop.feature")
+    "S01"  = @("Provider\Claim\Stop\FullStop.feature")
 
     "S02"  = @()  # Stop on Claim in TIM - Tim\ dir jest pusty, brak feature
     "S03"  = @()  # Full Stop on unpaid Claim in TIM - brak feature
@@ -194,34 +211,20 @@ $mapping = @{
     "S07"  = @()  # Closing stop Inzicht - brak feature
     "S08"  = @()  # Resurrect a Claim - brak feature
 
-    "S09"  = @("Agent\Clearing\CreateIA100PercentPromise.feature",
-                "Agent\Clearing\CreateIA0PercentPromise.feature",
-                "Agent\Clearing\CreateIA50PercentPromiseWithIrcrPrinted.feature",
-                "Agent\Clearing\CreateIA50PercentPromiseWithIrcrRejected.feature",
-                "Agent\Clearing\CreateIA50PercentPromiseWithIrcrSspAction.feature")
+    "S09"  = @("Agent\Clearing\CreateIA100PercentPromise.feature")
 
-    "S10"  = @("Agent\\ToDo\\Matching\\ManualMatchAndUnmatchPaymentWithClaim.feature",
-                "Agent\\ToDo\\Matching\\AssignPaymentsToMyself.feature",
-                "Agent\\ToDo\\Matching\\AssignSelectedPaymentsSummaryDialog.feature",
-                "Agent\\ToDo\\Matching\\DuplicatedPaymentsButtons.feature",
-                "Agent\\ToDo\\Matching\\FilterPayments.feature",
-                "Agent\\ToDo\\Matching\\FullTextSearch.feature",
-                "Agent\\ToDo\\Matching\\SortPayments.feature",
-                "Agent\\ToDo\\Matching\\StartMatchingButton.feature")
+    "S10"  = @("Agent\\ToDo\\Matching\\ManualMatchAndUnmatchPaymentWithClaim.feature")
     "S11"  = @("Agent\ToDo\Matching\AutomatchPaymentWithClaim.feature")
     "S12"  = @("Patient\Claim\PaymentAgreement\CreatePaymentAgreementDD.feature")
     "S13"  = @("Patient\Claim\Download\DownloadPublicInvoiceDocument.feature")
-    "S14"  = @("Patient\Claim\Pay\PayForInvoiceUsingIDEAL.feature",
-                "Patient\Claim\Pay\ConfirmIDEALPaymentManually.feature")
+    "S14"  = @("Patient\Claim\Pay\PayForInvoiceUsingIDEAL.feature")
     "S15"  = @("Agent\ToDo\Matching\ManualMatchAndUnmatchPaymentWithClaim.feature")
     "S16"  = @("Agent\\ToDo\\Matching\\PaybackReminder.feature")  # Make a Payback
     "S17"  = @()  # Small open amount tests - brak feature
 
     "S18"  = @("Agent\Clearing\CreateIA100PercentPromise.feature")
     "S19"  = @("Agent\Clearing\CreateIA0PercentPromise.feature")
-    "S20"  = @("Agent\Clearing\CreateIA50PercentPromiseWithIrcrPrinted.feature",
-                "Agent\Clearing\CreateIA50PercentPromiseWithIrcrRejected.feature",
-                "Agent\Clearing\CreateIA50PercentPromiseWithIrcrSspAction.feature")
+    "S20"  = @("Agent\Clearing\CreateIA50PercentPromiseWithIrcrPrinted.feature")
     "S21"  = @("Agent\Clearing\CreateIA50PercentPromiseWithIrcrPrinted.feature")
     "S22"  = @("Agent\Clearing\CreateIA50PercentPromiseWithIrcrRejected.feature")
     "S23"  = @("Agent\Clearing\CreateIA50PercentPromiseWithIrcrSspAction.feature")
@@ -232,35 +235,25 @@ $mapping = @{
     "S27"  = @("Provider\Contact\MessageToAgentFromInzicht.feature")
     "S28"  = @("Agent\Settlement\SettlementSend.feature")
     "S29"  = @()  # Settle CHA - brak feature
-    "S30"  = @("Patient\Claim\CreateCopy\CopyPaperInvoice.feature",
-                "Patient\Claim\CreateCopy\CopyDigitalInvoiceFromDownloadInvoicePopup.feature")
+    "S30"  = @("Patient\Claim\CreateCopy\CopyPaperInvoice.feature")
     "S31"  = @()  # Create BA and process - to Prepare testy
     "S32"  = @("Agent\Settlement\SettlementSetToToday.feature")
     "S33"  = @()  # Add Correction to Settlement - brak feature
-    "S34"  = @("Agent\Login\LoginToTIM.feature",
-                "Provider\Login\LoginToInzicht.feature",                "Provider\\Login\\AuthenticatorLogin.feature",
-                "Provider\\Login\\EmailLogin.feature",
-                "Provider\\Login\\SMSLogin.feature",                "Admin\LoginToIAM.feature")
+    "S34"  = @("Agent\Login\LoginToTIM.feature")
     "S35"  = @()  # Change Password - brak feature
     "S36"  = @("Agent\HelpdeskTOFIXPREPAREFOREMPTYENVIRONMENT\CreateTicket.feature")
     "S37"  = @()  # Resolve Ticket - brak dedykowanego (MyTicketsPage?)
     "S38"  = @("Agent\ToDo\Approvals\CreateResolveApproval-trzeba_rozdzielic.feature")
     "S39"  = @("Agent\ToDo\Approvals\CreateResolveApproval-trzeba_rozdzielic.feature")
     "S40"  = @()  # Ledger View Inzicht - brak feature
-    "S41"  = @("Provider\ClaimFile\UploadFile\SuccessfulUploadFileFromDeclarationsPage.feature",
-                "Provider\ClaimFile\UploadFile\SuccessfulUploadFileFromHomePage.feature")
+    "S41"  = @("Provider\ClaimFile\UploadFile\SuccessfulUploadFileFromDeclarationsPage.feature")
     "S42"  = @("Agent\BusinessAccount\ClaimFile\UploadFileFromUI.feature")
     "S43"  = @()  # Upload by Folder/IMD - brak feature
     "S44"  = @()  # Change Follow Up - brak feature
-    "S45"  = @("Agent\ClaimFile\UploadFile\ProcessClaimWhenUBOBlocked.feature",
-                "Agent\ClaimFile\UploadFile\ProcessClaimWhenUBONotBlocked.feature",
-                "Agent\ClaimFile\UploadFile\ProcessClaimWithoutChangingUBOStatusInDB.feature",
-                "Provider\ClaimFile\UploadFile\ProcessClaimInInzichtWhenUBOIsBlocked.feature")
-    "S46"  = @("Agent\Claim\Complaint\ResolveComplaint.feature",
-                "Agent\Claim\Complaint\AddCustomObjectionToClaim.feature")
+    "S45"  = @("Agent\ClaimFile\UploadFile\ProcessClaimWhenUBOBlocked.feature")
+    "S46"  = @("Agent\Claim\Complaint\ResolveComplaint.feature")
     "S47"  = @("Agent\Claim\AddAddressChange\AddAddressChange.feature")
-    "S48"  = @("Patient\\Claim\\ExtendDueDate\\PostponeInvoiceDueDateInCMIB.feature",
-                "Patient\\Claim\\ExtendDueDate\\PostponeInvoiceDueDate.feature")
+    "S48"  = @("Patient\\Claim\\ExtendDueDate\\PostponeInvoiceDueDateInCMIB.feature")
     "S49"  = @("Agent\ClaimFile\ProcessFile\GDS801v2withDPayWS.feature")
     "S50"  = @()  # Create/Resolve Complaint Action - brak feature
 
@@ -268,28 +261,21 @@ $mapping = @{
     "SM02" = @()  # Settle ROBP - brak feature
     "SM03" = @("Agent\Maintenance\PDP\RegeneratePDPFiles.feature")
     "SM04" = @()  # Generate CSV XML - brak feature
-    "SM05" = @("Patient\Claim\PaymentAgreement\CreatePaymentAgreementDD.feature",
-                "Patient\Claim\PaymentAgreement\ConfirmPaymentAgreementDDManually.feature")
+    "SM05" = @("Patient\Claim\PaymentAgreement\CreatePaymentAgreementDD.feature")
     "SM06" = @()  # PA DD reject matching - brak feature
     "SM07" = @()  # Bailiff full flow - brak feature
     "SM08" = @()  # BA Invoice DD matching - brak feature
     "SM09" = @()  # DPAY WS - brak feature
-    "SM10" = @("Agent\Clearing\CreateIA50PercentPromiseWithIrcrPrinted.feature",
-                "Agent\Clearing\CreateIA50PercentPromiseWithIrcrRejected.feature",
-                "Agent\Clearing\CreateIA50PercentPromiseWithIrcrSspAction.feature")
-    "SM11" = @("Provider\\Claim\\AddressChange\\ChangeAddressAndStoreDataOnly.feature",
-                "Provider\\Claim\\AddressChange\\BlockClaimRedeliveryByPostAfter3AddressChanges.feature",
-                "Provider\\Claim\\AddressChange\\CorrectIncorrectPostCode.feature")
+    "SM10" = @("Agent\Clearing\CreateIA50PercentPromiseWithIrcrPrinted.feature")
+    "SM11" = @("Provider\\Claim\\AddressChange\\ChangeAddressAndStoreDataOnly.feature")
     "SM12" = @()  # Resume Address Change without change - brak feature
     "SM13" = @("Provider\Claim\AddressChange\ChangeAddressAndRedeliverClaimByPost.feature")
     "SM14" = @("Provider\Claim\AddressChange\ChangeAddressAndRedeliverClaimByEmail.feature")
 
     "S51"  = @()  # Export KET users IAM - brak feature
     "S52"  = @("Patient\Claim\ShowClaim\OpenPaymentPageForInvoiceInBailiff.feature")
-    "S53"  = @("Provider\ClaimFile\ProcessFile\MZ301.feature",
-                "Provider\ClaimFile\ProcessFile\GDS801v1.feature",                "Provider\\ClaimFile\\ProcessFile\\CHA_IM001.feature",                "Provider\ClaimFile\ProcessFile\CHA_IM002.feature")
-    "S54"  = @("Provider\ClaimFile\UploadFile\FailedUploadFileFromDeclarationsPage.feature",
-                "Provider\ClaimFile\UploadFile\FailedUploadFileFromHomePage.feature")
+    "S53"  = @("Provider\ClaimFile\ProcessFile\MZ301.feature")
+    "S54"  = @("Provider\ClaimFile\UploadFile\FailedUploadFileFromDeclarationsPage.feature")
     "S55"  = @()  # Claim To Do View - brak feature
     "S56"  = @("Provider\ClaimFile\UploadFile\FailedUploadFileFromDeclarationsPage.feature")
     "S57"  = @("Agent\BusinessAccount\ClaimFile\StopClaimFile.feature")
@@ -309,26 +295,127 @@ $mapping = @{
 #     Dodawane na koncu raportu z kolejnymi TC-NNN numerami
 # ============================================================
 $extraTCs = [System.Collections.Generic.List[PSCustomObject]]::new()
-$extraTCs.Add([PSCustomObject]@{ Actor="Admin";    Name="Delete User";                          Domain="Auth & User Management"; Priority="Medium"; Status="TODO"; Person=""; Files=@("Admin\\User\\DeleteUser.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Approve / Decline Bulk Fee";           Domain="Costs & Tariffs";        Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\BulkFee\\ApproveFee.feature","Agent\\BulkFee\\DeclineFee.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Special Agreement Note";               Domain="Customer Configuration"; Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\BusinessAccount\\SpecialAgreementNote.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Claim Search";                         Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\Claim\\Search\\ClaimSearchFromForm.feature","Agent\\Claim\\Search\\ClaimSearchFromUri.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Admin Code Validation in Claim File";  Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ClaimFile\\AdminCode\\AdminCodeGDSFileName.feature","Agent\\ClaimFile\\AdminCode\\AdminCodeInGDSDeclarationNo.feature","Agent\\ClaimFile\\AdminCode\\AdminCodeInLHFileName.feature","Agent\\ClaimFile\\AdminCode\\NoAdminCodeInLHFileName.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="BSN Validation in Claim File";         Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ClaimFile\\BSN\\GDSWithCorrectBSN.feature","Agent\\ClaimFile\\BSN\\GDSWithIncorrectBSN.feature","Agent\\ClaimFile\\BSN\\MZWithCorrectBSN.feature","Agent\\ClaimFile\\BSN\\MZWithIncorrectBSN.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Notification CSV Export";              Domain="Templating & Messaging"; Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\Maintenance\\NotificationCSV.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="TIM-Inzicht Notification Integration"; Domain="Templating & Messaging"; Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\Maintenance\\NotificationTIMInzichtIntegration.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Objection Reason Management";          Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\Maintenance\\ObjectionReason.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Rule Interpreter";                     Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\RuleInterpreter\\RuleInterpretationDetails.feature","Agent\\RuleInterpreter\\RuleInterpreter.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Rules CRUD (Add / Update / Delete)";   Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\Rules\\AddNewRule.feature","Agent\\Rules\\DeleteRule.feature","Agent\\Rules\\UpdateRule.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Forward Payment";                      Domain="Payment Matching";       Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ToDo\\Matching\\ForwardPayment.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Take Remaining as Profit";             Domain="Payment Matching";       Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ToDo\\Matching\\TakeRemainingAsProfit.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="System";   Name="Invoice Expiration - CIR Flow";        Domain="Invoicing & Dunning";    Priority="High";   Status="TODO"; Person=""; Files=@("Automated\\InvoiceExpiration\\Basic\\ClaimHandledAfterCIR.feature","Automated\\InvoiceExpiration\\Basic\\DigitalClaimHandledAfterCIR.feature","Automated\\InvoiceExpiration\\Complete\\ClaimSentToBailiffAfterCIR.feature","Automated\\InvoiceExpiration\\Complete\\DigitalClaimSentToBailiffAfterCIR.feature","Automated\\InvoiceExpiration\\Extended\\ClaimSentToBailiffAfterCIR.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Patient";  Name="Open Payment Page (various entry points)"; Domain="Invoicing & Dunning"; Priority="Medium"; Status="TODO"; Person=""; Files=@("Patient\\Claim\\ShowClaim\\OpenPaymentPageForPharmaceuticalInvoice.feature","Patient\\Claim\\ShowClaim\\OpenPaymentPageFromFallbackPage.feature","Patient\\Claim\\ShowClaim\\OpenPaymentPageFromUrl.feature","Patient\\Claim\\ShowClaim\\OpenPaymentPageWithInvalidInvoiceNumber.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Retrocessions (Add / View)";           Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\\Claim\\Retrocessions\\AddRetrocession.feature","Provider\\Claim\\Retrocessions\\ViewRetrocessions.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Download All Claim Files Report";      Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\\Report\\DownloadAllClaimFiles.feature") })
-$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="[TO REMOVE] Provider Navigation";      Domain="Claim Orchestration";    Priority="Low";    Status="TODO"; Person=""; Files=@("Provider\\NavigationTOREMOVEMAYBE\\NavigateToIncorrectClaimsAndBack.feature","Provider\\NavigationTOREMOVEMAYBE\\NavigateToIncorrectClaimsFromBAOverview.feature","Provider\\NavigationTOREMOVEMAYBE\\NavigateToIncorrectClaimsFromFirstRow.feature") })
 
-# ============================================================# 4. Buduj wiersze raportu
+# --- Auth & User Management (from S34) ---
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Login to Inzicht";                                    Domain="Auth & User Management"; Priority="High";   Status="TODO"; Person=""; Files=@("Provider\Login\LoginToInzicht.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Login to Inzicht - Authenticator";                   Domain="Auth & User Management"; Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\\Login\\AuthenticatorLogin.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Login to Inzicht - Email";                           Domain="Auth & User Management"; Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\\Login\\EmailLogin.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Login to Inzicht - SMS";                             Domain="Auth & User Management"; Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\\Login\\SMSLogin.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Admin";    Name="Login to IAM";                                       Domain="Auth & User Management"; Priority="High";   Status="TODO"; Person=""; Files=@("Admin\LoginToIAM.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Admin";    Name="Delete User";                                        Domain="Auth & User Management"; Priority="Medium"; Status="TODO"; Person=""; Files=@("Admin\\User\\DeleteUser.feature") })
+
+# --- Claim Orchestration ---
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Stop - Partial Stop Claim Lines";                    Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\Claim\Stop\PartialStopClaimLines.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Stop - Leniency Stop";                               Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\Claim\Stop\LeniencyStop.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Stop - Outstanding Amount Stop";                     Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\Claim\Stop\OutstandingAmountStop.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Stop - Leniency Fixed Amount Stop";                  Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\Claim\Stop\LeniencyFixedAmountStop.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Stop - Leniency Percentage Amount Stop";             Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\Claim\Stop\LeniencyPercentageAmountStop.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Process Claim When UBO Not Blocked";                 Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\ClaimFile\UploadFile\ProcessClaimWhenUBONotBlocked.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Process Claim Without Changing UBO Status";          Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\ClaimFile\UploadFile\ProcessClaimWithoutChangingUBOStatusInDB.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Process Claim in Inzicht When UBO Blocked";          Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\ClaimFile\UploadFile\ProcessClaimInInzichtWhenUBOIsBlocked.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Add Custom Objection to Claim";                      Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\Claim\Complaint\AddCustomObjectionToClaim.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Claim Search - From Form";                           Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\Claim\\Search\\ClaimSearchFromForm.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Claim Search - From URI";                            Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\Claim\\Search\\ClaimSearchFromUri.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Objection Reason Management";                        Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\Maintenance\\ObjectionReason.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Rule Interpretation Details";                        Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\RuleInterpreter\\RuleInterpretationDetails.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Rule Interpreter";                                   Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\RuleInterpreter\\RuleInterpreter.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Add New Rule";                                       Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\Rules\\AddNewRule.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Delete Rule";                                        Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\Rules\\DeleteRule.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Update Rule";                                        Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\Rules\\UpdateRule.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Block Claim Redelivery After 3 Address Changes";     Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\\Claim\\AddressChange\\BlockClaimRedeliveryByPostAfter3AddressChanges.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Correct Incorrect Post Code";                        Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\\Claim\\AddressChange\\CorrectIncorrectPostCode.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Retrocessions - Add Retrocession";                   Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\\Claim\\Retrocessions\\AddRetrocession.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Retrocessions - View Retrocessions";                 Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\\Claim\\Retrocessions\\ViewRetrocessions.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="HelpDesk - My Tickets";                              Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\HelpdeskTOFIXPREPAREFOREMPTYENVIRONMENT\\MyTicketsPage.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="HelpDesk - Open Tickets";                            Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\HelpdeskTOFIXPREPAREFOREMPTYENVIRONMENT\\OpenTicketsPage.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="HelpDesk - Ticket Page";                             Domain="Claim Orchestration";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\HelpdeskTOFIXPREPAREFOREMPTYENVIRONMENT\\TicketPage.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="[TO REMOVE] Navigate to Incorrect Claims and Back";  Domain="Claim Orchestration";    Priority="Low";    Status="TODO"; Person=""; Files=@("Provider\\NavigationTOREMOVEMAYBE\\NavigateToIncorrectClaimsAndBack.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="[TO REMOVE] Navigate from BA Overview";              Domain="Claim Orchestration";    Priority="Low";    Status="TODO"; Person=""; Files=@("Provider\\NavigationTOREMOVEMAYBE\\NavigateToIncorrectClaimsFromBAOverview.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="[TO REMOVE] Navigate from First Row";                Domain="Claim Orchestration";    Priority="Low";    Status="TODO"; Person=""; Files=@("Provider\\NavigationTOREMOVEMAYBE\\NavigateToIncorrectClaimsFromFirstRow.feature") })
+
+# --- Costs & Tariffs ---
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Approve Bulk Fee";                                   Domain="Costs & Tariffs";        Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\BulkFee\\ApproveFee.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Decline Bulk Fee";                                   Domain="Costs & Tariffs";        Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\BulkFee\\DeclineFee.feature") })
+
+# --- Customer Configuration ---
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Special Agreement Note";                             Domain="Customer Configuration"; Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\BusinessAccount\\SpecialAgreementNote.feature") })
+
+# --- Invoicing & Dunning ---
+$extraTCs.Add([PSCustomObject]@{ Actor="Patient";  Name="Copy Digital Invoice from Download Popup";           Domain="Invoicing & Dunning";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Patient\Claim\CreateCopy\CopyDigitalInvoiceFromDownloadInvoicePopup.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Patient";  Name="Postpone Invoice Due Date";                          Domain="Invoicing & Dunning";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Patient\\Claim\\ExtendDueDate\\PostponeInvoiceDueDate.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Patient";  Name="Open Payment Page - Pharmaceutical Invoice";         Domain="Invoicing & Dunning";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Patient\\Claim\\ShowClaim\\OpenPaymentPageForPharmaceuticalInvoice.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Patient";  Name="Open Payment Page - From Fallback Page";             Domain="Invoicing & Dunning";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Patient\\Claim\\ShowClaim\\OpenPaymentPageFromFallbackPage.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Patient";  Name="Open Payment Page - From URL";                       Domain="Invoicing & Dunning";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Patient\\Claim\\ShowClaim\\OpenPaymentPageFromUrl.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Patient";  Name="Open Payment Page - Invalid Invoice Number";         Domain="Invoicing & Dunning";    Priority="Medium"; Status="TODO"; Person=""; Files=@("Patient\\Claim\\ShowClaim\\OpenPaymentPageWithInvalidInvoiceNumber.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="System";   Name="Invoice Expiration - Basic Claim After CIR";         Domain="Invoicing & Dunning";    Priority="High";   Status="TODO"; Person=""; Files=@("Automated\\InvoiceExpiration\\Basic\\ClaimHandledAfterCIR.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="System";   Name="Invoice Expiration - Basic Digital After CIR";       Domain="Invoicing & Dunning";    Priority="High";   Status="TODO"; Person=""; Files=@("Automated\\InvoiceExpiration\\Basic\\DigitalClaimHandledAfterCIR.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="System";   Name="Invoice Expiration - Complete Claim to Bailiff";     Domain="Invoicing & Dunning";    Priority="High";   Status="TODO"; Person=""; Files=@("Automated\\InvoiceExpiration\\Complete\\ClaimSentToBailiffAfterCIR.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="System";   Name="Invoice Expiration - Complete Digital to Bailiff";   Domain="Invoicing & Dunning";    Priority="High";   Status="TODO"; Person=""; Files=@("Automated\\InvoiceExpiration\\Complete\\DigitalClaimSentToBailiffAfterCIR.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="System";   Name="Invoice Expiration - Extended Claim to Bailiff";     Domain="Invoicing & Dunning";    Priority="High";   Status="TODO"; Person=""; Files=@("Automated\\InvoiceExpiration\\Extended\\ClaimSentToBailiffAfterCIR.feature") })
+
+# --- Payment Matching ---
+$extraTCs.Add([PSCustomObject]@{ Actor="Patient";  Name="Confirm IDEAL Payment Manually";                     Domain="Payment Matching";       Priority="Medium"; Status="TODO"; Person=""; Files=@("Patient\Claim\Pay\ConfirmIDEALPaymentManually.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Patient";  Name="Confirm Payment Agreement DD Manually";              Domain="Payment Matching";       Priority="Medium"; Status="TODO"; Person=""; Files=@("Patient\Claim\PaymentAgreement\ConfirmPaymentAgreementDDManually.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Matching - Assign Payments To Myself";               Domain="Payment Matching";       Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ToDo\\Matching\\AssignPaymentsToMyself.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Matching - Assign Selected Payments Summary";        Domain="Payment Matching";       Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ToDo\\Matching\\AssignSelectedPaymentsSummaryDialog.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Matching - Duplicated Payments Buttons";             Domain="Payment Matching";       Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ToDo\\Matching\\DuplicatedPaymentsButtons.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Matching - Filter Payments";                         Domain="Payment Matching";       Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ToDo\\Matching\\FilterPayments.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Matching - Full Text Search";                        Domain="Payment Matching";       Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ToDo\\Matching\\FullTextSearch.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Matching - Sort Payments";                           Domain="Payment Matching";       Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ToDo\\Matching\\SortPayments.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Matching - Start Matching Button";                   Domain="Payment Matching";       Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ToDo\\Matching\\StartMatchingButton.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Matching - Forward Payment";                         Domain="Payment Matching";       Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ToDo\\Matching\\ForwardPayment.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Matching - Take Remaining as Profit";                Domain="Payment Matching";       Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ToDo\\Matching\\TakeRemainingAsProfit.feature") })
+
+# --- Reception ---
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Admin Code in GDS File Name";                        Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ClaimFile\\AdminCode\\AdminCodeGDSFileName.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Admin Code in GDS Declaration No";                   Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ClaimFile\\AdminCode\\AdminCodeInGDSDeclarationNo.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Admin Code in LH File Name";                         Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ClaimFile\\AdminCode\\AdminCodeInLHFileName.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="No Admin Code in LH File Name";                      Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ClaimFile\\AdminCode\\NoAdminCodeInLHFileName.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="GDS Claim File with Correct BSN";                    Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ClaimFile\\BSN\\GDSWithCorrectBSN.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="GDS Claim File with Incorrect BSN";                  Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ClaimFile\\BSN\\GDSWithIncorrectBSN.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="MZ Claim File with Correct BSN";                     Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ClaimFile\\BSN\\MZWithCorrectBSN.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="MZ Claim File with Incorrect BSN";                   Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ClaimFile\\BSN\\MZWithIncorrectBSN.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Process CHA Claim File - Agent (IM001)";             Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\ClaimFile\\ProcessFile\\CHA_IM001.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Process Claim File Inzicht - GDS801v1";              Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\ClaimFile\ProcessFile\GDS801v1.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Process Claim File Inzicht - CHA_IM001";             Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\ClaimFile\ProcessFile\CHA_IM001.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Process Claim File Inzicht - CHA_IM002";             Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\ClaimFile\ProcessFile\CHA_IM002.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Upload Claim File from Home Page";                   Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\ClaimFile\UploadFile\SuccessfulUploadFileFromHomePage.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Failed Upload Claim File from Home Page";            Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\ClaimFile\UploadFile\FailedUploadFileFromHomePage.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Provider"; Name="Download All Claim Files Report";                    Domain="Reception";              Priority="Medium"; Status="TODO"; Person=""; Files=@("Provider\\Report\\DownloadAllClaimFiles.feature") })
+
+# --- Templating & Messaging ---
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="Notification CSV Export";                            Domain="Templating & Messaging"; Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\Maintenance\\NotificationCSV.feature") })
+$extraTCs.Add([PSCustomObject]@{ Actor="Agent";    Name="TIM-Inzicht Notification Integration";               Domain="Templating & Messaging"; Priority="Medium"; Status="TODO"; Person=""; Files=@("Agent\\Maintenance\\NotificationTIMInzichtIntegration.feature") })
+
+# ============================================================
+# 3d. Tryb DiffOnly - wyswietl niezamapowane feature files i zakoncz
+# ============================================================
+if ($DiffOnly) {
+    Write-Host ""
+    Write-Host "=== DIFF MODE: feature files bez TC w inventory ===" -ForegroundColor Yellow
+    $allMappedFiles = [System.Collections.Generic.List[string]]::new()
+    foreach ($paths in $mapping.Values) {
+        foreach ($p in $paths) { $allMappedFiles.Add([IO.Path]::GetFileNameWithoutExtension($p).ToLower()) }
+    }
+    foreach ($etc in $extraTCs) {
+        foreach ($p in $etc.Files) { $allMappedFiles.Add([IO.Path]::GetFileNameWithoutExtension($p).ToLower()) }
+    }
+    $features = Get-ChildItem -Path $RepoRoot -Recurse -Filter "*.feature" |
+        Where-Object { $_.FullName -notmatch "\\Prepare\\" }
+    $unmapped = $features | Where-Object { $allMappedFiles -notcontains $_.BaseName.ToLower() } |
+        ForEach-Object { $_.FullName -replace [regex]::Escape($RepoRoot+"\\"),"" } | Sort-Object
+    if ($unmapped.Count -eq 0) {
+        Write-Host "  Brak niezamapowanych plikow - wszystko w inventory!" -ForegroundColor Green
+    } else {
+        Write-Host "  Znaleziono $($unmapped.Count) plikow bez TC:" -ForegroundColor Red
+        $unmapped | ForEach-Object { Write-Host "    $_" }
+    }
+    Write-Host ""
+    exit
+}
+
+# ============================================================
+# 4. Buduj wiersze raportu
 # ============================================================
 Write-Host "Generuję raport..." -ForegroundColor Cyan
 
@@ -384,13 +471,16 @@ foreach ($tc in $tcList) {
         }
     }
 
+    # Jesli feature istnieje ale Excel mowi TODO -> nadpisz na DONE
+    $effectiveStatus = if ($hasFeature -and $tc.Status -eq "TODO") { "DONE" } else { $tc.Status }
+
     # Okresl gap/action
-    $action = switch ($tc.Status) {
+    $action = switch ($effectiveStatus) {
         "DONE"        { if ($hasFeature) { "OK" } else { "SPRAWDZ - brak feature mimo DONE" } }
         "IN PROGRESS" { if ($hasFeature) { "W trakcie" } else { "DO STWORZENIA (in progress)" } }
         "ALMOST"      { if ($hasFeature) { "Prawie gotowe" } else { "DO DOKONCZENIA" } }
         "TODO"        { "DO ZROBIENIA" }
-        default       { if ($tc.Status) { $tc.Status } else { "BRAK STATUSU" } }
+        default       { if ($effectiveStatus) { $effectiveStatus } else { "BRAK STATUSU" } }
     }
 
     $suiteStr = ($suiteTags | Select-Object -Unique) -join "; "
@@ -405,7 +495,7 @@ foreach ($tc in $tcList) {
         Test_Name      = $tc.Name
         Domain         = $tc.Domain
         Test_Type      = $testType
-        Excel_Status   = $tc.Status
+        Excel_Status   = $effectiveStatus
         Person         = $person
         Priority       = $tc.Priority
         Feature_Files  = $filesStr
@@ -440,7 +530,7 @@ foreach ($etc in $extraTCs) {
         Test_Name      = $etc.Name
         Domain         = $etc.Domain
         Test_Type      = $testType
-        Excel_Status   = $etc.Status
+        Excel_Status   = if ($etc.Files.Count -gt 0) { "DONE" } else { $etc.Status }
         Person         = $etc.Person
         Priority       = $etc.Priority
         Feature_Files  = $matchedFiles -join "`n"
@@ -536,8 +626,8 @@ $usedRange.Columns.AutoFit() | Out-Null
 # Ogranicz max szerokosc kolumny Feature_Files (col 9) i Notes (col 10)
 $ws.Columns.Item(9).ColumnWidth = 60
 $ws.Columns.Item(10).ColumnWidth = 40
-# Wlacz zawijanie tekstu dla Feature_Files
-$ws.Columns.Item(9).WrapText = $true
+# WrapText tylko na zakresie z danymi (nie na calej kolumnie - bug COM przy SaveAs)
+$ws.Range($ws.Cells.Item(2, 9), $ws.Cells.Item($dataRows + 1, 9)).WrapText = $true
 # ADO link columns
 $ws.Columns.Item(11).ColumnWidth = 12
 $ws.Columns.Item(12).ColumnWidth = 12
@@ -715,10 +805,13 @@ if ($dataRows -gt 0) {
 $ws.Activate()
 
 # Zapisz
-$wb2.SaveAs($OutputXlsx, 51)  # 51 = xlOpenXMLWorkbook (.xlsx)
-$wb2.Close($false)
-$xlApp.Quit()
-[System.Runtime.InteropServices.Marshal]::ReleaseComObject($xlApp) | Out-Null
+try {
+    $wb2.SaveAs($OutputXlsx, 51)  # 51 = xlOpenXMLWorkbook (.xlsx)
+} finally {
+    $wb2.Close($false)
+    $xlApp.Quit()
+    [System.Runtime.InteropServices.Marshal]::ReleaseComObject($xlApp) | Out-Null
+}
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
