@@ -668,7 +668,9 @@ Add-RefSheet -wb $wb2 -name "Test_Types" -headerColor $refSheetColor `
         @("Smoke"),
         @("Functional"),
         @("Regression"),
-        @("E2E")
+        @("E2E"),
+        @("API"),
+        @("Preparation")
     ) | Out-Null
 
 # Actors
@@ -691,7 +693,8 @@ Add-RefSheet -wb $wb2 -name "Status_Options" -headerColor $refSheetColor `
         @("ALMOST",      "Prawie gotowy — drobne poprawki"),
         @("DONE",        "Zaimplementowany i działa"),
         @("BLOCKED",     "Zablokowany — czeka na zewnętrzną zależność"),
-        @("ON HOLD",     "Wstrzymany")
+        @("ON HOLD",     "Wstrzymany"),
+        @("TO FIX",      "Do naprawy")
     ) | Out-Null
 
 # Priorities
@@ -783,13 +786,13 @@ if ($dataRows -gt 0) {
     # Kolumna 5 = Test_Type (odwołanie do zakresu w zakładce Test_Types)
     $typeRange = $ws.Range($ws.Cells.Item(2,5), $ws.Cells.Item($dataRows+1, 5))
     $typeRange.Validation.Delete()
-    $typeRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Test_Types!`$A`$2:`$A`$6") | Out-Null
+    $typeRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Test_Types!`$A`$2:`$A`$8") | Out-Null
     $typeRange.Validation.ShowInput = $false
 
     # Kolumna 6 = Excel_Status (odwołanie do zakresu w zakładce Status_Options)
     $statusRange = $ws.Range($ws.Cells.Item(2,6), $ws.Cells.Item($dataRows+1, 6))
     $statusRange.Validation.Delete()
-    $statusRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Status_Options!`$A`$1:`$A`$6") | Out-Null
+    $statusRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Status_Options!`$A`$2:`$A`$8") | Out-Null
     $statusRange.Validation.ShowInput = $false
 
     # Kolumna 7 = Person (odwołanie do zakresu w zakładce Team_Members)
