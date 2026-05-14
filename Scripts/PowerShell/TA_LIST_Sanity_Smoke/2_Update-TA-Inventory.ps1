@@ -38,6 +38,29 @@ param([switch]$DiffOnly, [switch]$Sync, [switch]$UpdateBase, [switch]$SkipGitAut
 $GitRoot = "d:\git\TimTestAutomation"
 
 $RepoRoot      = "d:\git\TimTestAutomation\AutomationTests"
+
+# Normalizacja @Domain: z feature files -> wartosci dropdownu w inventory
+$domainNormalize = @{
+    "Accounting"             = "Accounting (w. Ledger Connector)"
+    "AuthAndUserManagement"  = "Auth & User Management"
+    "AuthNAndUserMgt"        = "Auth & User Management"
+    "Banking"                = "Banking"
+    "BIDataCollector"        = "BIDataCollector"
+    "Bailiff"                = "Bailiff"
+    "ClaimOrchestration"     = "Claim Orchestration"
+    "ClaimOrchistration"     = "Claim Orchestration"   # literowka w repo
+    "CostsAndTariffs"        = "Costs & Tariffs"
+    "CustomerConfiguration"  = "Customer Configuration"
+    "Factoring"              = "Factoring (w. Risk & CHA)"
+    "Insurers"               = "Insurers"
+    "InvoicingAndDunning"    = "Invoicing & Dunning"
+    "PaymentMatching"        = "Payment Matching"
+    "Reception"              = "Reception"
+    "TemplatingAndMsg"       = "Templating & Messaging"
+    "Templating&Messagaing"  = "Templating & Messaging"  # literowka w repo
+    "Validation"             = "Validation"
+    "VendorAPI"              = "Vendor API"
+}
 $InventoryFile = "d:\SQL\SQL\TA_LIST_Sanity_Smoke\TA_Inventory.xlsx"
 $OutputFile    = "d:\SQL\SQL\TA_LIST_Sanity_Smoke\TA_Inventory_$(Get-Date -Format 'yyyy-MM-dd').xlsx"
 
@@ -122,7 +145,8 @@ $newFiles = $features |
         $rel    = $_.FullName -replace [regex]::Escape($RepoRoot + "\"), ""
         $lines  = Get-Content $_.FullName -TotalCount 25
         $allTags = ($lines | Where-Object { $_ -match "^\s*@" }) -join " "
-        $domain  = if ($allTags -match "@Domain:(\S+)")  { $Matches[1] -replace "@.*", "" } else { "" }
+        $domainRaw = if ($allTags -match "@Domain:(\S+)")  { $Matches[1] -replace "@.*", "" } else { "" }
+        $domain    = if ($domainRaw -and $domainNormalize.ContainsKey($domainRaw)) { $domainNormalize[$domainRaw] } else { $domainRaw }
         $actor   = if ($allTags -match "@Actor:(\w+)")   { $Matches[1] } else { "" }
         $suite   = if ($allTags -match "@Suite:(\w+)")   { $Matches[1] } else { "" }
         $gitRel  = $_.FullName -replace [regex]::Escape($GitRoot + "\\"), "" -replace "\\", "/"

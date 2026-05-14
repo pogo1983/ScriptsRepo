@@ -109,6 +109,29 @@ $featureData = foreach ($f in $features) {
 }
 Write-Host "  -> Znaleziono $($featureData.Count) .feature files" -ForegroundColor Green
 
+# Normalizacja @Domain: z feature files -> wartosci dropdownu w inventory
+$domainNormalize = @{
+    "Accounting"             = "Accounting (w. Ledger Connector)"
+    "AuthAndUserManagement"  = "Auth & User Management"
+    "AuthNAndUserMgt"        = "Auth & User Management"
+    "Banking"                = "Banking"
+    "BIDataCollector"        = "BIDataCollector"
+    "Bailiff"                = "Bailiff"
+    "ClaimOrchestration"     = "Claim Orchestration"
+    "ClaimOrchistration"     = "Claim Orchestration"
+    "CostsAndTariffs"        = "Costs & Tariffs"
+    "CustomerConfiguration"  = "Customer Configuration"
+    "Factoring"              = "Factoring (w. Risk & CHA)"
+    "Insurers"               = "Insurers"
+    "InvoicingAndDunning"    = "Invoicing & Dunning"
+    "PaymentMatching"        = "Payment Matching"
+    "Reception"              = "Reception"
+    "TemplatingAndMsg"       = "Templating & Messaging"
+    "Templating&Messagaing"  = "Templating & Messaging"
+    "Validation"             = "Validation"
+    "VendorAPI"              = "Vendor API"
+}
+
 # ============================================================
 # 3a. Mapping: TC ID -> Actor (zgodnie ze struktura repo: Agent/Provider/Patient/Admin/System)
 # ============================================================
@@ -458,6 +481,7 @@ foreach ($tc in $tcList) {
     $matchedFiles = [System.Collections.Generic.List[string]]::new()
     $suiteTags = [System.Collections.Generic.List[string]]::new()
     $hasFeature = $false
+    $featureDomain = ""
 
     foreach ($p in $paths) {
         $p = $p -replace '\\\\', '\'
@@ -465,7 +489,8 @@ foreach ($tc in $tcList) {
         if ($info) {
             $hasFeature = $true
             $matchedFiles.Add($info.RelPath)
-            if ($info.Suite) { $suiteTags.Add($info.Suite) }
+            if ($info.Suite)   { $suiteTags.Add($info.Suite) }
+            if ($info.Domain -and -not $featureDomain) { $featureDomain = $info.Domain }
         } else {
             # Sciezka w mapping ale plik nie istnieje w repo
             $matchedFiles.Add("BRAK: $p")
@@ -490,11 +515,17 @@ foreach ($tc in $tcList) {
                 else                            { "" }
     $filesStr = if ($matchedFiles.Count -gt 0) { $matchedFiles -join "`n" } else { "" }
 
+    # Domain: z source Excela, jesli puste -> z tagu @Domain: feature file (znormalizowany)
+    $domainFinal = $tc.Domain
+    if (-not $domainFinal -and $featureDomain) {
+        $domainFinal = if ($domainNormalize.ContainsKey($featureDomain)) { $domainNormalize[$featureDomain] } else { $featureDomain }
+    }
+
     $report.Add([PSCustomObject]@{
         Actor          = $actor
         TC_ID          = $tcId
         Test_Name      = $tc.Name
-        Domain         = $tc.Domain
+        Domain         = $domainFinal
         Test_Type      = $testType
         Excel_Status   = $effectiveStatus
         Person         = $person
@@ -725,7 +756,9 @@ Add-RefSheet -wb $wb2 -name "Domains" -headerColor $refSheetColor `
         @("Payment Matching"),
         @("Accounting (w. Ledger Connector)"),
         @("Auth & User Management"),
-        @("Frontend Infrastructure")
+        @("Frontend Infrastructure"),
+        @("BIDataCollector"),
+        @("Validation")
     ) | Out-Null
 
 # Team_Members
@@ -780,7 +813,7 @@ if ($dataRows -gt 0) {
     # Kolumna 4 = Domain (odwołanie do zakresu w zakładce Domains)
     $domainRange = $ws.Range($ws.Cells.Item(2,4), $ws.Cells.Item($dataRows+1, 4))
     $domainRange.Validation.Delete()
-    $domainRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Domains!`$A`$2:`$A`$16") | Out-Null
+    $domainRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Domains!`$A`$2:`$A`$18") | Out-Null
     $domainRange.Validation.ShowInput = $false
 
     # Kolumna 5 = Test_Type (odwołanie do zakresu w zakładce Test_Types)
