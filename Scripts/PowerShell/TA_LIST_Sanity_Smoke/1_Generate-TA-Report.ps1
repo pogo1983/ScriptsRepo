@@ -695,6 +695,7 @@ function Add-RefSheet {
 Add-RefSheet -wb $wb2 -name "Test_Types" -headerColor $refSheetColor `
     -headers @("Test_Type") `
     -data @(
+        @(""),
         @("Sanity"),
         @("Smoke"),
         @("Functional"),
@@ -708,6 +709,7 @@ Add-RefSheet -wb $wb2 -name "Test_Types" -headerColor $refSheetColor `
 Add-RefSheet -wb $wb2 -name "Actors" -headerColor $refSheetColor `
     -headers @("Actor") `
     -data @(
+        @(""),
         @("Agent"),
         @("Provider"),
         @("Patient"),
@@ -719,6 +721,7 @@ Add-RefSheet -wb $wb2 -name "Actors" -headerColor $refSheetColor `
 Add-RefSheet -wb $wb2 -name "Status_Options" -headerColor $refSheetColor `
     -headers @("Status","Description") `
     -data @(
+        @("",            ""),
         @("TODO",        "Nie zaczęty"),
         @("IN PROGRESS", "W trakcie implementacji"),
         @("ALMOST",      "Prawie gotowy — drobne poprawki"),
@@ -732,6 +735,7 @@ Add-RefSheet -wb $wb2 -name "Status_Options" -headerColor $refSheetColor `
 Add-RefSheet -wb $wb2 -name "Priorities" -headerColor $refSheetColor `
     -headers @("Priority","Suite") `
     -data @(
+        @("",         ""),
         @("Low",      ""),
         @("Medium",   ""),
         @("High",     "SANITY"),
@@ -742,6 +746,7 @@ Add-RefSheet -wb $wb2 -name "Priorities" -headerColor $refSheetColor `
 Add-RefSheet -wb $wb2 -name "Domains" -headerColor $refSheetColor `
     -headers @("Domain") `
     -data @(
+        @(""),
         @("Factoring (w. Risk & CHA)"),
         @("Costs & Tariffs"),
         @("Customer Configuration"),
@@ -765,6 +770,7 @@ Add-RefSheet -wb $wb2 -name "Domains" -headerColor $refSheetColor `
 Add-RefSheet -wb $wb2 -name "Team_Members" -headerColor $refSheetColor `
     -headers @("Name") `
     -data @(
+        @(""),
         @("Adam Kolassa"),            @("Adam Szmielak"),
         @("Andrzej Woźniak"),          @("Bartłomiej Smykowski"),
         @("Bartosz Jonik"),            @("Bartosz Uscinowicz"),
@@ -803,42 +809,68 @@ if ($dataRows -gt 0) {
     $xlValidateList    = 3
     $xlBetween         = 1
     $xlValidAlertStop  = 1
+    $maxRow            = 500  # dropdowny aktywne do wiersza 500 (zapas na przyszłe TC)
 
     # Kolumna 1 = Actor (odwołanie do zakresu w zakładce Actors)
-    $actorRange = $ws.Range($ws.Cells.Item(2,1), $ws.Cells.Item($dataRows+1, 1))
+    $actorRange = $ws.Range($ws.Cells.Item(2,1), $ws.Cells.Item($maxRow, 1))
     $actorRange.Validation.Delete()
-    $actorRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Actors!`$A`$2:`$A`$6") | Out-Null
+    $actorRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Actors!`$A`$2:`$A`$7") | Out-Null
     $actorRange.Validation.ShowInput = $false
 
     # Kolumna 4 = Domain (odwołanie do zakresu w zakładce Domains)
-    $domainRange = $ws.Range($ws.Cells.Item(2,4), $ws.Cells.Item($dataRows+1, 4))
+    $domainRange = $ws.Range($ws.Cells.Item(2,4), $ws.Cells.Item($maxRow, 4))
     $domainRange.Validation.Delete()
-    $domainRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Domains!`$A`$2:`$A`$18") | Out-Null
+    $domainRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Domains!`$A`$2:`$A`$19") | Out-Null
     $domainRange.Validation.ShowInput = $false
 
     # Kolumna 5 = Test_Type (odwołanie do zakresu w zakładce Test_Types)
-    $typeRange = $ws.Range($ws.Cells.Item(2,5), $ws.Cells.Item($dataRows+1, 5))
+    $typeRange = $ws.Range($ws.Cells.Item(2,5), $ws.Cells.Item($maxRow, 5))
     $typeRange.Validation.Delete()
-    $typeRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Test_Types!`$A`$2:`$A`$8") | Out-Null
+    $typeRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Test_Types!`$A`$2:`$A`$9") | Out-Null
     $typeRange.Validation.ShowInput = $false
 
     # Kolumna 6 = Excel_Status (odwołanie do zakresu w zakładce Status_Options)
-    $statusRange = $ws.Range($ws.Cells.Item(2,6), $ws.Cells.Item($dataRows+1, 6))
+    $statusRange = $ws.Range($ws.Cells.Item(2,6), $ws.Cells.Item($maxRow, 6))
     $statusRange.Validation.Delete()
-    $statusRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Status_Options!`$A`$2:`$A`$8") | Out-Null
+    $statusRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Status_Options!`$A`$2:`$A`$9") | Out-Null
     $statusRange.Validation.ShowInput = $false
 
     # Kolumna 7 = Person (odwołanie do zakresu w zakładce Team_Members)
-    $personRange = $ws.Range($ws.Cells.Item(2,7), $ws.Cells.Item($dataRows+1, 7))
+    $personRange = $ws.Range($ws.Cells.Item(2,7), $ws.Cells.Item($maxRow, 7))
     $personRange.Validation.Delete()
-    $personRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Team_Members!`$A`$2:`$A`$57") | Out-Null
+    $personRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Team_Members!`$A`$2:`$A`$58") | Out-Null
     $personRange.Validation.ShowInput = $false
 
     # Kolumna 8 = Priority (odwołanie do zakresu w zakładce Priorities)
-    $prioRange = $ws.Range($ws.Cells.Item(2,8), $ws.Cells.Item($dataRows+1, 8))
+    $prioRange = $ws.Range($ws.Cells.Item(2,8), $ws.Cells.Item($maxRow, 8))
     $prioRange.Validation.Delete()
-    $prioRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Priorities!`$A`$2:`$A`$5") | Out-Null
+    $prioRange.Validation.Add($xlValidateList, $xlValidAlertStop, $xlBetween, "=Priorities!`$A`$2:`$A`$6") | Out-Null
     $prioRange.Validation.ShowInput = $false
+
+    # --------------------------------------------------------
+    # Conditional Formatting — kolorowanie całych wierszy wg statusu (col 6 = Excel_Status)
+    # Formula =$F2="TODO" z absolutną kolumną → działa dla każdego wiersza zakresu
+    # --------------------------------------------------------
+    $statusColRange = $ws.Range($ws.Cells.Item(2,6), $ws.Cells.Item($maxRow, 6))
+    $statusColRange.FormatConditions.Delete()
+
+    $xlCellValue = 1
+    $xlEqual     = 3
+    $statusColors = @(
+        @{ Value = "TODO";        R = 214; G = 186; B = 235 },  # lawenda
+        @{ Value = "IN PROGRESS"; R = 173; G = 216; B = 230 },  # jasny błękit
+        @{ Value = "ALMOST";      R = 255; G = 255; B = 153 },  # jasny żółty
+        @{ Value = "DONE";        R = 198; G = 239; B = 206 },  # jasny zielony
+        @{ Value = "BLOCKED";     R = 255; G = 199; B = 206 },  # jasny czerwony
+        @{ Value = "ON HOLD";     R = 217; G = 217; B = 217 },  # jasny szary
+        @{ Value = "TO FIX";      R = 255; G = 192; B = 0   }   # pomarańczowy
+    )
+    foreach ($s in $statusColors) {
+        $color = $s.R + $s.G * 256 + $s.B * 65536
+        $fc = $statusColRange.FormatConditions.Add($xlCellValue, $xlEqual, $s.Value)
+        $fc.Interior.Color = $color
+        $fc.StopIfTrue = $false
+    }
 }
 
 # Aktywuj zakładkę TA_Report przy otwieraniu
