@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #  [SKRYPT 2/3]  2_Update-TA-Inventory.ps1
 # ============================================================
 #  CEL: Jedyne narzedzie do codziennej obslugi inventory.
@@ -145,16 +145,20 @@ $newFiles = $features |
         $rel    = $_.FullName -replace [regex]::Escape($RepoRoot + "\"), ""
         $lines  = Get-Content $_.FullName -TotalCount 25
         $allTags = ($lines | Where-Object { $_ -match "^\s*@" }) -join " "
-        $domainRaw = if ($allTags -match "@Domain:(\S+)")  { $Matches[1] -replace "@.*", "" } else { "" }
-        $domain    = if ($domainRaw -and $domainNormalize.ContainsKey($domainRaw)) { $domainNormalize[$domainRaw] } else { $domainRaw }
-        $actor   = if ($allTags -match "@Actor:(\w+)")   { $Matches[1] } else { "" }
-        $suite   = if ($allTags -match "@Suite:(\w+)")   { $Matches[1] } else { "" }
+        $domainRaw = ""
+        if ($allTags -match "@Domain:(\S+)") { $domainRaw = $Matches[1] -replace "@.*", "" }
+        $domain = if ($domainRaw -and $domainNormalize.ContainsKey($domainRaw)) { $domainNormalize[$domainRaw] } else { $domainRaw }
+        $actor = ""
+        if ($allTags -match "@Actor:(\w+)") { $actor = $Matches[1] }
+        $suite = ""
+        if ($allTags -match "@Suite:(\w+)") { $suite = $Matches[1] }
         $gitRel  = $_.FullName -replace [regex]::Escape($GitRoot + "\\"), "" -replace "\\", "/"
-        $author  = if (-not $SkipGitAuthor) {
+        $author  = ""
+        if (-not $SkipGitAuthor) {
             $raw = git -C $GitRoot log --diff-filter=A --follow --format="%an" -- $gitRel 2>$null | Select-Object -First 1
             if (-not $raw) { $raw = git -C $GitRoot log --follow --format="%an" -1 -- $gitRel 2>$null | Select-Object -First 1 }
-            $raw
-        } else { "" }
+            $author = $raw
+        }
         [PSCustomObject]@{ BaseName = $_.BaseName; RelPath = $rel; Domain = $domain; Actor = $actor; Suite = $suite; Author = $author }
     } | Sort-Object RelPath
 
@@ -185,7 +189,9 @@ if ($Sync -and $rowPaths.Count -gt 0) {
             # Dodaj notatke w Notes jezeli jej nie ma
             $currentNote = $ws.Cells.Item($entry.Row, $colNotes).Value2
             if (-not ($currentNote -like "*BRAK PLIKU*")) {
-                $ws.Cells.Item($entry.Row, $colNotes).Value2 = "[BRAK PLIKU] $(Get-Date -Format 'yyyy-MM-dd')" + $(if ($currentNote) { " | $currentNote" } else { "" })
+                $noteSuffix = ""
+                if ($currentNote) { $noteSuffix = " | $currentNote" }
+                $ws.Cells.Item($entry.Row, $colNotes).Value2 = "[BRAK PLIKU] $(Get-Date -Format 'yyyy-MM-dd')" + $noteSuffix
             }
         }
     }
