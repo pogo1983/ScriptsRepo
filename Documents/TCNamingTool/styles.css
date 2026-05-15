@@ -489,3 +489,18 @@ select:disabled { opacity: .45; cursor: not-allowed; }
   transition: background .15s;
 }
 .lookup-use-btn:hover { background: #106ebe; }
+
+.lookup-copy-btn {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  border: 1px solid #c7e0f4;
+  border-radius: 2px;
+  background: #deecf9;
+  color: #106ebe;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+.lookup-copy-btn:hover { background: #c7e0f4; }
+.lookup-copy-btn.copied { background: #107c10; color: #fff; border-color: #107c10; }

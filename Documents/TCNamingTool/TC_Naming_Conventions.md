@@ -30,7 +30,7 @@ Interactive helper with three features:
 - **History** — saves last 20 names in browser localStorage; **Copy as docs** exports them as a numbered Markdown list
 - **Conventions tab** — full reference guide built into the tool
 
-Known abbreviations understood by Smart Lookup: `bnm` `lgc` `cha` `dd` `clr` `irb` `ind` `rnn` `med` `val` `acq` `arp` `iip` `iam` `pa` `vr` `ir`
+Known abbreviations understood by Smart Lookup: `bnm` `bm` `lgc` `lc` `cha` `dd` `clr` `irb` `ind` `rnn` `med` `val` `acq` `inp` `arp` `iip` `iam` `cat` `timui` `capi` `uia` `msa` `vendorapi` `vr` `ir` `ia` `va`
 
 ---
 
@@ -103,6 +103,7 @@ Known abbreviations understood by Smart Lookup: `bnm` `lgc` `cha` `dd` `clr` `ir
 | Costs and Tariffs | Tariff · Pricing Plan · Rating |
 | Customer Configuration | Contract · Product · Business Account · Insurer Config |
 | Vendor API | Claim Receipt · Retrocession |
+| Frontend Infrastructure | TIM UI · Agent UI · Inzicht · Claim API View |
 | Authentication & User Management | IAM · IIP · User Account · Identity |
 | Auditing | Audit Log · UI Audit · Message Audit |
 | Bailiff | Bailiff Action · Debt Collection |
@@ -115,7 +116,7 @@ Known abbreviations understood by Smart Lookup: `bnm` `lgc` `cha` `dd` `clr` `ir
 
 ### Scenario / Context Terms
 
-Twinfield · AFAS · Exact · Direct Debit · Installment Direct Debit · AP304 Direct Debit · AP301 · Standard Payment · Monthly Subscription · iDEAL · Payment Page · Patient Portal · Account · Claim Routing · SSP Status · Multi BA Login
+Twinfield · AFAS · Exact · Direct Debit · Installment Direct Debit · AP304 Direct Debit · AP301 · Standard Payment · Monthly Subscription · iDEAL · Payment Page · Patient Portal · Account · Claim Routing · SSP Status · Multi BA Login · VR Request · IR Request · VA Answer · IA Answer · Batch DD · Single Payment · Reject DD
 
 ### Result / Outcome Terms
 

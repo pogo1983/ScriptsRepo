@@ -146,6 +146,7 @@
     charCounter.className = "char-counter" + (len > 120 ? " over" : len > 90 ? " warn" : "");
 
     copyNLBtn.disabled = !nl;
+    saveBtn.disabled = !nl;
   }
 
   function setPlaceholder() {
@@ -154,16 +155,33 @@
     charCounter.textContent = "";
     charCounter.className = "char-counter";
     copyNLBtn.disabled = true;
+    saveBtn.disabled = true;
   }
 
   // ── Copy to clipboard ─────────────────────────────────────────────────────
   function copyText(btn, text) {
-    navigator.clipboard.writeText(text).then(() => {
+    const flash = () => {
       const orig = btn.textContent;
       btn.textContent = "Copied!";
       btn.classList.add("copied");
       setTimeout(() => { btn.textContent = orig; btn.classList.remove("copied"); }, 1500);
-    });
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(flash).catch(() => fallbackCopy(text, flash));
+    } else {
+      fallbackCopy(text, flash);
+    }
+  }
+
+  function fallbackCopy(text, cb) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    if (cb) cb();
   }
 
   copyNLBtn.addEventListener("click", () => copyText(copyNLBtn, previewNL.textContent));
@@ -220,7 +238,7 @@
     addToHistory(nl, "");
 
     saveBtn.textContent = "Saved!";
-    setTimeout(() => saveBtn.textContent = "Save", 1500);
+    setTimeout(() => saveBtn.textContent = "Save to History", 1500);
   });
 
   clearHistBtn.addEventListener("click", () => {
@@ -494,6 +512,7 @@
         </div>
         <div class="lookup-proposal">
           <div class="lookup-proposed-name">${proposed}</div>
+          <button class="lookup-copy-btn">Copy</button>
           <button class="lookup-use-btn">Use ↗</button>
         </div>`;
 
@@ -504,6 +523,11 @@
         lookupResults.innerHTML = "";
         document.querySelector(".domain-chip.selected")
           ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+
+      // Copy button → copy proposed name directly
+      el.querySelector(".lookup-copy-btn").addEventListener("click", () => {
+        copyText(el.querySelector(".lookup-copy-btn"), proposed);
       });
 
       // "Use" button → select domain + fill all fields
