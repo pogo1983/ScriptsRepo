@@ -17,33 +17,35 @@ Both formats can be used together: Natural Language for human-readable titles in
 
 ## Option 1: Natural Language Format *(Recommended for Azure DevOps)*
 
-**Format:** `[Domain] - [Entity] - [Action Description]`
+**Format:** `[Domain] - [Entity] - [Scenario] - [Action] - [Result]`
 
-**Example:** `BNM - Payment Agreement - Create Direct Debit via Portal`
+**Example:** `Accounting - Ledger Connector - Twinfield - Send Documents - Fail Authorization`
 
 ### Components
 
 | # | Component | Description | Format | Examples |
-|---|-----------|-------------|--------|---------|
-| 1 | **Domain** | System area or module abbreviation | UPPERCASE, 3-letter code | `BNM`, `RCP`, `CLO` |
-| 2 | **Entity** | Main business object or functional area being tested | Title Case, full names | `Payment Agreement`, `BA Invoice`, `Patient Portal` |
-| 3 | **Action Description** | Verb-based phrase: what the test does + expected outcome + context | Start with verb, Title Case | `Create Direct Debit via Portal`, `Pay Term Successfully` |
+|---|-----------|-------------|--------|----------|
+| 1 | **Domain** | System area or module full name | Title Case | `Banking`, `Accounting`, `Claim Orchestration` |
+| 2 | **Entity** | Main service, module or business object | Title Case, full names | `Payment Agreement`, `Ledger Connector`, `Patient Portal` |
+| 3 | **Scenario** | Specific context, sub-system or variant | Title Case | `Twinfield`, `Direct Debit`, `AP304`, `iDEAL` |
+| 4 | **Action** | What the test does | Start with verb, Title Case | `Send Documents`, `Pay Term`, `Create via Portal` |
+| 5 | **Result** | *(Optional)* Expected outcome | Title Case | `Success`, `Fail Authorization`, `After Rejection` |
 
 ### Rules
 
 **DO:**
 - Use spaces and dashes (` - `) for readability
-- Start action with a verb (`Create`, `Pay`, `Reject`, etc.)
-- Include outcome when relevant (`Successfully`, `Failed`, `After Rejection`)
-- Add context in action (`via Portal`, `for AP304`, `Before Batch DD`)
+- Start Action with a verb (`Create`, `Pay`, `Reject`, etc.)
+- Keep Scenario specific — name the sub-system, technology or variant (`Twinfield`, `AP304`, `Direct Debit`)
+- Include Result when the outcome matters (`Success`, `Fail Authorization`, `After Rejection`)
 - Keep entity names clear and business-friendly
-- Use Title Case for Entity and Action Description
-- Keep under 80 characters when possible
+- Use Title Case for all components
+- Keep under 100 characters when possible
 
 **DON'T:**
 - Use underscores or camelCase
 - Abbreviate entity names (use `Payment Agreement` not `PA`)
-- Include technical IDs or numbers in the title
+- Mix Action and Result into one component
 - Use technical jargon without context
 - Make it overly long or complex
 
@@ -63,28 +65,28 @@ Both formats can be used together: Natural Language for human-readable titles in
 
 ## Option 2: Technical Format *(For Automation & Code)*
 
-**Format:** `[Domain]_[Entity]_[Action]_[Scenario]_[Result]`
+**Format:** `[Domain]_[Entity]_[Scenario]_[Action]_[Result]`
 
-**Example:** `BNM_PaymentAgreement_Create_DirectDebit_Portal`
+**Example:** `Accounting_LedgerConnector_Twinfield_SendDocuments_FailAuthorization`
 
 ### Components
 
 | # | Component | Description | Format | Examples |
-|---|-----------|-------------|--------|---------|
-| 1 | **Domain** | System area abbreviation | UPPERCASE, 3-letter code | `BNM`, `RCP`, `CLO` |
-| 2 | **Entity** | Main business object being tested | CamelCase | `PaymentAgreement`, `BAInvoice`, `Patient` |
-| 3 | **Action** | Operation being tested | CamelCase verb | `Create`, `Pay`, `Reject`, `Process` |
-| 4 | **Scenario** | Context or type | CamelCase | `DirectDebit`, `Term`, `Portal`, `AP304` |
-| 5 | **Result** | *(Optional)* Expected outcome or status | CamelCase | `Success`, `Failed`, `AfterRejection` |
+|---|-----------|-------------|--------|----------|
+| 1 | **Domain** | System area full name | CamelCase | `Banking`, `Accounting`, `ClaimOrchestration` |
+| 2 | **Entity** | Main service or business object | CamelCase | `PaymentAgreement`, `LedgerConnector`, `PatientPortal` |
+| 3 | **Scenario** | Specific context or sub-system | CamelCase | `Twinfield`, `DirectDebit`, `AP304` |
+| 4 | **Action** | Operation being tested | CamelCase verb | `SendDocuments`, `Pay`, `Create` |
+| 5 | **Result** | *(Optional)* Expected outcome | CamelCase | `Success`, `FailAuthorization`, `AfterRejection` |
 
 ### Rules
 
 **DO:**
 - Use underscores (`_`) to separate components
 - Use CamelCase for multi-word components
-- Keep abbreviations consistent
+- Keep Scenario as specific sub-system or variant name
 - Include Result component when outcome matters
-- Keep components in order: `Domain_Entity_Action_Scenario_Result`
+- Keep components in order: `Domain_Entity_Scenario_Action_Result`
 
 **DON'T:**
 - Use spaces or dashes
@@ -110,12 +112,12 @@ Both formats can be used together: Natural Language for human-readable titles in
 
 | # | Natural Language Format | Technical Format |
 |---|------------------------|-----------------|
-| 1 | `BNM - Payment Agreement - Create Direct Debit via Portal` | `BNM_PaymentAgreement_Create_DirectDebit_Portal` |
-| 2 | `BNM - Payment Agreement - Pay Term Successfully` | `BNM_PaymentAgreement_Pay_Term_Success` |
-| 3 | `BNM - Acquisition - Reject Direct Debit` | `BNM_Acquisition_Reject_DirectDebit_Failed` |
-| 4 | `BNM - Patient Portal - Create Account without Invoice` | `BNM_PatientPortal_Create_Account_WithoutInvoice` |
-| 5 | `RCP - Mediation - Process AP301 File Successfully` | `RCP_Mediation_Process_AP301_Success` |
-| 6 | `CLO - Workflow - Route Claim to Correct Handler` | `CLO_Workflow_Route_Claim_AutoAssign` |
+| 1 | `Accounting - Ledger Connector - Twinfield - Send Documents - Fail Authorization` | `Accounting_LedgerConnector_Twinfield_SendDocuments_FailAuthorization` |
+| 2 | `Accounting - Ledger Connector - Twinfield - Send Documents - Success` | `Accounting_LedgerConnector_Twinfield_SendDocuments_Success` |
+| 3 | `Banking - Payment Agreement - Direct Debit - Pay Term - Success` | `Banking_PaymentAgreement_DirectDebit_Pay_Success` |
+| 4 | `Banking - Patient Portal - Account - Create without Invoice` | `Banking_PatientPortal_Account_Create_WithoutInvoice` |
+| 5 | `Reception - Mediation - AP301 - Process File - Success` | `Reception_Mediation_AP301_ProcessFile_Success` |
+| 6 | `Claim Orchestration - Workflow - Claim Routing - Route to Correct Handler` | `ClaimOrchestration_Workflow_ClaimRouting_Route_AutoAssign` |
 
 ---
 
@@ -123,37 +125,37 @@ Both formats can be used together: Natural Language for human-readable titles in
 
 | Context | Format | Example |
 |---------|--------|---------|
-| **Azure DevOps test case title** (user-facing) | Natural Language | `BNM - Payment Agreement - Create Direct Debit via Portal` |
-| **Automation test identifier** (code-facing) | Technical | `BNM_PaymentAgreement_Create_DirectDebit_Portal` |
+| **Azure DevOps test case title** (user-facing) | Natural Language | `Accounting - Ledger Connector - Twinfield - Send Documents - Fail Authorization` |
+| **Automation test identifier** (code-facing) | Technical | `Accounting_LedgerConnector_Twinfield_SendDocuments_FailAuthorization` |
 
 ---
 
 ## Component Vocabulary
 
-### Domain Codes
+### Domains
 
-| Code | Domain |
-|------|--------|
-| `BNM` | Banking |
-| `RCP` | Reception |
-| `CLO` | Claim Orchestration |
-| `FAC` | Factoring |
-| `CTA` | Costs and Tariffs |
-| `INS` | Insurers |
-| `IVD` | Invoicing and Dunning |
-| `BLF` | Bailiff |
-| `PMT` | Payment Matching |
-| `CFG` | Customer Configuration |
-| `AUD` | Auditing |
-| `ACC` | Accounting |
-| `TPL` | Templating and Messaging |
-| `FEI` | Frontend Infrastructure |
-| `API` | Vendor API |
-| `AUM` | Authentication & User Management |
-| `BDC` | BI Data Collector |
-| `E2E` | End-to-End Testing |
-| `PFT` | Performance Testing |
-| `SEC` | Security Testing |
+| Natural Language (Azure DevOps) | Technical Format (CamelCase) |
+|---------------------------------|------------------------------|
+| Banking | `Banking` |
+| Reception | `Reception` |
+| Claim Orchestration | `ClaimOrchestration` |
+| Factoring | `Factoring` |
+| Costs and Tariffs | `CostsAndTariffs` |
+| Insurers | `Insurers` |
+| Invoicing and Dunning | `InvoicingAndDunning` |
+| Bailiff | `Bailiff` |
+| Payment Matching | `PaymentMatching` |
+| Customer Configuration | `CustomerConfiguration` |
+| Auditing | `Auditing` |
+| Accounting | `Accounting` |
+| Templating and Messaging | `TemplatingAndMessaging` |
+| Frontend Infrastructure | `FrontendInfrastructure` |
+| Vendor API | `VendorAPI` |
+| Authentication & User Management | `AuthAndUserMgmt` |
+| BI Data Collector | `BIDataCollector` |
+| End-to-End Testing | `EndToEndTesting` |
+| Performance Testing | `PerformanceTesting` |
+| Security Testing | `SecurityTesting` |
 
 ### Entity Terms
 
@@ -206,99 +208,89 @@ Both formats can be used together: Natural Language for human-readable titles in
 
 ---
 
-## Real-World Examples — BNM Domain (27 Test Cases)
+## Real-World Examples — Banking Domain (24 Test Cases)
 
 ### Natural Language Format
 
 **Payment Agreement (4)**
-1. `BNM - Payment Agreement - Create Direct Debit via Portal`
-2. `BNM - Payment Agreement - Pay Term Successfully`
-3. `BNM - Payment Agreement - Reject Term`
-4. `BNM - Payment Agreement - Break Agreement After Rejection`
+1. `Banking - Payment Agreement - Direct Debit - Create via Payment Page`
+2. `Banking - Payment Agreement - Direct Debit - Pay Term - Success`
+3. `Banking - Payment Agreement - Direct Debit - Reject Term - Failed`
+4. `Banking - Payment Agreement - Direct Debit - Break Agreement - After Rejection`
 
 **Acquisition (4)**
-5. `BNM - Acquisition - Create Direct Debit for AP304`
-6. `BNM - Acquisition - Pay Direct Debit Successfully`
-7. `BNM - Acquisition - Reject Direct Debit`
-8. `BNM - Acquisition - Retry Direct Debit After Rejection`
+5. `Banking - Acquisition - AP304 Direct Debit - Create`
+6. `Banking - Acquisition - AP304 Direct Debit - Pay - Success`
+7. `Banking - Acquisition - AP304 Direct Debit - Reject - Failed`
+8. `Banking - Acquisition - AP304 Direct Debit - Retry - After Rejection`
 
 **BA Invoice (5)**
-9. `BNM - BA Invoice - Create Direct Debit Successfully`
-10. `BNM - BA Invoice - Pay Direct Debit Successfully`
-11. `BNM - BA Invoice - Reject Direct Debit`
-12. `BNM - BA Invoice - Pay Manually Before Batch DD`
-13. `BNM - BA Invoice - Pay with Standard Payment Before Batch DD`
+9. `Banking - BA Invoice - Direct Debit - Create - Success`
+10. `Banking - BA Invoice - Direct Debit - Pay - Success`
+11. `Banking - BA Invoice - Direct Debit - Reject - Failed`
+12. `Banking - BA Invoice - Direct Debit - Pay Manually - Before Batch DD`
+13. `Banking - BA Invoice - Standard Payment - Pay - Before Batch DD`
 
 **Patient (3)**
-14. `BNM - Patient - Create Direct Debit via Portal`
-15. `BNM - Patient - Pay Direct Debit Successfully`
-16. `BNM - Patient - Reject Direct Debit`
+14. `Banking - Patient - Direct Debit - Create via Patient Portal`
+15. `Banking - Patient - Direct Debit - Pay - Success`
+16. `Banking - Patient - Direct Debit - Reject - Failed`
 
 **Credit (3)**
-17. `BNM - Credit - Create Installment Direct Debit`
-18. `BNM - Credit - Pay Installment Successfully`
-19. `BNM - Credit - Reject Installment`
+17. `Banking - Credit - Installment Direct Debit - Create`
+18. `Banking - Credit - Installment Direct Debit - Pay - Success`
+19. `Banking - Credit - Installment Direct Debit - Reject - Failed`
 
 **Standard Payments (2)**
-20. `BNM - Claim - Pay with Standard Payment`
-21. `BNM - Insurance Receivable - Pay with Standard Payment`
-
-**Helpers (3)**
-22. `BNM - Helper - Confirm Direct Debit Payment`
-23. `BNM - Helper - Reject Direct Debit Payment`
-24. `BNM - Helper - Process Direct Debit with Wrong Amount`
+20. `Banking - Claim - Standard Payment - Pay`
+21. `Banking - Insurance Receivable - Standard Payment - Pay`
 
 **Patient Portal (3)**
-25. `BNM - Patient Portal - Create Account without Invoice`
-26. `BNM - Patient Portal - Create Account with Invoice`
-27. `BNM - Patient Portal - Link Claim to Account`
+22. `Banking - Patient Portal - Account - Create without Invoice`
+23. `Banking - Patient Portal - Account - Create with Invoice`
+24. `Banking - Patient Portal - Claim - Link to Account`
 
 ---
 
 ### Technical Format
 
 **Payment Agreement (4)**
-1. `BNM_PaymentAgreement_Create_DirectDebit_Portal`
-2. `BNM_PaymentAgreement_Pay_Term_Success`
-3. `BNM_PaymentAgreement_Reject_Term_Failed`
-4. `BNM_PaymentAgreement_Break_AfterRejection`
+1. `Banking_PaymentAgreement_DirectDebit_Create_PaymentPage`
+2. `Banking_PaymentAgreement_DirectDebit_Pay_Success`
+3. `Banking_PaymentAgreement_DirectDebit_Reject_Failed`
+4. `Banking_PaymentAgreement_DirectDebit_Break_AfterRejection`
 
 **Acquisition (4)**
-5. `BNM_Acquisition_Create_DirectDebit_AP304`
-6. `BNM_Acquisition_Pay_DirectDebit_Success`
-7. `BNM_Acquisition_Reject_DirectDebit_Failed`
-8. `BNM_Acquisition_Retry_DirectDebit_AfterRejection`
+5. `Banking_Acquisition_AP304DirectDebit_Create`
+6. `Banking_Acquisition_AP304DirectDebit_Pay_Success`
+7. `Banking_Acquisition_AP304DirectDebit_Reject_Failed`
+8. `Banking_Acquisition_AP304DirectDebit_Retry_AfterRejection`
 
 **BA Invoice (5)**
-9. `BNM_BAInvoice_Create_DirectDebit_Success`
-10. `BNM_BAInvoice_Pay_DirectDebit_Success`
-11. `BNM_BAInvoice_Reject_DirectDebit_Failed`
-12. `BNM_BAInvoice_Pay_Manual_BeforeBatchDD`
-13. `BNM_BAInvoice_Pay_Standard_BeforeBatchDD`
+9. `Banking_BAInvoice_DirectDebit_Create_Success`
+10. `Banking_BAInvoice_DirectDebit_Pay_Success`
+11. `Banking_BAInvoice_DirectDebit_Reject_Failed`
+12. `Banking_BAInvoice_DirectDebit_PayManually_BeforeBatchDD`
+13. `Banking_BAInvoice_StandardPayment_Pay_BeforeBatchDD`
 
 **Patient (3)**
-14. `BNM_Patient_Create_DirectDebit_Portal`
-15. `BNM_Patient_Pay_DirectDebit_Success`
-16. `BNM_Patient_Reject_DirectDebit_Failed`
+14. `Banking_Patient_DirectDebit_Create_PatientPortal`
+15. `Banking_Patient_DirectDebit_Pay_Success`
+16. `Banking_Patient_DirectDebit_Reject_Failed`
 
 **Credit (3)**
-17. `BNM_Credit_Create_Installment_DirectDebit`
-18. `BNM_Credit_Pay_Installment_Success`
-19. `BNM_Credit_Reject_Installment_Failed`
+17. `Banking_Credit_InstallmentDirectDebit_Create`
+18. `Banking_Credit_InstallmentDirectDebit_Pay_Success`
+19. `Banking_Credit_InstallmentDirectDebit_Reject_Failed`
 
 **Standard Payments (2)**
-20. `BNM_Claim_Pay_Standard_Payment`
-21. `BNM_IR_Pay_Standard_Payment`
-
-**Helpers (3)**
-22. `BNM_Helper_Confirm_DirectDebit_Payment`
-23. `BNM_Helper_Reject_DirectDebit_Payment`
-24. `BNM_Helper_Process_DirectDebit_WrongAmount`
+20. `Banking_Claim_StandardPayment_Pay`
+21. `Banking_InsuranceReceivable_StandardPayment_Pay`
 
 **Patient Portal (3)**
-25. `BNM_Portal_Create_Account_WithoutInvoice`
-26. `BNM_Portal_Create_Account_WithInvoice`
-27. `BNM_Portal_Link_Claim_Account`
+22. `Banking_PatientPortal_Account_Create_WithoutInvoice`
+23. `Banking_PatientPortal_Account_Create_WithInvoice`
+24. `Banking_PatientPortal_Claim_Link_ToAccount`
 
 ---
 
@@ -306,7 +298,7 @@ Both formats can be used together: Natural Language for human-readable titles in
 
 1. Which format do you find more readable and easier to understand?
 2. Should we use Natural Language for Azure and Technical for automation, or standardize on one format?
-3. Are the domain codes (`BNM`, `RCP`, `CLO`, etc.) clear enough? Should we add a reference guide?
+3. Are the domain names (`Banking`, `Claim Orchestration`, etc.) clear enough? Should any be shortened or aliased?
 4. Do the entity names make sense from a business perspective? Any suggestions?
 5. Are there any action verbs or scenario terms we should add to the vocabulary?
 6. Should we enforce character limits? (e.g., max 80 characters)
