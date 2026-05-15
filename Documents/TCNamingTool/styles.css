@@ -100,6 +100,34 @@ header {
   border: 1px solid #edebe9;
 }
 
+/* ── Smart Lookup card — highlighted as quick-entry shortcut ── */
+.card-lookup {
+  border-left: 3px solid #0078d4;
+  background: #f0f6ff;
+}
+.card-lookup .section-title {
+  color: #0078d4;
+}
+
+/* ── Step separator ── */
+.step-separator {
+  max-width: 860px;
+  margin: 4px auto 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #a19f9d;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: .4px;
+}
+.step-separator::before,
+.step-separator::after {
+  content: "";
+  flex: 1;
+  border-top: 1px dashed #c8c6c4;
+}
+
 /* ── Domain picker ── */
 .cluster-label {
   font-size: 0.7rem;
