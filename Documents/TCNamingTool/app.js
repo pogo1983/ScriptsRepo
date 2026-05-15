@@ -461,16 +461,26 @@
         });
       });
       // Component / service name scoring:
-      // Each word from a component that appears in the query scores +2.
+      // Each word from a component name that appears in the query scores +2.
       // Multi-word components require ≥2 matching words; single-word require ≥1.
+      // timService words matching query score +1 each (signal boost).
       (DATA.components || []).forEach(comp => {
         if (comp.domain !== entry.domain) return;
-        const words = comp.name.toLowerCase().split(/[\s.\\/()\[\]]+/).filter(w => w.length > 1);
+        const words = comp.name.toLowerCase().split(/[\s._\-\\/()\[\]|]+/).filter(w => w.length > 1);
         const hits  = words.filter(w => tokens.some(t => t === w || (t.length >= 3 && w.startsWith(t))));
         const need  = words.length === 1 ? 1 : 2;
         if (hits.length >= need) {
           score += hits.length * 2;
           matched.push(comp.name);
+        }
+        // timService boost: words like "mediation", "clearing", "ledger" etc.
+        if (comp.timService) {
+          const svcWords = comp.timService.toLowerCase().split(/[\s._\-\\/()\[\]|]+/).filter(w => w.length > 2 && !/^\d+$/.test(w));
+          const svcHits  = svcWords.filter(w => tokens.some(t => t === w || (t.length >= 4 && w.startsWith(t))));
+          if (svcHits.length > 0) {
+            score += svcHits.length;
+            matched.push(...svcHits);
+          }
         }
       });
       return { ...entry, score, matched: [...new Set(matched)].slice(0, 4) };
