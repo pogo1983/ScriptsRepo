@@ -419,13 +419,18 @@
     }
 
     // 5. Remaining meaningful tokens → scenario fallback (Title Case, skip abbreviation expansions)
+    //    A raw token is "consumed" if it OR any of its synonym/abbrev expansions
+    //    appeared in the expanded tokens array at a position that is marked used.
     if (!scenario) {
+      const isConsumed = rawTokens.map(rt => {
+        const subs = splitCompound(rt);
+        return subs.some(st => {
+          const forms = new Set([st, ...(ABBREVS[st] || []), ...(SYNONYMS[st] || [])]);
+          return [...forms].some(f => tokens.some((et, i) => et === f && used.has(i)));
+        });
+      });
       const remaining = rawTokens
-        .filter(t => {
-          // find where this raw token ended up in expanded tokens and check if used
-          const expIdx = tokens.findIndex((et, i) => !used.has(i) && et === t);
-          return expIdx !== -1;
-        })
+        .filter((t, i) => !isConsumed[i])
         .filter(t => t.length > 2 && !domain.toLowerCase().split(/\s+/).includes(t))
         .map(t => t.charAt(0).toUpperCase() + t.slice(1));
       if (remaining.length) scenario = remaining.join(" ");
@@ -460,13 +465,32 @@
           else if (kw.length <= 5 && token.startsWith(kw))        { score += 1; matched.push(kw); }
         });
       });
+      // Multi-word keyword full-phrase match:
+      // If ALL words of a multi-word keyword appear in tokens → bonus +3
+      // (overrides the weak +1+1 per-token partial that loses to domain-name matches)
+      entry.keywords.forEach(kw => {
+        const kwWords = kw.split(/\s+/);
+        if (kwWords.length < 2) return;
+        if (kwWords.every(w => tokens.some(t =>
+          t === w || (t.length >= 3 && w.startsWith(t)) || (w.length >= 3 && t.startsWith(w))
+        ))) {
+          score += 3;
+          matched.push(kw);
+        }
+      });
       // Component / service name scoring:
       // Each word from a component name that appears in the query scores +2.
       // Multi-word components require ≥2 matching words; single-word require ≥1.
       // timService words matching query score +1 each (signal boost).
       (DATA.components || []).forEach(comp => {
         if (comp.domain !== entry.domain) return;
-        const words = comp.name.toLowerCase().split(/[\s._\-\\/()\[\]|]+/).filter(w => w.length > 1);
+        // Split PascalCase component name segments so "ClaimReceipt" → ["claim","receipt"]
+        const words = comp.name
+          .replace(/([a-z])([A-Z])/g, '$1 $2')
+          .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+          .toLowerCase()
+          .split(/[\s._\-\\/(\)\[\]|]+/)
+          .filter(w => w.length > 1);
         const hits  = words.filter(w => tokens.some(t => t === w || (t.length >= 3 && w.startsWith(t))));
         const need  = words.length === 1 ? 1 : 2;
         if (hits.length >= need) {

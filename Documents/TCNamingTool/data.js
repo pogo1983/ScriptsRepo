@@ -85,6 +85,7 @@ const DATA = {
       { name: "Claim",          camel: "Claim"         },
       { name: "Payment Page",   camel: "PaymentPage"   },
       { name: "Patient Portal", camel: "PatientPortal" },
+      { name: "Bad Debtor",     camel: "BadDebtor"     },
     ],
     "Bailiff": [
       { name: "Bailiff Action", camel: "BailiffAction" },
