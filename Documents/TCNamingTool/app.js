@@ -418,10 +418,10 @@
       if (idxs) { scenario = sc; idxs.forEach(i => used.add(i)); break; }
     }
 
-    // 5. Remaining meaningful tokens → scenario fallback (Title Case, skip abbreviation expansions)
-    //    A raw token is "consumed" if it OR any of its synonym/abbrev expansions
-    //    appeared in the expanded tokens array at a position that is marked used.
-    if (!scenario) {
+    // 5. Remaining meaningful tokens → appended to scenario (or used as fallback)
+    //    A raw token is "consumed" if it OR any synonym/abbrev expansion was marked used.
+    //    This runs unconditionally so tokens don't get dropped when step 4 found a scenario.
+    {
       const isConsumed = rawTokens.map(rt => {
         const subs = splitCompound(rt);
         return subs.some(st => {
@@ -433,7 +433,11 @@
         .filter((t, i) => !isConsumed[i])
         .filter(t => t.length > 2 && !domain.toLowerCase().split(/\s+/).includes(t))
         .map(t => t.charAt(0).toUpperCase() + t.slice(1));
-      if (remaining.length) scenario = remaining.join(" ");
+      if (remaining.length) {
+        scenario = scenario
+          ? `${scenario} ${remaining.join(" ")}`
+          : remaining.join(" ");
+      }
     }
 
     return { entity, scenario, action, result };
@@ -482,19 +486,31 @@
       // Each word from a component name that appears in the query scores +2.
       // Multi-word components require ≥2 matching words; single-word require ≥1.
       // timService words matching query score +1 each (signal boost).
+      // Total component score is capped at +8 to prevent generic-word false positives.
+      // Generic UI/structural words are excluded from matching.
+      const COMP_NOISE = new Set([
+        'documents','document','details','list','overview','search','add','edit',
+        'modal','modals','notes','messages','message','home','maintenance','todo',
+        'history','popup','latest','other','overig','overview','approvals',
+        'registration','settings','items','management',
+      ]);
+      let compScore = 0;
       (DATA.components || []).forEach(comp => {
         if (comp.domain !== entry.domain) return;
+        if (compScore >= 8) return; // cap to prevent noise accumulation
         // Split PascalCase component name segments so "ClaimReceipt" → ["claim","receipt"]
         const words = comp.name
           .replace(/([a-z])([A-Z])/g, '$1 $2')
           .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
           .toLowerCase()
-          .split(/[\s._\-\\/(\)\[\]|]+/)
-          .filter(w => w.length > 1);
+          .split(/[\s._\-\\/()\[\]|]+/)
+          .filter(w => w.length > 1 && !COMP_NOISE.has(w));
         const hits  = words.filter(w => tokens.some(t => t === w || (t.length >= 3 && w.startsWith(t))));
         const need  = words.length === 1 ? 1 : 2;
         if (hits.length >= need) {
-          score += hits.length * 2;
+          const pts = Math.min(hits.length * 2, 8 - compScore);
+          compScore += pts;
+          score += pts;
           matched.push(comp.name);
         }
         // timService boost: words like "mediation", "clearing", "ledger" etc.
