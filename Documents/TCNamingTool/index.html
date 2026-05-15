@@ -23,6 +23,24 @@
 
 <div id="builderTab" class="tab-panel">
 
+<!-- 0. Smart Lookup -->
+<div class="card">
+  <div class="section-title">0 · Smart Lookup <span class="optional-tag">optional</span></div>
+  <div class="form-row">
+    <label for="lookupInput">Keywords</label>
+    <div class="field-wrap">
+      <input
+        id="lookupInput"
+        type="text"
+        placeholder="e.g. CHA settlement, lgc twinfield, ind invoice, clr vr…"
+        autocomplete="off"
+      />
+      <div class="field-hint">Type any service name, abbreviation or concept — we'll suggest the right domain</div>
+    </div>
+  </div>
+  <div id="lookupResults" class="lookup-results"></div>
+</div>
+
 <!-- 1. Domain picker -->
 <div class="card">
   <div class="section-title">1 · Select Domain</div>
@@ -126,19 +144,12 @@
   <div class="section-title">3 · Preview</div>
 
   <div class="preview-section">
-    <div class="preview-label">Natural Language · Azure DevOps</div>
     <div class="preview-box">
       <div class="preview-text placeholder" id="previewNL">
         Select domain, entity, scenario and action above…
       </div>
       <span class="char-counter" id="charCounter"></span>
       <button class="copy-btn" id="copyNL" disabled>Copy</button>
-    </div>
-
-    <div class="preview-label">Technical · Automation / Code</div>
-    <div class="preview-box">
-      <div class="preview-text placeholder" id="previewTech"></div>
-      <button class="copy-btn" id="copyTech" disabled>Copy</button>
     </div>
   </div>
 
@@ -151,7 +162,10 @@
 <div class="card">
   <div class="section-title">
     History (last 20)
-    <button id="clearHistory">Clear all</button>
+    <div style="display:flex;gap:6px">
+      <button id="exportMD" title="Copy all history items as Markdown list">Copy as docs</button>
+      <button id="clearHistory">Clear all</button>
+    </div>
   </div>
   <ul class="history-list" id="historyList">
     <li class="empty-history">No saved names yet.</li>

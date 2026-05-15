@@ -164,4 +164,181 @@ const DATA = {
     "Before Batch DD", "Without Invoice", "With Invoice", "Wrong Amount",
     "After Rejection",
   ],
+
+  // ── Smart Lookup index ────────────────────────────────────────────────────
+  // keywords: all terms a user might type to reach this domain
+  // aliases:  short codes / abbreviations from the Excel (bnm, lgc, clr…)
+  // note:     brief label shown in search results
+  lookup: [
+    {
+      domain: "Banking",
+      aliases: ["bnm", "bm"],
+      keywords: [
+        "banking", "bank", "banking and matching", "payment agreement",
+        "direct debit", "dd", "dpayws", "ideal", "idéal", "credit",
+        "ba invoice", "patient", "patient portal", "insurance receivable",
+        "order out-payment", "mutation", "bank account", "statement",
+        "payment provider", "pp", "ami", "installment"
+      ],
+      note: "Banking & Matching (BnM) — DD, iDEAL, BA Invoice, Credit, Patient Portal"
+    },
+    {
+      domain: "Payment Matching",
+      aliases: ["bnm", "matching"],
+      keywords: [
+        "payment matching", "matching", "matchable item", "bank statement",
+        "camt", "pof", "categorize", "manual match", "forward", "payback",
+        "receivable", "payable", "payment file"
+      ],
+      note: "Payment Matching (BnM) — CAMT, POF, Matchable Items, bank mutations"
+    },
+    {
+      domain: "Accounting",
+      aliases: ["lgc", "lc"],
+      keywords: [
+        "accounting", "ledger", "ledger connector", "twinfield", "afas",
+        "exact online", "exact", "financial statement", "booking",
+        "payment specification", "online ledger", "gl document",
+        "financial booking", "charging", "send documents"
+      ],
+      note: "Accounting with Ledger Connector (LgC) — Twinfield, AFAS, Exact Online"
+    },
+    {
+      domain: "Factoring",
+      aliases: ["arp", "cha", "mdma"],
+      keywords: [
+        "factoring", "arp", "cha", "mdma", "risk", "risk assessment",
+        "risk management", "bad debtor", "ap", "accounts payable",
+        "ba accounts payable", "financial settlement", "settlement",
+        "ba account", "charging"
+      ],
+      note: "Factoring with Risk & CHA (MDMA) — ARP Accounts Payable, Risk, BA Account"
+    },
+    {
+      domain: "Claim Orchestration",
+      aliases: ["capi", "claimapi"],
+      keywords: [
+        "claim orchestration", "workflow", "claim routing", "routing",
+        "claim api", "capi", "accounts receivable", "ar", "claim status",
+        "ssp", "ssp status", "claim handling", "orchestration",
+        "claim validation", "claim processing"
+      ],
+      note: "Claim Orchestration — Workflow, Claim Routing, SSP Status"
+    },
+    {
+      domain: "Reception",
+      aliases: ["med", "val", "acq", "inp"],
+      keywords: [
+        "reception", "mediation", "med", "acquisition", "acq",
+        "claimfile", "claim file", "validation", "val", "enrichment",
+        "enrichers", "imd", "imd input", "inp", "ap301", "ap304",
+        "vektis", "mz", "zh", "ha", "os", "pm", "gds", "xml", "prerating",
+        "file processing", "file delivery", "claim delivery"
+      ],
+      note: "Reception (Acquisition: Mediation, Validation, IMD) — ClaimFile, AP301/AP304"
+    },
+    {
+      domain: "Insurers",
+      aliases: ["clr", "irb"],
+      keywords: [
+        "insurers", "clearing", "clr", "irb", "irbroker", "insurance request",
+        "vr", "ir", "ia", "va", "ircr", "retrocession", "clearable",
+        "insurer", "insurance answer", "uzovi", "annotation",
+        "vecozo", "vsp", "edp", "rejection level", "resultcode"
+      ],
+      note: "Insurers (Clearing + IRBroker) — VR/IR/IA/VA, IRCR, Vecozo"
+    },
+    {
+      domain: "Invoicing and Dunning",
+      aliases: ["ind"],
+      keywords: [
+        "invoicing", "dunning", "invoice", "ind", "print", "printable",
+        "dunning stage", "patient portal", "rekening", "payment page",
+        "printing data", "pdp", "debtor invoice", "ba report invoicing"
+      ],
+      note: "Invoicing and Dunning (InD) — Invoice, Dunning, Payment Page (Rekening)"
+    },
+    {
+      domain: "Bailiff",
+      aliases: [],
+      keywords: [
+        "bailiff", "deurwaarder", "debt collection", "bad debtor collection",
+        "debt", "bailiff action"
+      ],
+      note: "Bailiff — debt collection process"
+    },
+    {
+      domain: "Templating and Messaging",
+      aliases: ["rnn"],
+      keywords: [
+        "templating", "messaging", "rnn", "rendering", "notification",
+        "template", "report", "message", "email", "letter", "notify",
+        "ba report", "debtor report", "communication items",
+        "sms", "pdf", "print template", "rendering and notification"
+      ],
+      note: "Templating and Messaging (RnN) — Rendering, Notification, Reports"
+    },
+    {
+      domain: "Costs and Tariffs",
+      aliases: [],
+      keywords: [
+        "costs", "tariffs", "tariff", "pricing", "price", "rating",
+        "rates", "cost", "catalog price", "tariff plan", "arp rating",
+        "product pricing"
+      ],
+      note: "Costs and Tariffs — Pricing plans, Tariffs, ARP Rating"
+    },
+    {
+      domain: "Customer Configuration",
+      aliases: ["cat", "catalog"],
+      keywords: [
+        "customer configuration", "catalog", "configuration", "cat",
+        "contract", "ba contract", "product", "platform", "catcfg",
+        "customer config", "insurer config", "authorization",
+        "controldata", "clearingdata", "business account",
+        "product catalog"
+      ],
+      note: "Customer Configuration (Catalog) — Products, Tariffs, BA Contracts"
+    },
+    {
+      domain: "Vendor API",
+      aliases: ["vendorapi"],
+      keywords: [
+        "vendor", "vendor api", "vendorapi", "retrocession", "claim receipt",
+        "external vendor", "ba software", "vendor software",
+        "inzicht vendor"
+      ],
+      note: "Vendor API — ClaimReceipt endpoint, Retrocession"
+    },
+    {
+      domain: "Frontend Infrastructure",
+      aliases: ["timui", "capi"],
+      keywords: [
+        "frontend", "frontend infra", "frontend infrastructure", "tim ui",
+        "ui", "inzicht", "agent ui", "web ui", "spa", "views", "screens",
+        "claim api frontend", "tim web ui", "agent"
+      ],
+      note: "Frontend Infrastructure — TIM UI, Agent UI, InZicht, Claim API views"
+    },
+    {
+      domain: "Auditing",
+      aliases: ["uia", "msa"],
+      keywords: [
+        "auditing", "audit", "uia", "msa", "message audit", "ui audit",
+        "log", "monitor", "audit trail", "logging", "audit log"
+      ],
+      note: "Auditing — UI Audit (UIA) + Message Audit (MSA)"
+    },
+    {
+      domain: "Authentication & User Management",
+      aliases: ["iip", "iam"],
+      keywords: [
+        "authentication", "auth", "user management", "iip", "iam",
+        "identity", "user", "login", "sso", "oauth", "clp", "user account",
+        "identities", "auth management", "dpayws user", "portal user",
+        "sha", "symmetric key", "facade"
+      ],
+      note: "Authentication & User Management (IIP/IAM) — Identity, SSO, User accounts"
+    },
+  ],
 };

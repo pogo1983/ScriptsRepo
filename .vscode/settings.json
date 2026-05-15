@@ -7,6 +7,10 @@
         "/^python3 -c \"\nimport openpyxl\nwb = openpyxl\\.load_workbook\\('IMF Mapping\\.xlsx', read_only=True\\)\n\ndef print_sheet\\(name, max_rows=100\\):\n    ws = wb\\[name\\]\n    print\\(f'\\\\n=== \\{name\\} ==='\\)\n    for i, row in enumerate\\(ws\\.iter_rows\\(values_only=True\\)\\):\n        if i >= max_rows: break\n        if any\\(c is not None for c in row\\):\n            print\\(row\\)\n\nprint_sheet\\('New Team Scopes', 100\\)\n\"$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^cd \"/Users/marcinpogorzelski/Documents/GIT/ScriptsRepo/Documents/TCNamingTool\" && python3 -c \"\nimport openpyxl\nwb = openpyxl\\.load_workbook\\('IMF Mapping\\.xlsx', read_only=True, data_only=True\\)\n\nsheets_to_check = \\['5 bnm', '#10 lgc', '3\\.1 med', '3\\.2 val', '6\\.1 clr', '#7 ind', '#8 rnn', '2 arp', '1 core'\\]\nfor name in sheets_to_check:\n    ws = wb\\[name\\]\n    print\\(f'\\\\n=== \\{name\\} ==='\\)\n    for i, row in enumerate\\(ws\\.iter_rows\\(values_only=True\\)\\):\n        if i >= 30: break\n        if any\\(c is not None for c in row\\):\n            print\\(row\\)\n\" 2>/dev/null$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     }
 }

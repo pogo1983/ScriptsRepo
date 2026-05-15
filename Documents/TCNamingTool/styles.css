@@ -336,3 +336,103 @@ select:disabled { opacity: .45; cursor: not-allowed; }
 .conv-checklist li { padding: 5px 0 5px 26px; position: relative; font-size: 0.88rem; }
 .conv-checklist li::before { content: "☐"; position: absolute; left: 0; color: #888; }
 @media (max-width: 600px) { .conv-rules { grid-template-columns: 1fr; } }
+
+/* ── Smart Lookup ── */
+.optional-tag {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: #aaa;
+  margin-left: 6px;
+  letter-spacing: 0;
+}
+.lookup-results {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lookup-result {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #f8f9fb;
+  border-radius: 10px;
+  border: 1px solid #e4e7ee;
+}
+.lookup-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.lookup-chip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity .15s, transform .1s;
+  user-select: none;
+}
+.lookup-chip:hover { opacity: .85; transform: scale(1.03); }
+.lookup-team-badge {
+  font-size: 0.68rem;
+  font-weight: 500;
+  opacity: .8;
+}
+.lookup-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 2px;
+}
+.lookup-note {
+  font-size: 0.84rem;
+  color: #333;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.lookup-why {
+  font-size: 0.72rem;
+  color: #aaa;
+}
+.lookup-empty {
+  font-size: 0.82rem;
+  color: #999;
+  padding: 6px 0;
+}
+.lookup-proposal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1.5px dashed #c5cae9;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.lookup-proposed-name {
+  flex: 1;
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 0.82rem;
+  color: #1a1a2e;
+  font-weight: 600;
+  word-break: break-word;
+}
+.lookup-use-btn {
+  flex-shrink: 0;
+  padding: 5px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #6c5ce7;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s;
+}
+.lookup-use-btn:hover { background: #5a4bd1; }

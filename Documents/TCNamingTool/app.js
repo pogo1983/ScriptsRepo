@@ -44,12 +44,11 @@
   const actionInput   = document.getElementById("actionInput");
   const resultInput   = document.getElementById("resultInput");
   const previewNL     = document.getElementById("previewNL");
-  const previewTech   = document.getElementById("previewTech");
   const charCounter   = document.getElementById("charCounter");
   const copyNLBtn     = document.getElementById("copyNL");
-  const copyTechBtn   = document.getElementById("copyTech");
   const historyList   = document.getElementById("historyList");
   const clearHistBtn  = document.getElementById("clearHistory");
+  const exportMDBtn   = document.getElementById("exportMD");
   const resetBtn      = document.getElementById("resetBtn");
   const scenarioList  = document.getElementById("scenarioSuggestions");
   const saveBtn       = document.getElementById("saveBtn");
@@ -136,32 +135,25 @@
       return;
     }
 
-    const nl   = buildNL(domain, entity, scenario, action, result);
-    const tech = buildTech(domain, entity, scenario, action, result);
+    const nl = buildNL(domain, entity, scenario, action, result);
 
-    previewNL.textContent   = nl   || "—";
-    previewTech.textContent = tech || "—";
+    previewNL.textContent = nl || "—";
     previewNL.classList.remove("placeholder");
-    previewTech.classList.remove("placeholder");
 
     // Char counter on NL
     const len = nl.length;
     charCounter.textContent = `${len} chars`;
     charCounter.className = "char-counter" + (len > 120 ? " over" : len > 90 ? " warn" : "");
 
-    copyNLBtn.disabled   = !nl;
-    copyTechBtn.disabled = !tech;
+    copyNLBtn.disabled = !nl;
   }
 
   function setPlaceholder() {
-    previewNL.textContent   = "Select domain, entity, scenario and action above…";
-    previewTech.textContent = "";
+    previewNL.textContent = "Select domain, entity, scenario and action above…";
     previewNL.classList.add("placeholder");
-    previewTech.classList.add("placeholder");
     charCounter.textContent = "";
     charCounter.className = "char-counter";
-    copyNLBtn.disabled   = true;
-    copyTechBtn.disabled = true;
+    copyNLBtn.disabled = true;
   }
 
   // ── Copy to clipboard ─────────────────────────────────────────────────────
@@ -175,7 +167,6 @@
   }
 
   copyNLBtn.addEventListener("click", () => copyText(copyNLBtn, previewNL.textContent));
-  copyTechBtn.addEventListener("click", () => copyText(copyTechBtn, previewTech.textContent));
 
   // ── Save to history ───────────────────────────────────────────────────────
   function loadHistory() {
@@ -226,7 +217,7 @@
     const nl   = previewNL.textContent;
     const tech = previewTech.textContent;
     if (!nl || previewNL.classList.contains("placeholder")) return;
-    addToHistory(nl, tech);
+    addToHistory(nl, "");
 
     saveBtn.textContent = "Saved!";
     setTimeout(() => saveBtn.textContent = "Save", 1500);
@@ -235,6 +226,17 @@
   clearHistBtn.addEventListener("click", () => {
     localStorage.removeItem("tc_history");
     renderHistory();
+  });
+
+  exportMDBtn.addEventListener("click", () => {
+    const h = loadHistory();
+    if (!h.length) { alert("History is empty — save some TC names first."); return; }
+    const md = h.map((item, i) => `${i + 1}. \`${item.nl}\``).join("\n");
+    navigator.clipboard.writeText(md).then(() => {
+      const orig = exportMDBtn.textContent;
+      exportMDBtn.textContent = "Copied!";
+      setTimeout(() => exportMDBtn.textContent = orig, 1800);
+    });
   });
 
   // ── Reset ─────────────────────────────────────────────────────────────────
@@ -258,6 +260,212 @@
   [scenarioInput, actionInput, resultInput].forEach(el =>
     el.addEventListener("input", updatePreview)
   );
+
+  // ── Smart Lookup ──────────────────────────────────────────────────────────
+  const lookupInput   = document.getElementById("lookupInput");
+  const lookupResults = document.getElementById("lookupResults");
+
+  // Common abbreviation expansions: typed token → words to add alongside
+  const ABBREVS = {
+    lgc:  ["ledger", "connector"],
+    cha:  ["cha"],
+    dd:   ["direct", "debit"],
+    vr:   ["vr"],
+    ir:   ["insurance", "request"],
+    clr:  ["clearing"],
+    irb:  ["irbroker"],
+    ind:  ["invoicing", "dunning"],
+    rnn:  ["rendering", "notification"],
+    med:  ["mediation"],
+    val:  ["validation"],
+    acq:  ["acquisition"],
+    bnm:  ["banking", "matching"],
+    iip:  ["iip"],
+    iam:  ["iam"],
+    arp:  ["arp"],
+    pa:   ["payment", "agreement"],
+    pdp:  ["payment", "page"],
+  };
+
+  // Try to extract TC components from tokens for a given domain
+  function extractComponents(rawTokens, domain) {
+    // Expand abbreviations to help matching
+    const tokens = rawTokens.flatMap(t =>
+      ABBREVS[t] ? [...new Set([t, ...ABBREVS[t]])] : [t]
+    );
+
+    const entities = DATA.entities[domain] || [];
+    const used     = new Set();
+
+    // Mark tokens that just repeat the domain name so they don't leak into scenario
+    tokens.forEach((t, i) => {
+      if (domain.toLowerCase().split(/\s+/).some(w => w === t)) used.add(i);
+    });
+
+    // Matching: token t matches term part p if:
+    //   exact, OR t is a meaningful prefix of p (>=3 chars), OR p starts with t (>=3 chars)
+    function fits(t, p) {
+      if (t === p) return true;
+      if (t.length >= 3 && p.startsWith(t)) return true;
+      if (t.length >= 3 && t.startsWith(p) && p.length >= 3) return true;
+      return false;
+    }
+
+    function matchTerm(term) {
+      const parts = term.toLowerCase().split(/\s+/);
+      const idxs  = [];
+      for (const part of parts) {
+        const idx = tokens.findIndex((t, i) => !used.has(i) && fits(t, part));
+        if (idx === -1) return null;
+        idxs.push(idx);
+      }
+      return idxs;
+    }
+
+    // 1. Entity — longest match first
+    let entity = null;
+    for (const ent of [...entities].sort((a, b) => b.name.length - a.name.length)) {
+      const idxs = matchTerm(ent.name);
+      if (idxs) { entity = ent.name; idxs.forEach(i => used.add(i)); break; }
+    }
+
+    // 2. Action — longest (multi-word) first
+    let action = null;
+    for (const act of [...DATA.actions].sort((a, b) => b.length - a.length)) {
+      const idxs = matchTerm(act);
+      if (idxs) { action = act; idxs.forEach(i => used.add(i)); break; }
+    }
+
+    // 3. Result — longest first
+    let result = null;
+    for (const res of [...new Set(DATA.results)].sort((a, b) => b.length - a.length)) {
+      const idxs = matchTerm(res);
+      if (idxs) { result = res; idxs.forEach(i => used.add(i)); break; }
+    }
+
+    // 4. Scenario — domain-specific suggestions first, then global scenario terms
+    let scenario = null;
+    const domainScenarios = Object.entries(DATA.scenarios)
+      .filter(([k]) => k.startsWith(domain + "|"))
+      .flatMap(([, v]) => v);
+    for (const sc of [...new Set(domainScenarios)].sort((a, b) => b.length - a.length)) {
+      const idxs = matchTerm(sc);
+      if (idxs) { scenario = sc; idxs.forEach(i => used.add(i)); break; }
+    }
+
+    // 5. Remaining meaningful tokens → scenario fallback (Title Case, skip abbreviation expansions)
+    if (!scenario) {
+      const remaining = rawTokens
+        .filter(t => {
+          // find where this raw token ended up in expanded tokens and check if used
+          const expIdx = tokens.findIndex((et, i) => !used.has(i) && et === t);
+          return expIdx !== -1;
+        })
+        .filter(t => t.length > 2 && !domain.toLowerCase().split(/\s+/).includes(t))
+        .map(t => t.charAt(0).toUpperCase() + t.slice(1));
+      if (remaining.length) scenario = remaining.join(" ");
+    }
+
+    return { entity, scenario, action, result };
+  }
+
+  lookupInput.addEventListener("input", () => {
+    const raw = lookupInput.value.trim().toLowerCase();
+    lookupResults.innerHTML = "";
+    if (!raw || raw.length < 2) return;
+
+    const tokens = raw.split(/[\s,;]+/).filter(t => t.length > 1);
+
+    const scored = DATA.lookup.map(entry => {
+      let score = 0;
+      const matched = [];
+      tokens.forEach(token => {
+        entry.aliases.forEach(a => {
+          if (a.toLowerCase() === token)            { score += 5; matched.push(a); }
+          else if (a.toLowerCase().startsWith(token)) { score += 3; matched.push(a); }
+        });
+        if (entry.domain.toLowerCase().includes(token)) { score += 3; matched.push(entry.domain); }
+        entry.keywords.forEach(kw => {
+          if (kw === token)              { score += 2; matched.push(kw); }
+          else if (kw.includes(token))  { score += 1; matched.push(kw); }
+        });
+      });
+      return { ...entry, score, matched: [...new Set(matched)].slice(0, 4) };
+    })
+      .filter(e => e.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4);
+
+    if (!scored.length) {
+      lookupResults.innerHTML =
+        `<p class="lookup-empty">No matching domain found. Try: service name, abbreviation (bnm, lgc, clr…) or concept.</p>`;
+      return;
+    }
+
+    scored.forEach(entry => {
+      const dom     = DATA.domains.find(d => d.name === entry.domain);
+      const cluster = DATA.clusters.find(c => c.name === (dom && dom.cluster));
+      const bg      = cluster ? cluster.color : "#888";
+      const fg      = cluster ? cluster.textColor : "#fff";
+
+      // Build proposed TC name from input tokens
+      const comp     = extractComponents(tokens, entry.domain);
+      const proposed = [entry.domain, comp.entity, comp.scenario, comp.action, comp.result]
+        .filter(Boolean).join(" - ");
+
+      const el = document.createElement("div");
+      el.className = "lookup-result";
+      el.innerHTML = `
+        <div class="lookup-top">
+          <div class="lookup-chip" style="background:${bg};color:${fg}">
+            ${entry.domain}
+            ${dom ? `<span class="lookup-team-badge">${dom.team}</span>` : ""}
+          </div>
+          <div class="lookup-meta">
+            <span class="lookup-note">${entry.note}</span>
+            <span class="lookup-why">matched: ${entry.matched.join(" · ")}</span>
+          </div>
+        </div>
+        <div class="lookup-proposal">
+          <div class="lookup-proposed-name">${proposed}</div>
+          <button class="lookup-use-btn">Use ↗</button>
+        </div>`;
+
+      // Domain chip → select domain only
+      el.querySelector(".lookup-chip").addEventListener("click", () => {
+        selectDomain(entry.domain);
+        lookupInput.value = "";
+        lookupResults.innerHTML = "";
+        document.querySelector(".domain-chip.selected")
+          ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+
+      // "Use" button → select domain + fill all fields
+      el.querySelector(".lookup-use-btn").addEventListener("click", () => {
+        selectDomain(entry.domain);
+        // entitySel is rebuilt by selectDomain — wait one tick
+        setTimeout(() => {
+          if (comp.entity) {
+            const opt = [...entitySel.options].find(o => o.value === comp.entity);
+            if (opt) {
+              entitySel.value = comp.entity;
+              entitySel.dispatchEvent(new Event("change"));
+            }
+          }
+          if (comp.scenario) scenarioInput.value = comp.scenario;
+          if (comp.action)   actionInput.value   = comp.action;
+          if (comp.result)   resultInput.value   = comp.result;
+          updatePreview();
+          lookupInput.value = "";
+          lookupResults.innerHTML = "";
+          document.querySelector(".domain-chip.selected")
+            ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }, 30);
+      });
+
+      lookupResults.appendChild(el);
+    });
+  });
 
   // ── Init ──────────────────────────────────────────────────────────────────
   buildDomainGrid();
