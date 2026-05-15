@@ -462,12 +462,25 @@
           else if (a.toLowerCase().startsWith(token)) { score += 3; matched.push(a); }
         });
         if (entry.domain.toLowerCase().includes(token)) { score += 3; matched.push(entry.domain); }
+        let kwIncludes = 0; // cap kw.includes per token to prevent keyword flooding (+4 max)
         entry.keywords.forEach(kw => {
-          if (kw === token)                                         { score += 2; matched.push(kw); }
-          else if (kw.includes(token))                             { score += 1; matched.push(kw); }
+          if (kw === token)                                                 { score += 2; matched.push(kw); }
+          else if (kw.includes(token) && kwIncludes < 4)                   { kwIncludes++; score += 1; matched.push(kw); }
           // Short keyword prefix: "mz301" matches keyword "mz", "ap304" matches "ap"
-          else if (kw.length <= 5 && token.startsWith(kw))        { score += 1; matched.push(kw); }
+          else if (kw.length <= 5 && token.startsWith(kw))                 { score += 1; matched.push(kw); }
         });
+      });
+      // Multi-word alias bonus: +8 when ALL words of a multi-word alias appear in tokens.
+      // Provides strong signal for domain-specific 2-word identifiers like "claim receipt".
+      entry.aliases.forEach(a => {
+        const aWords = a.toLowerCase().split(/\s+/);
+        if (aWords.length < 2) return;
+        if (aWords.every(w => tokens.some(t =>
+          t === w || (t.length >= 3 && w.startsWith(t)) || (w.length >= 3 && t.startsWith(w))
+        ))) {
+          score += 8;
+          matched.push(a);
+        }
       });
       // Multi-word keyword full-phrase match:
       // If ALL words of a multi-word keyword appear in tokens → bonus +3
@@ -495,9 +508,10 @@
         'registration','settings','items','management',
       ]);
       let compScore = 0;
+      let timScore  = 0; // cap for timService boosts (separate from compScore)
       (DATA.components || []).forEach(comp => {
         if (comp.domain !== entry.domain) return;
-        if (compScore >= 8) return; // cap to prevent noise accumulation
+        if (compScore >= 8 && timScore >= 4) return; // skip only when BOTH caps hit
         // Split PascalCase component name segments so "ClaimReceipt" → ["claim","receipt"]
         const words = comp.name
           .replace(/([a-z])([A-Z])/g, '$1 $2')
@@ -507,19 +521,21 @@
           .filter(w => w.length > 1 && !COMP_NOISE.has(w));
         const hits  = words.filter(w => tokens.some(t => t === w || (t.length >= 3 && w.startsWith(t))));
         const need  = words.length === 1 ? 1 : 2;
-        if (hits.length >= need) {
+        if (compScore < 8 && hits.length >= need) {
           const pts = Math.min(hits.length * 2, 8 - compScore);
           compScore += pts;
           score += pts;
           matched.push(comp.name);
         }
-        // timService boost: words like "mediation", "clearing", "ledger" etc.
-        if (comp.timService) {
+        // timService boost: capped at +4 per domain to prevent flood from many identical timServices
+        if (comp.timService && timScore < 4) {
           const svcWords = comp.timService.toLowerCase().split(/[\s._\-\\/()\[\]|]+/).filter(w => w.length > 2 && !/^\d+$/.test(w));
           const svcHits  = svcWords.filter(w => tokens.some(t => t === w || (t.length >= 4 && w.startsWith(t))));
           if (svcHits.length > 0) {
-            score += svcHits.length;
-            matched.push(...svcHits);
+            const pts = Math.min(svcHits.length, 4 - timScore);
+            timScore += pts;
+            score   += pts;
+            matched.push(...svcHits.slice(0, pts));
           }
         }
       });

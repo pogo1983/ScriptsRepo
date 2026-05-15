@@ -301,7 +301,7 @@ const DATA = {
     },
     {
       domain: "Invoicing and Dunning",
-      aliases: ["ind"],
+      aliases: ["ind", "bad debtor"],
       keywords: [
         "invoicing", "dunning", "invoice", "ind", "print", "printable",
         "dunning stage", "patient portal", "rekening", "payment page",
@@ -310,6 +310,7 @@ const DATA = {
         "pay online", "request credit", "stop dunning",
         "digital portal", "invoice clearing", "digital invoice", "ideal invoice",
         "clearing invoice", "dunning letter", "payment agreement term",
+        "bad debtor", "blockage",
         "i153822", "i153824"
       ],
       note: "Invoicing and Dunning (InD) — Invoice, Dunning, Payment Page (Rekening)"
@@ -369,7 +370,7 @@ const DATA = {
     },
     {
       domain: "Vendor API",
-      aliases: ["vendorapi"],
+      aliases: ["vendorapi", "claim receipt", "receipt", "retrocession"],
       keywords: [
         "vendor", "vendor api", "vendorapi", "retrocession", "claim receipt",
         "external vendor", "ba software", "vendor software",
