@@ -8,13 +8,20 @@
 </head>
 <body>
 
-<header>
-  <div>
-    <h1>TC Name Builder</h1>
-    <div class="subtitle">Test Case naming tool · Format: Domain - Entity - Scenario - Action - Result</div>
+<div class="top-nav">
+  <div class="top-nav-content">
+    <div class="top-nav-title">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><rect width="9" height="9" fill="white" opacity=".9"/><rect x="11" width="9" height="9" fill="white" opacity=".7"/><rect y="11" width="9" height="9" fill="white" opacity=".7"/><rect x="11" y="11" width="9" height="9" fill="white" opacity=".9"/></svg>
+      <strong>TC Name Builder</strong>
+    </div>
+    <div class="top-nav-subtitle">Test Case naming &nbsp;·&nbsp; Format:&nbsp; <span class="nav-format-part">Domain</span> <span class="nav-sep">-</span> <span class="nav-format-part">Entity</span> <span class="nav-sep">-</span> <span class="nav-format-part">Scenario</span> <span class="nav-sep">-</span> <span class="nav-format-part">Action</span> <span class="nav-sep">-</span> <span class="nav-format-part">Result</span></div>
+    <div class="top-nav-right">
+      <button class="reset-btn" id="resetBtn">↺ Reset</button>
+    </div>
   </div>
-  <button class="reset-btn" id="resetBtn">↺ Reset</button>
-</header>
+</div>
+
+<div class="main-container">
 
 <nav class="tab-nav">
   <button class="tab-btn active" data-tab="builder">Builder</button>
@@ -154,7 +161,7 @@
   </div>
 
   <div style="display:flex; justify-content:flex-end; margin-top:4px;">
-    <button class="copy-btn" id="saveBtn" style="background:#6c5ce7;" disabled>Save to History</button>
+    <button class="copy-btn" id="saveBtn" style="background:#0078d4;" disabled>Save to History</button>
   </div>
 </div>
 
@@ -163,7 +170,7 @@
   <div class="section-title">
     History (last 20)
     <div style="display:flex;gap:6px">
-      <button id="exportMD" title="Copy all history items as Markdown list">Copy as docs</button>
+      <button id="exportMD" title="Copy all history items as Markdown list" style="background:#106ebe;color:#fff;border:none;padding:3px 10px;border-radius:2px;font-size:0.75rem;font-weight:600;cursor:pointer;">Copy as docs</button>
       <button id="clearHistory">Clear all</button>
     </div>
   </div>
@@ -347,5 +354,7 @@ Reception - Mediation - AP301 - Process File - Success</pre>
     });
   });
 </script>
+
+</div><!-- /main-container -->
 </body>
 </html>

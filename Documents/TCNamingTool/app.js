@@ -287,12 +287,60 @@
     pdp:  ["payment", "page"],
   };
 
+  // Informal verb → formal action synonym expansions
+  const SYNONYMS = {
+    put:     ["process", "deliver", "store"],
+    store:   ["process"],
+    check:   ["validate"],
+    make:    ["create"],
+    build:   ["create"],
+    run:     ["process"],
+    do:      ["process"],
+    execute: ["process"],
+    show:    ["get"],
+    view:    ["get"],
+    handle:  ["process"],
+    save:    ["create"],
+    add:     ["create"],
+    submit:  ["send"],
+  };
+
+  // Noise words to strip before scoring / matching
+  const STOPWORDS = new Set([
+    "then", "and", "the", "a", "an", "to", "via", "with", "for", "of",
+    "is", "are", "was", "has", "in", "on", "by", "at", "from", "after",
+    "before", "next", "also", "that", "it", "its",
+  ]);
+
+  // Split known compound tokens into their component words
+  // e.g. "claimfile" → ["claim", "file"],  "paymentfile" → ["payment", "file"]
+  function splitCompound(token) {
+    const map = {
+      claimfile:       ["claim", "file"],
+      claimfiles:      ["claim", "file"],
+      dpayws:          ["dpayws"],
+      paymentfile:     ["payment", "file"],
+      bankaccount:     ["bank", "account"],
+      baaccount:       ["ba", "account"],
+      matchableitem:   ["matchable", "item"],
+      bankstatement:   ["bank", "statement"],
+      paymentprovider: ["payment", "provider"],
+      controldataprovider: ["controldata", "provider"],
+      controldataproviders: ["controldata", "provider"],
+      ledgerconnector: ["ledger", "connector"],
+    };
+    return map[token] || [token];
+  }
+
   // Try to extract TC components from tokens for a given domain
   function extractComponents(rawTokens, domain) {
-    // Expand abbreviations to help matching
-    const tokens = rawTokens.flatMap(t =>
-      ABBREVS[t] ? [...new Set([t, ...ABBREVS[t]])] : [t]
-    );
+    // 1. Split compound words ("claimfile" → ["claim","file"]),
+    //    expand abbreviations,
+    //    expand informal synonyms
+    const tokens = rawTokens.flatMap(t => splitCompound(t)).flatMap(t => {
+      const exp = [...(ABBREVS[t] || []), ...(SYNONYMS[t] || [])];
+      return exp.length ? [...new Set([t, ...exp])] : [t];
+    });
 
     const entities = DATA.entities[domain] || [];
     const used     = new Set();
@@ -374,20 +422,25 @@
     lookupResults.innerHTML = "";
     if (!raw || raw.length < 2) return;
 
-    const tokens = raw.split(/[\s,;]+/).filter(t => t.length > 1);
+    // Split, remove stopwords, split compound words
+    const tokens = raw.split(/[\s,;→]+/)
+      .filter(t => t.length > 1 && !STOPWORDS.has(t))
+      .flatMap(t => splitCompound(t));
 
     const scored = DATA.lookup.map(entry => {
       let score = 0;
       const matched = [];
       tokens.forEach(token => {
         entry.aliases.forEach(a => {
-          if (a.toLowerCase() === token)            { score += 5; matched.push(a); }
+          if (a.toLowerCase() === token)              { score += 5; matched.push(a); }
           else if (a.toLowerCase().startsWith(token)) { score += 3; matched.push(a); }
         });
         if (entry.domain.toLowerCase().includes(token)) { score += 3; matched.push(entry.domain); }
         entry.keywords.forEach(kw => {
-          if (kw === token)              { score += 2; matched.push(kw); }
-          else if (kw.includes(token))  { score += 1; matched.push(kw); }
+          if (kw === token)                                         { score += 2; matched.push(kw); }
+          else if (kw.includes(token))                             { score += 1; matched.push(kw); }
+          // Short keyword prefix: "mz301" matches keyword "mz", "ap304" matches "ap"
+          else if (kw.length <= 5 && token.startsWith(kw))        { score += 1; matched.push(kw); }
         });
       });
       // Component / service name scoring:
