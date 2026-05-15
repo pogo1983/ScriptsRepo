@@ -3,7 +3,7 @@ const DATA = {
   clusters: [
     { name: "Customer",      color: "#388E3C", textColor: "#fff" },
     { name: "Care Consumer", color: "#1565C0", textColor: "#fff" },
-    { name: "Finance",       color: "#E65100", textColor: "#fff" },
+    { name: "Finance",       color: "#f5f925", textColor: "#1a1a2e" },
   ],
 
   domains: [

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TC Name Builder</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>TC Name Builder</h1>
+    <div class="subtitle">Test Case naming tool · Format: Domain - Entity - Scenario - Action - Result</div>
+  </div>
+  <button class="reset-btn" id="resetBtn">↺ Reset</button>
+</header>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" data-tab="builder">Builder</button>
+  <button class="tab-btn" data-tab="conventions">Conventions</button>
+</nav>
+
+<div id="builderTab" class="tab-panel">
+
+<!-- 1. Domain picker -->
+<div class="card">
+  <div class="section-title">1 · Select Domain</div>
+  <div id="domainGrid"></div>
+</div>
+
+<!-- 2. Build name -->
+<div class="card">
+  <div class="section-title">2 · Build Name</div>
+
+  <div class="form-row">
+    <label for="entitySel">Entity</label>
+    <div class="field-wrap">
+      <select id="entitySel" disabled>
+        <option value="">— select domain first —</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <label for="scenarioInput">Scenario</label>
+    <div class="field-wrap">
+      <input
+        id="scenarioInput"
+        type="text"
+        list="scenarioSuggestions"
+        placeholder="e.g. Direct Debit, Twinfield, AP304…"
+        autocomplete="off"
+      />
+      <datalist id="scenarioSuggestions"></datalist>
+      <div class="field-hint">Sub-system, technology or variant — suggestions appear based on Domain + Entity</div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <label for="actionInput">Action</label>
+    <div class="field-wrap">
+      <input
+        id="actionInput"
+        type="text"
+        list="actionSuggestions"
+        placeholder="e.g. Create, Pay, Reject, Send Documents…"
+        autocomplete="off"
+      />
+      <datalist id="actionSuggestions">
+        <option value="Create" />
+        <option value="Pay" />
+        <option value="Reject" />
+        <option value="Process" />
+        <option value="Validate" />
+        <option value="Send" />
+        <option value="Receive" />
+        <option value="Submit" />
+        <option value="Confirm" />
+        <option value="Cancel" />
+        <option value="Retry" />
+        <option value="Break" />
+        <option value="Link" />
+        <option value="Login" />
+        <option value="Get Status" />
+        <option value="Request" />
+        <option value="Route" />
+        <option value="Match" />
+        <option value="Generate" />
+        <option value="Approve" />
+        <option value="Assign" />
+        <option value="Send Documents" />
+        <option value="Pay Term" />
+        <option value="Create Account" />
+        <option value="Link Claim" />
+      </datalist>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <label for="resultInput">Result <span style="font-weight:400;opacity:.6">(optional)</span></label>
+    <div class="field-wrap">
+      <input
+        id="resultInput"
+        type="text"
+        list="resultSuggestions"
+        placeholder="e.g. Success, Failed, Fail Authorization…"
+        autocomplete="off"
+      />
+      <datalist id="resultSuggestions">
+        <option value="Success" />
+        <option value="Failed" />
+        <option value="After Rejection" />
+        <option value="Fail Authorization" />
+        <option value="Before Batch DD" />
+        <option value="Without Invoice" />
+        <option value="With Invoice" />
+        <option value="Wrong Amount" />
+      </datalist>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Preview -->
+<div class="card">
+  <div class="section-title">3 · Preview</div>
+
+  <div class="preview-section">
+    <div class="preview-label">Natural Language · Azure DevOps</div>
+    <div class="preview-box">
+      <div class="preview-text placeholder" id="previewNL">
+        Select domain, entity, scenario and action above…
+      </div>
+      <span class="char-counter" id="charCounter"></span>
+      <button class="copy-btn" id="copyNL" disabled>Copy</button>
+    </div>
+
+    <div class="preview-label">Technical · Automation / Code</div>
+    <div class="preview-box">
+      <div class="preview-text placeholder" id="previewTech"></div>
+      <button class="copy-btn" id="copyTech" disabled>Copy</button>
+    </div>
+  </div>
+
+  <div style="display:flex; justify-content:flex-end; margin-top:4px;">
+    <button class="copy-btn" id="saveBtn" style="background:#6c5ce7;" disabled>Save to History</button>
+  </div>
+</div>
+
+<!-- 4. History -->
+<div class="card">
+  <div class="section-title">
+    History (last 20)
+    <button id="clearHistory">Clear all</button>
+  </div>
+  <ul class="history-list" id="historyList">
+    <li class="empty-history">No saved names yet.</li>
+  </ul>
+</div>
+
+</div><!-- /builderTab -->
+
+<!-- Conventions tab -->
+<div id="conventionsTab" class="tab-panel hidden">
+<div class="card">
+<div class="conv-page">
+
+<a class="conv-link" href="https://dev.azure.com/infomedics/TIM/_testPlans/define?planId=41364&amp;suiteId=47496" target="_blank">↗ Azure DevOps Test Plans</a>
+
+<h2 class="conv-h2">Format</h2>
+<div class="conv-format-box"><code>[Domain] - [Entity] - [Scenario] - [Action] - [Result]</code></div>
+<pre class="conv-pre">Accounting - Ledger Connector - Twinfield - Send Documents - Fail Authorization
+Accounting - Ledger Connector - Twinfield - Send Documents - Success
+Accounting - Ledger Connector - Twinfield - Send Documents
+Banking - Payment Agreement - Direct Debit - Pay Term - Success
+Reception - Mediation - AP301 - Process File - Success</pre>
+
+<h2 class="conv-h2">Components</h2>
+<table class="conv-table">
+  <thead><tr><th>#</th><th>Component</th><th>Description</th><th>Format</th><th>Examples</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><strong>Domain</strong></td><td>System area or module full name</td><td>Title Case</td><td><code>Banking</code>, <code>Accounting</code>, <code>Claim Orchestration</code></td></tr>
+    <tr><td>2</td><td><strong>Entity</strong></td><td>Main service, module or business object</td><td>Title Case, full names</td><td><code>Payment Agreement</code>, <code>Ledger Connector</code>, <code>Patient Portal</code></td></tr>
+    <tr><td>3</td><td><strong>Scenario</strong></td><td>Specific context, sub-system or variant</td><td>Title Case</td><td><code>Twinfield</code>, <code>Direct Debit</code>, <code>AP304</code>, <code>iDEAL</code></td></tr>
+    <tr><td>4</td><td><strong>Action</strong></td><td>What the test does</td><td>Start with verb, Title Case</td><td><code>Send Documents</code>, <code>Pay Term</code>, <code>Create via Portal</code></td></tr>
+    <tr><td>5</td><td><strong>Result</strong></td><td><em>(Optional)</em> Expected outcome</td><td>Title Case</td><td><code>Success</code>, <code>Fail Authorization</code>, <code>After Rejection</code></td></tr>
+  </tbody>
+</table>
+
+<h3 class="conv-h3">Rules</h3>
+<div class="conv-rules">
+  <div class="conv-do">
+    <div class="conv-rule-label">✔ DO</div>
+    <ul>
+      <li>Use spaces and dashes (<code> - </code>) for readability</li>
+      <li>Start Action with a verb (<code>Create</code>, <code>Pay</code>, <code>Reject</code>…)</li>
+      <li>Keep Scenario specific — name the sub-system, technology or variant (<code>Twinfield</code>, <code>AP304</code>)</li>
+      <li>Include Result when the outcome matters (<code>Success</code>, <code>After Rejection</code>)</li>
+      <li>Keep entity names clear and business-friendly</li>
+      <li>Use Title Case for all components</li>
+      <li>Keep under 100 characters when possible</li>
+    </ul>
+  </div>
+  <div class="conv-dont">
+    <div class="conv-rule-label">✘ DON'T</div>
+    <ul>
+      <li>Use underscores or camelCase</li>
+      <li>Abbreviate entity names (use <code>Payment Agreement</code> not <code>PA</code>)</li>
+      <li>Mix Action and Result into one component</li>
+      <li>Use technical jargon without context</li>
+      <li>Make it overly long or complex</li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="conv-h2">Vocabulary</h2>
+<h3 class="conv-h3">Domains</h3>
+<table class="conv-table">
+  <thead><tr><th>Domain</th><th>Cluster</th><th>Team</th></tr></thead>
+  <tbody>
+    <tr><td>Banking</td><td>Finance</td><td>Yellow 1</td></tr>
+    <tr><td>Payment Matching</td><td>Finance</td><td>Yellow 1</td></tr>
+    <tr><td>Accounting</td><td>Finance</td><td>Yellow 1</td></tr>
+    <tr><td>Frontend Infrastructure</td><td>Finance</td><td>Yellow 2</td></tr>
+    <tr><td>Auditing</td><td>Finance</td><td>Yellow 2</td></tr>
+    <tr><td>Authentication &amp; User Management</td><td>Finance</td><td>Yellow 2</td></tr>
+    <tr><td>Reception</td><td>Customer</td><td>Green 2</td></tr>
+    <tr><td>Claim Orchestration</td><td>Customer</td><td>Green 3</td></tr>
+    <tr><td>Factoring</td><td>Customer</td><td>Green 1</td></tr>
+    <tr><td>Costs and Tariffs</td><td>Customer</td><td>Green 1</td></tr>
+    <tr><td>Customer Configuration</td><td>Customer</td><td>Green 1</td></tr>
+    <tr><td>Vendor API</td><td>Customer</td><td>Green 2</td></tr>
+    <tr><td>Insurers</td><td>Care Consumer</td><td>Blue 1</td></tr>
+    <tr><td>Templating and Messaging</td><td>Care Consumer</td><td>Blue 1</td></tr>
+    <tr><td>Invoicing and Dunning</td><td>Care Consumer</td><td>Blue 2</td></tr>
+    <tr><td>Bailiff</td><td>Care Consumer</td><td>Blue 2</td></tr>
+  </tbody>
+</table>
+
+<h3 class="conv-h3">Entity Terms</h3>
+<p class="conv-pills">Payment Agreement · Acquisition · BA Invoice · Patient · Patient Portal · Credit · Claim · Insurance Receivable · Direct Debit · Installment · Term · Settlement · Mediation · Validation · Risk Assessment · Workflow · Ledger Connector · DPAYWS</p>
+
+<h3 class="conv-h3">Action Verbs</h3>
+<p class="conv-pills"><code>Create</code> · <code>Pay</code> · <code>Reject</code> · <code>Process</code> · <code>Validate</code> · <code>Match</code> · <code>Update</code> · <code>Delete</code> · <code>Search</code> · <code>Filter</code> · <code>Export</code> · <code>Import</code> · <code>Send</code> · <code>Receive</code> · <code>Confirm</code> · <code>Cancel</code> · <code>Retry</code> · <code>Break</code> · <code>Link</code> · <code>Route</code> · <code>Calculate</code> · <code>Generate</code> · <code>Approve</code> · <code>Assign</code></p>
+
+<h3 class="conv-h3">Scenario / Context Terms</h3>
+<p class="conv-pills">Twinfield · AFAS · Exact · Direct Debit · Installment Direct Debit · AP304 Direct Debit · AP301 · Standard Payment · Monthly Subscription · iDEAL · Payment Page · Patient Portal · Account · Claim Routing · SSP Status · Multi BA Login</p>
+
+<h3 class="conv-h3">Result / Outcome Terms</h3>
+<p class="conv-pills">Success · Failed · After Rejection · Fail Authorization · Before Batch DD · Without Invoice · With Invoice · Wrong Amount</p>
+
+<h2 class="conv-h2">Real-World Examples — Banking Domain (24 Test Cases)</h2>
+
+<h3 class="conv-h3">Payment Agreement (4)</h3>
+<ol class="conv-list">
+  <li><code>Banking - Payment Agreement - Direct Debit - Create via Payment Page</code></li>
+  <li><code>Banking - Payment Agreement - Direct Debit - Pay Term - Success</code></li>
+  <li><code>Banking - Payment Agreement - Direct Debit - Reject Term - Failed</code></li>
+  <li><code>Banking - Payment Agreement - Direct Debit - Break Agreement - After Rejection</code></li>
+</ol>
+<h3 class="conv-h3">Acquisition (4)</h3>
+<ol class="conv-list" start="5">
+  <li><code>Banking - Acquisition - AP304 Direct Debit - Create</code></li>
+  <li><code>Banking - Acquisition - AP304 Direct Debit - Pay - Success</code></li>
+  <li><code>Banking - Acquisition - AP304 Direct Debit - Reject - Failed</code></li>
+  <li><code>Banking - Acquisition - AP304 Direct Debit - Retry - After Rejection</code></li>
+</ol>
+<h3 class="conv-h3">BA Invoice (5)</h3>
+<ol class="conv-list" start="9">
+  <li><code>Banking - BA Invoice - Direct Debit - Create - Success</code></li>
+  <li><code>Banking - BA Invoice - Direct Debit - Pay - Success</code></li>
+  <li><code>Banking - BA Invoice - Direct Debit - Reject - Failed</code></li>
+  <li><code>Banking - BA Invoice - Direct Debit - Pay Manually - Before Batch DD</code></li>
+  <li><code>Banking - BA Invoice - Standard Payment - Pay - Before Batch DD</code></li>
+</ol>
+<h3 class="conv-h3">Patient (3)</h3>
+<ol class="conv-list" start="14">
+  <li><code>Banking - Patient - Direct Debit - Create via Patient Portal</code></li>
+  <li><code>Banking - Patient - Direct Debit - Pay - Success</code></li>
+  <li><code>Banking - Patient - Direct Debit - Reject - Failed</code></li>
+</ol>
+<h3 class="conv-h3">Credit (3)</h3>
+<ol class="conv-list" start="17">
+  <li><code>Banking - Credit - Installment Direct Debit - Create</code></li>
+  <li><code>Banking - Credit - Installment Direct Debit - Pay - Success</code></li>
+  <li><code>Banking - Credit - Installment Direct Debit - Reject - Failed</code></li>
+</ol>
+<h3 class="conv-h3">Standard Payments (2)</h3>
+<ol class="conv-list" start="20">
+  <li><code>Banking - Claim - Standard Payment - Pay</code></li>
+  <li><code>Banking - Insurance Receivable - Standard Payment - Pay</code></li>
+</ol>
+<h3 class="conv-h3">Patient Portal (3)</h3>
+<ol class="conv-list" start="22">
+  <li><code>Banking - Patient Portal - Account - Create without Invoice</code></li>
+  <li><code>Banking - Patient Portal - Account - Create with Invoice</code></li>
+  <li><code>Banking - Patient Portal - Claim - Link to Account</code></li>
+</ol>
+
+<h2 class="conv-h2">Discussion Questions for Team</h2>
+<ol class="conv-questions">
+  <li>Are the domain names (<code>Banking</code>, <code>Claim Orchestration</code>, etc.) clear enough? Should any be renamed?</li>
+  <li>Do the entity names make sense from a business perspective? Any suggestions?</li>
+  <li>Are there any action verbs or scenario terms we should add to the vocabulary?</li>
+  <li>Should we enforce a character limit? (e.g., max 100 characters)</li>
+  <li>How should we handle edge cases or complex scenarios that don't fit the format?</li>
+  <li>Who will be responsible for maintaining the naming convention standards?</li>
+  <li>How do we ensure consistency across all domains and test suites?</li>
+</ol>
+
+<h2 class="conv-h2">Next Steps</h2>
+<ul class="conv-checklist">
+  <li>Get team approval</li>
+  <li>Update existing test cases to match convention</li>
+  <li>Create examples for remaining domains</li>
+  <li>Train team members</li>
+  <li>Document in team wiki/Confluence</li>
+</ul>
+
+</div><!-- /conv-page -->
+</div><!-- /card -->
+</div><!-- /conventionsTab -->
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab + 'Tab').classList.remove('hidden');
+    });
+  });
+</script>
+</body>
+</html>
