@@ -5,6 +5,24 @@ https://dev.azure.com/infomedics/TIM/_testPlans/define?planId=41364&suiteId=4749
 ================================================================================
 
 
+TC NAMING TOOL
+================================================================================
+
+File: TCNamingTool/index.html -- open locally in any browser, no server needed
+
+Features:
+  Smart Lookup   -- type any keyword, abbreviation or concept (e.g. lgc twinfield,
+                    cha settlement create, clr vr) to find the right domain and
+                    get a proposed TC name. Click "Use" to fill the form.
+  Builder        -- step-by-step: pick domain, select entity, fill scenario /
+                    action / result, preview and copy
+  History        -- saves last 20 names locally; "Copy as docs" exports as
+                    numbered list ready to paste into this document
+  Conventions    -- full reference guide built into the tool as a tab
+
+Known abbreviations: bnm lgc cha dd clr irb ind rnn med val acq arp iip iam pa vr ir
+
+
 FORMAT
 ================================================================================
 
@@ -80,20 +98,53 @@ DOMAINS
   Invoicing and Dunning               Care Consumer    Blue 2
   Bailiff                             Care Consumer    Blue 2
 
-ENTITY TERMS
-  Payment Agreement, Acquisition, BA Invoice, Patient, Patient Portal, Credit,
-  Claim, Insurance Receivable, Direct Debit, Installment, Term, Settlement,
-  Mediation, Validation, Risk Assessment, Workflow, Ledger Connector, DPAYWS
+ENTITY TERMS (per domain)
+
+  Banking                      Payment Agreement, Acquisition, BA Invoice, Patient,
+                               Patient Portal, Credit, Claim, Insurance Receivable, DPAYWS
+
+  Payment Matching             Matchable Item, Payment File, CAMT, POF
+
+  Accounting                   Ledger Connector, Settlement, Booking, GL Document
+
+  Factoring                    ARP, Risk Assessment, CHA, BA Account
+
+  Claim Orchestration          Workflow, Claim, Claim Status
+
+  Reception                    Mediation, Validation, Enrichers, Claim File, IMD Input
+
+  Insurers                     Clearing, Insurance Request, Insurance Answer,
+                               IR Broker, Insurance Receivable
+
+  Invoicing and Dunning        Invoice, Dunning, Payment Page, Patient Portal
+
+  Templating and Messaging     Template, Notification, BA Report, Debtor Report
+
+  Costs and Tariffs            Tariff, Pricing Plan, Rating
+
+  Customer Configuration       Contract, Product, Business Account, Insurer Config
+
+  Vendor API                   Claim Receipt, Retrocession
+
+  Auth & User Management       IAM, IIP, User Account, Identity
+
+  Auditing                     Audit Log, UI Audit, Message Audit
+
+  Bailiff                      Bailiff Action, Debt Collection
 
 ACTION VERBS
   Create, Pay, Reject, Process, Validate, Match, Update, Delete, Search, Filter,
   Export, Import, Send, Receive, Confirm, Cancel, Retry, Break, Link, Route,
-  Calculate, Generate, Approve, Assign
+  Calculate, Generate, Approve, Assign, Login, Submit, Request
+
+  Multi-word: Send Documents, Pay Term, Create Account, Create via Portal,
+  Create via Payment Page, Pay Manually, Break Agreement, Link to Account, Get Status
 
 SCENARIO / CONTEXT TERMS
   Twinfield, AFAS, Exact, Direct Debit, Installment Direct Debit,
   AP304 Direct Debit, AP301, Standard Payment, Monthly Subscription, iDEAL,
-  Payment Page, Patient Portal, Account, Claim Routing, SSP Status, Multi BA Login
+  Payment Page, Patient Portal, Account, Claim Routing, SSP Status, Multi BA Login,
+  VR Request, IR Request, VA Answer, IA Answer, Batch DD, Single Payment, Reject DD
 
 RESULT / OUTCOME TERMS
   Success, Failed, After Rejection, Fail Authorization, Before Batch DD,

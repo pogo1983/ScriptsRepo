@@ -19,6 +19,21 @@ Reception - Mediation - AP301 - Process File - Success
 
 ---
 
+## TC Naming Tool
+
+> File: `TCNamingTool/index.html` — open locally in any browser, no server needed
+
+Interactive helper with three features:
+
+- **Smart Lookup** — type any keyword, abbreviation or concept (e.g. `lgc twinfield`, `cha settlement create`, `clr vr`) → instantly finds the right domain and proposes a complete TC name. Click **Use ↗** to fill the form automatically.
+- **Builder** — step-by-step: pick domain chip → select entity → fill scenario / action / result → preview and copy
+- **History** — saves last 20 names in browser localStorage; **Copy as docs** exports them as a numbered Markdown list
+- **Conventions tab** — full reference guide built into the tool
+
+Known abbreviations understood by Smart Lookup: `bnm` `lgc` `cha` `dd` `clr` `irb` `ind` `rnn` `med` `val` `acq` `arp` `iip` `iam` `pa` `vr` `ir`
+
+---
+
 ## Components
 
 | # | Component | Description | Format | Examples |
@@ -74,11 +89,29 @@ Reception - Mediation - AP301 - Process File - Success
 
 ### Entity Terms
 
-Payment Agreement · Acquisition · BA Invoice · Patient · Patient Portal · Credit · Claim · Insurance Receivable · Direct Debit · Installment · Term · Settlement · Mediation · Validation · Risk Assessment · Workflow · Ledger Connector · DPAYWS
+| Domain | Entities |
+|--------|----------|
+| Banking | Payment Agreement · Acquisition · BA Invoice · Patient · Patient Portal · Credit · Claim · Insurance Receivable · DPAYWS |
+| Payment Matching | Matchable Item · Payment File · CAMT · POF |
+| Accounting | Ledger Connector · Settlement · Booking · GL Document |
+| Factoring | ARP · Risk Assessment · CHA · BA Account |
+| Claim Orchestration | Workflow · Claim · Claim Status |
+| Reception | Mediation · Validation · Enrichers · Claim File · IMD Input |
+| Insurers | Clearing · Insurance Request · Insurance Answer · IR Broker · Insurance Receivable |
+| Invoicing and Dunning | Invoice · Dunning · Payment Page · Patient Portal |
+| Templating and Messaging | Template · Notification · BA Report · Debtor Report |
+| Costs and Tariffs | Tariff · Pricing Plan · Rating |
+| Customer Configuration | Contract · Product · Business Account · Insurer Config |
+| Vendor API | Claim Receipt · Retrocession |
+| Authentication & User Management | IAM · IIP · User Account · Identity |
+| Auditing | Audit Log · UI Audit · Message Audit |
+| Bailiff | Bailiff Action · Debt Collection |
 
 ### Action Verbs
 
-`Create` · `Pay` · `Reject` · `Process` · `Validate` · `Match` · `Update` · `Delete` · `Search` · `Filter` · `Export` · `Import` · `Send` · `Receive` · `Confirm` · `Cancel` · `Retry` · `Break` · `Link` · `Route` · `Calculate` · `Generate` · `Approve` · `Assign`
+`Create` · `Pay` · `Reject` · `Process` · `Validate` · `Match` · `Update` · `Delete` · `Search` · `Filter` · `Export` · `Import` · `Send` · `Receive` · `Confirm` · `Cancel` · `Retry` · `Break` · `Link` · `Route` · `Calculate` · `Generate` · `Approve` · `Assign` · `Login` · `Submit` · `Request`
+
+*Multi-word:* `Send Documents` · `Pay Term` · `Create Account` · `Create via Portal` · `Create via Payment Page` · `Pay Manually` · `Break Agreement` · `Link to Account` · `Get Status`
 
 ### Scenario / Context Terms
 

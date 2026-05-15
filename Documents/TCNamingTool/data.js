@@ -178,7 +178,7 @@ const DATA = {
         "direct debit", "dd", "dpayws", "ideal", "idéal", "credit",
         "ba invoice", "patient", "patient portal", "insurance receivable",
         "order out-payment", "mutation", "bank account", "statement",
-        "payment provider", "pp", "ami", "installment"
+        "ami", "installment"
       ],
       note: "Banking & Matching (BnM) — DD, iDEAL, BA Invoice, Credit, Patient Portal"
     },
@@ -295,7 +295,8 @@ const DATA = {
         "customer configuration", "catalog", "configuration", "cat",
         "contract", "ba contract", "product", "platform", "catcfg",
         "customer config", "insurer config", "authorization",
-        "controldata", "clearingdata", "business account",
+        "controldata", "controldataprovider", "control data provider",
+        "provider", "clearingdata", "business account",
         "product catalog"
       ],
       note: "Customer Configuration (Catalog) — Products, Tariffs, BA Contracts"
@@ -340,5 +341,37 @@ const DATA = {
       ],
       note: "Authentication & User Management (IIP/IAM) — Identity, SSO, User accounts"
     },
+  ],
+
+  // ── Component / service index (from IMF Mapping.xlsx / TIM\ project names) ─
+  // Used for searching by project or service name (e.g. "Ledger Connector", "IRBroker")
+  // Scoring: each word from the component name that appears in the query = +2 pts
+  //          Requires ≥2 matching words for multi-word names, ≥1 for single-word
+  components: [
+    { name: "Core Catalog",               domain: "Customer Configuration" },
+    { name: "Core WebApi",                domain: "Frontend Infrastructure" },
+    { name: "ARP",                        domain: "Factoring" },
+    { name: "Acquisition Mediation",      domain: "Reception" },
+    { name: "Acquisition Validation",     domain: "Reception" },
+    { name: "Acquisition Enrichers",      domain: "Reception" },
+    { name: "Banking And Matching",       domain: "Banking" },
+    { name: "Clearing",                   domain: "Insurers" },
+    { name: "IRBroker",                   domain: "Insurers" },
+    { name: "Invoicing And Dunning",      domain: "Invoicing and Dunning" },
+    { name: "Rendering And Notification", domain: "Templating and Messaging" },
+    { name: "Claim WebApi",               domain: "Frontend Infrastructure" },
+    { name: "Invoice WebAPI",             domain: "Invoicing and Dunning" },
+    { name: "VendorAPI",                  domain: "Vendor API" },
+    { name: "Ledger Connector",           domain: "Accounting" },
+    { name: "Payment Provider",           domain: "Banking" },
+    { name: "Credit UI",                  domain: "Banking" },
+    { name: "IIP",                        domain: "Authentication & User Management" },
+    { name: "IIP IAM",                    domain: "Authentication & User Management" },
+    { name: "Agent UI",                   domain: "Frontend Infrastructure" },
+    { name: "Patient Portal",             domain: "Invoicing and Dunning" },
+    { name: "UI Audit",                   domain: "Auditing" },
+    { name: "Audit Facade API",           domain: "Auditing" },
+    { name: "Notification Facade API",    domain: "Templating and Messaging" },
+    { name: "WebApi DPayWS",              domain: "Banking" },
   ],
 };

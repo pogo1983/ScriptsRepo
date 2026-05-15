@@ -390,9 +390,22 @@
           else if (kw.includes(token))  { score += 1; matched.push(kw); }
         });
       });
+      // Component / service name scoring:
+      // Each word from a component that appears in the query scores +2.
+      // Multi-word components require ≥2 matching words; single-word require ≥1.
+      (DATA.components || []).forEach(comp => {
+        if (comp.domain !== entry.domain) return;
+        const words = comp.name.toLowerCase().split(/[\s.\\/()\[\]]+/).filter(w => w.length > 1);
+        const hits  = words.filter(w => tokens.some(t => t === w || (t.length >= 3 && w.startsWith(t))));
+        const need  = words.length === 1 ? 1 : 2;
+        if (hits.length >= need) {
+          score += hits.length * 2;
+          matched.push(comp.name);
+        }
+      });
       return { ...entry, score, matched: [...new Set(matched)].slice(0, 4) };
     })
-      .filter(e => e.score > 0)
+      .filter(e => e.score >= 2)
       .sort((a, b) => b.score - a.score)
       .slice(0, 4);
 
