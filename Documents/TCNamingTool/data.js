@@ -336,6 +336,7 @@ const DATA = {
         "define service template", "define price template",
         "catalog api", "contract settings", "contract relationships",
         "modify contract", "new contract", "business account settings",
+        "third party connector", "thirdpartyconnector", "third party", "external connector",
         "i153825", "i153826", "i153827"
       ],
       note: "Customer Configuration (Catalog) — Products, Tariffs, BA Contracts"
@@ -417,5 +418,7 @@ const DATA = {
     { name: "Audit Facade API",           domain: "Auditing" },
     { name: "Notification Facade API",    domain: "Templating and Messaging" },
     { name: "WebApi DPayWS",              domain: "Banking" },
+    { name: "Third Party Connector",      domain: "Customer Configuration" },
+    { name: "ThirdPartyConnector",        domain: "Customer Configuration" },
   ],
 };
