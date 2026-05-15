@@ -232,8 +232,7 @@
   }
 
   saveBtn.addEventListener("click", () => {
-    const nl   = previewNL.textContent;
-    const tech = previewTech.textContent;
+    const nl = previewNL.textContent;
     if (!nl || previewNL.classList.contains("placeholder")) return;
     addToHistory(nl, "");
 
